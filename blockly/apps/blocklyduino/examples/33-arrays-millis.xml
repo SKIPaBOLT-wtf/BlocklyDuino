@@ -1,0 +1,176 @@
+<xml>
+  <block type="arduino_array_declare" x="30" y="30">
+    <field name="TYPE">uint8_t</field>
+    <field name="VAR">duomenys</field>
+    <field name="SIZE">4</field>
+  </block>
+  <block type="arduino_typed_variable" x="400" y="30">
+    <field name="TYPE">unsigned long</field>
+    <field name="VAR">paskutinis</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_typed_variable" x="400" y="155">
+    <field name="TYPE">int</field>
+    <field name="VAR">indeksas</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_setup_section" x="30" y="180">
+    <statement name="DO">
+      <block type="arduino_array_set">
+        <field name="VAR">duomenys</field>
+        <value name="INDEX">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <next>
+          <block type="arduino_array_set">
+            <field name="VAR">duomenys</field>
+            <value name="INDEX">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">20</field>
+              </block>
+            </value>
+            <next>
+              <block type="arduino_array_set">
+                <field name="VAR">duomenys</field>
+                <value name="INDEX">
+                  <block type="math_number">
+                    <field name="NUM">2</field>
+                  </block>
+                </value>
+                <value name="VALUE">
+                  <block type="math_number">
+                    <field name="NUM">30</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="arduino_array_set">
+                    <field name="VAR">duomenys</field>
+                    <value name="INDEX">
+                      <block type="math_number">
+                        <field name="NUM">3</field>
+                      </block>
+                    </value>
+                    <value name="VALUE">
+                      <block type="math_number">
+                        <field name="NUM">40</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="serial_print">
+                        <value name="CONTENT">
+                          <block type="text">
+                            <field name="TEXT">Arrays and millis</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="30" y="580">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GTE</field>
+            <value name="A">
+              <block type="math_arithmetic">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <block type="arduino_millis" />
+                </value>
+                <value name="B">
+                  <block type="variables_get">
+                    <field name="VAR">paskutinis</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1000</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="variables_set">
+            <field name="VAR">paskutinis</field>
+            <value name="VALUE">
+              <block type="arduino_millis" />
+            </value>
+            <next>
+              <block type="serial_print">
+                <value name="CONTENT">
+                  <block type="arduino_array_get">
+                    <field name="VAR">duomenys</field>
+                    <value name="INDEX">
+                      <block type="variables_get">
+                        <field name="VAR">indeksas</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="variables_set">
+                    <field name="VAR">indeksas</field>
+                    <value name="VALUE">
+                      <block type="math_modulo">
+                        <value name="DIVIDEND">
+                          <block type="math_arithmetic">
+                            <field name="OP">ADD</field>
+                            <value name="A">
+                              <block type="variables_get">
+                                <field name="VAR">indeksas</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <block type="math_number">
+                                <field name="NUM">1</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <value name="DIVISOR">
+                          <block type="arduino_array_length">
+                            <field name="VAR">duomenys</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

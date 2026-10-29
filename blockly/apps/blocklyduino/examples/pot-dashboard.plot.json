@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "pot-dashboard",
+  "title": "Potentiometer dashboard",
+  "history": 500,
+  "fields": [
+    {
+      "id": "adc",
+      "label": "ADC",
+      "type": "number",
+      "min": 0,
+      "max": 1023
+    },
+    {
+      "id": "volts",
+      "label": "Voltage",
+      "unit": "V",
+      "type": "number",
+      "min": 0,
+      "max": 5,
+      "scale": 0.004887585532746823
+    }
+  ],
+  "widgets": [
+    {
+      "type": "gauge",
+      "field": "volts"
+    },
+    {
+      "type": "bar",
+      "field": "adc"
+    },
+    {
+      "type": "line",
+      "fields": [
+        "adc"
+      ]
+    },
+    {
+      "type": "xy",
+      "x": "adc",
+      "y": "volts"
+    },
+    {
+      "type": "raw",
+      "fields": [
+        "adc",
+        "volts"
+      ]
+    }
+  ]
+}

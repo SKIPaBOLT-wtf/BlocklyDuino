@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Play a melody from SD</title><style>body{font:16px/1.6 system-ui;max-width:850px;margin:35px auto;padding:0 20px;color:#253141}h1,h2{line-height:1.25}code,pre{background:#edf2f6;padding:.2em .4em}pre{padding:1em}a{color:#176a52}</style><h1>Play a known melody file</h1>
+<p>Define one SD card and one passive buzzer in <b>Devices</b>. The example uses SD CS D10 and buzzer D4. Copy <a href="MELODY.TXT" download>MELODY.TXT</a> to the root of a FAT16/FAT32 card, then open <a href="../index.html?url=examples/39-sd-melody.xml">the SD melody example</a>.</p>
+<p>In setup, <b>play score</b> opens that known file. In loop, <b>service score</b> keeps playback moving. It reads at most 32 input characters on each call and holds only one small note token and the current duration. The complete melody is never loaded into RAM.</p>
+<h2>File format</h2><pre># Note and duration in milliseconds
+C4 250
+D#4 250
+R 100
+Bb3 500</pre>
+<p>Notes use A–G, an optional # or b, and an octave digit. C4 is middle C. R is a rest. Duration is 1–60000 ms. Use pitches within 20–4000 Hz; unsupported pitches are errors rather than silently changed notes. A # at the beginning of a record starts a comment. Spaces, tabs, commas and line endings separate fields.</p>
+<p><b>score playing</b> stays true through the final note/rest. <b>score OK</b> becomes false for a missing file, malformed record or read failure. <b>stop score</b> stops the buzzer and closes the file.</p>
+<h2>Cooperation with other blocks</h2><p>The score player shares the existing card and its 512-byte cache. It owns the one open file until completion: do not open another file, draw BMPs or append logs on that card while the score is active. It does not prebuffer notes. An SD delay may postpone the next note, while the current note expires through the sound timer.</p>
+<p>The melody file example is one voice. For three simultaneous voices, use the Flash-stored score example from <a href="music-guide.html">the music guide</a>. The same Timer2 restrictions apply. Reading SD is cooperative, not a hard real-time guarantee.</p>
+<p id="build">Compiled for Pro Mini ATmega168:12,256 bytes Flash (85%),758 bytes static RAM,266 bytes left for stack and temporary data. The parser passed host tests for malformed files, duration/pitch limits, bounded reads and cleanup. Actual card/buzzer operation has not been tested.</p>
+</html>

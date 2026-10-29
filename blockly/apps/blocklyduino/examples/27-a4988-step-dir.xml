@@ -1,0 +1,44 @@
+<xml>
+  <block type="stepper_step_dir" x="30" y="30">
+    <field name="STEP">3</field>
+    <field name="DIR">4</field>
+    <field name="DIRECTION">HIGH</field>
+    <field name="DELAY">1000</field>
+    <value name="STEPS">
+      <block type="math_number">
+        <field name="NUM">200</field>
+      </block>
+    </value>
+    <next>
+      <block type="base_delay">
+        <value name="DELAY_TIME">
+          <block type="math_number">
+            <field name="NUM">500</field>
+          </block>
+        </value>
+        <next>
+          <block type="stepper_step_dir">
+            <field name="STEP">3</field>
+            <field name="DIR">4</field>
+            <field name="DIRECTION">LOW</field>
+            <field name="DELAY">1000</field>
+            <value name="STEPS">
+              <block type="math_number">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">500</field>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

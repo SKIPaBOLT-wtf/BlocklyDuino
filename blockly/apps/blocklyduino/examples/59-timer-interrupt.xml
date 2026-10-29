@@ -1,0 +1,178 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_typed_variable" x="25" y="100">
+    <field name="VAR">tickCount</field>
+    <field name="TYPE">uint32_t</field>
+    <field name="QUALIFIER">volatile</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="irq_timer1" x="430" y="25">
+    <value name="PERIOD_US">
+      <block type="math_number">
+        <field name="NUM">100000</field>
+      </block>
+    </value>
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">tickCount</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="variables_get">
+                <field name="VAR">tickCount</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_setup_section" x="25" y="230">
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">Timer1: 10 Hz. Send p to pause, r to restart.</field>
+        <field name="END">println</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="430" y="250">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="serial_available"></block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="arduino_typed_variable">
+            <field name="VAR">command</field>
+            <field name="TYPE">int</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="serial_read"></block>
+            </value>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="logic_compare">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="variables_get">
+                        <field name="VAR">command</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number">
+                        <field name="NUM">112</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="irq_timer1_control">
+                    <field name="ACTION">PAUSE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">command</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">114</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="irq_timer1_control">
+                        <field name="ACTION">RESTART</field>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <next>
+          <block type="arduino_typed_variable">
+            <field name="VAR">snapshot</field>
+            <field name="TYPE">uint32_t</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="avr_atomic">
+                <statement name="DO">
+                  <block type="variables_set">
+                    <field name="VAR">snapshot</field>
+                    <value name="VALUE">
+                      <block type="variables_get">
+                        <field name="VAR">tickCount</field>
+                      </block>
+                    </value>
+                  </block>
+                </statement>
+                <next>
+                  <block type="serial_text">
+                    <field name="TEXT">ticks:</field>
+                    <field name="END">print</field>
+                    <next>
+                      <block type="serial_send">
+                        <field name="END">println</field>
+                        <value name="VALUE">
+                          <block type="variables_get">
+                            <field name="VAR">snapshot</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="base_delay">
+                            <value name="DELAY_TIME">
+                              <block type="math_number">
+                                <field name="NUM">250</field>
+                              </block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

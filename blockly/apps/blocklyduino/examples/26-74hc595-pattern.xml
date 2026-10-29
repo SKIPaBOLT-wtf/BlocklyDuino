@@ -1,0 +1,42 @@
+<xml>
+  <block type="shift595_write" x="30" y="30">
+    <field name="DATA">8</field>
+    <field name="CLK">9</field>
+    <field name="LATCH">10</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">170</field>
+      </block>
+    </value>
+    <next>
+      <block type="base_delay">
+        <value name="DELAY_TIME">
+          <block type="math_number">
+            <field name="NUM">500</field>
+          </block>
+        </value>
+        <next>
+          <block type="shift595_write">
+            <field name="DATA">8</field>
+            <field name="CLK">9</field>
+            <field name="LATCH">10</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">85</field>
+              </block>
+            </value>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">500</field>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

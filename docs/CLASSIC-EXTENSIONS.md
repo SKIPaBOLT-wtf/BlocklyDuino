@@ -1,0 +1,77 @@
+# Classic editor extension: changes and integration map
+
+This is a contribution proposal for the classic `v1-gh-pages` application,
+based on upstream commit `67c85046d39cbde2c59d26c921a29a3b964e8c54`.
+It does not replace Blockly's bundled engine or modify the separate v2 application.
+The additions are Apache-2.0; original notices and the separate v2 license remain.
+
+## User-visible additions
+
+| Area | Added behavior | Main files under `blockly/apps/blocklyduino` |
+| --- | --- | --- |
+| Program structure | setup/loop, lexical typed variables, dynamic multidimensional indices, typed functions, math | `program_blocks.js`, `math_blocks.js`, `ux_blocks.js` |
+| Devices | declare wiring once, stable device IDs, illustrated picker, device-specific actions and wiring inspector | `device_blocks.js`, `device_catalog.js`, `project_devices.js`, `workspace_inspector.js` |
+| Modules | AccelStepper acceleration, servos, LCD/OLED/TFT, common sensors, NeoPixel, IR, shift registers | `extra_blocks.js`, `popular_blocks.js`, `device_blocks.js` |
+| Memory | 24LC256, 25LC256, W25Q32; bounded typed/string access; SdFat files and directory listing | `storage_blocks.js`, `arduino/libraries/BlocklyStorage` |
+| Images | streamed/coordinate grayscale BMP, RGB BMP, high-precision PGM/PPM | `image_blocks.js`, `BlocklyStorage/src/BlocklyImage.h` |
+| Music | nonblocking tones, flash melodies, three Timer2 voices, SD text scores | `music_blocks.js`, `sd_music_blocks.js`, `BlocklyMusic`, `BlocklySDMusic` |
+| Low-level | unsigned bit operations, logic, masked AVR port/register access, custom SPI/I2C transactions | `bit_blocks.js`, `logic_blocks.js`, `avr_blocks.js`, `bus_blocks.js` |
+| Interrupts | named external/pin-change handlers, attach/detach, atomic access, configurable Timer1 | `interrupt_blocks.js`, `timer_interrupt_blocks.js` |
+| Workspace | stack selection, new/recover project, pointer-anchored 1–300% zoom, labelled areas | `editor_actions.js`, `workspace_zoom.js`, `workspace_regions.js`, `blockly_helper.js` |
+| Serial | shared bidirectional connection, independent Monitor/Plotter, saved layouts and capture | `serial_client.js`, `serial_monitor.js`, `serial_plotter.js`, `serial_protocol.js` |
+| Build target | actual installed board menus, port selection, applied target persistence, compact panels | `target_picker.js`, `panel_state.js`, `server/` |
+
+The static toolbox has 176 block types, supplemented by 20 device configurations
+and 102 bound action entries. Sixty-nine numbered XML examples cover beginner
+circuits through interrupt control, music, files and streaming images. English
+guides explain wiring, constraints and extension templates. Legacy block types
+remain loadable where newer named-device actions replace them in the visible UI.
+
+## Architecture and extension points
+
+New JavaScript files register blocks and Arduino generators against the existing
+Blockly API. `index.html` loads them after the bundled generators. Named devices
+serialize stable IDs, so renaming a device preserves its action references.
+Workspace regions are separate XML metadata and do not change generated C++.
+Most implementation lives in separate modules; only the entry page and persistence
+helper substantially modify existing classic application files.
+
+`server/blocklyduino-server.py` serves static files, compiles/uploads via Arduino
+CLI, and exposes local target and serial endpoints. `blocklyduino_serial.py` owns
+one bounded event ring and one serial connection; reads do not consume another
+view's data. Upload uses a lease to close/reopen the connection. Port selection,
+baud and target settings are stored privately outside the repository. There is
+no telemetry or bundled personal configuration.
+
+`user_blocks.js` is a small custom-extension template. The in-app extension guide
+explains block shape, inputs, code generation, definitions and setup sections.
+The old Blockly API must be respected; modern Blockly snippets need adaptation.
+
+## Compatibility and limits
+
+- AVR registers, pin-change mappings, Timer1 and the three-voice Timer2 engine
+  target ATmega168/328(P). Selecting another board cannot translate these blocks.
+- Known timer/pin conflicts are diagnosed, but arbitrary manual C++ and hidden
+  third-party library resource conflicts cannot be proven safe by the generator.
+- ISR handlers must be short. Shared multibyte data needs atomic access; direct
+  delay/Serial/Wire calls in generated named handlers are rejected.
+- BMP grayscale supports 2–256 levels; RGB24 supports 2–256 per channel. PGM/PPM
+  preserve 2–65536 levels with high-byte-first 16-bit samples where required.
+  SD images stream through the filesystem cache, not a full RAM framebuffer.
+- FAT16/FAT32, one open SD file, short filenames. Coordinate images initialize
+  the file first. Sequential scan output is substantially cheaper than random
+  writes. The image writer and SD melody player cannot share an active file.
+- ATmega168 has very little RAM/Flash. Individual examples fitting does not mean
+  arbitrary combinations fit; compile reports static RAM only, not stack/heap.
+- 93Cxx Microwire and AT45 devices are not implemented. The generic SPI/I2C blocks
+  provide a starting point for additional drivers.
+- This is a single-file sketch/block editor. It does not round-trip arbitrary C++
+  or provide multi-file project editing. The new backend is verified on Linux.
+
+## Suggested upstream review sequence
+
+The complete runnable branch is offered for evaluation. If smaller changes suit
+upstream better, the boundaries above permit separate reviews of workspace UX,
+named devices/types, serial/backend, and hardware/storage/music modules. A future
+port to v2 requires an explicit migration of the Blockly APIs and XML formats.
+Feedback and alternative integration plans are welcome in the pull request.

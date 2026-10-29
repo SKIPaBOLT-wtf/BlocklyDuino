@@ -1,0 +1,168 @@
+<xml>
+  <block type="ll_i2c_device" x="25" y="25">
+    <mutation uid="raw_sensor" />
+    <field name="NAME">sensor</field>
+    <field name="ADDR">0x68</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="100">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="ll_i2c_config">
+            <value name="HZ">
+              <block type="math_number">
+                <field name="NUM">100000</field>
+              </block>
+            </value>
+            <value name="TIMEOUT">
+              <block type="math_number">
+                <field name="NUM">25000</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="serial_print">
+            <value name="CONTENT">
+              <block type="text">
+                <field name="TEXT">I2C ready: WHO_AM_I register read</field>
+              </block>
+            </value>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="600" y="25">
+    <statement name="DO">
+      <block type="ll_i2c_start">
+        <field name="DEVICE">raw_sensor</field>
+        <next>
+          <block type="ll_i2c_write">
+            <field name="DEVICE">raw_sensor</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">117</field>
+              </block>
+            </value>
+            <next>
+              <block type="arduino_typed_variable">
+                <field name="TYPE">uint8_t</field>
+                <field name="VAR">status</field>
+                <value name="VALUE">
+                  <block type="ll_i2c_end">
+                    <field name="DEVICE">raw_sensor</field>
+                    <value name="STOP">
+                      <block type="logic_boolean">
+                        <field name="BOOL">FALSE</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">status</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="arduino_typed_variable">
+                        <field name="TYPE">uint8_t</field>
+                        <field name="VAR">received</field>
+                        <value name="VALUE">
+                          <block type="ll_i2c_request">
+                            <field name="DEVICE">raw_sensor</field>
+                            <value name="COUNT">
+                              <block type="math_number">
+                                <field name="NUM">1</field>
+                              </block>
+                            </value>
+                            <value name="STOP">
+                              <block type="logic_boolean">
+                                <field name="BOOL">TRUE</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="controls_if">
+                            <value name="IF0">
+                              <block type="logic_compare">
+                                <field name="OP">EQ</field>
+                                <value name="A">
+                                  <block type="variables_get">
+                                    <field name="VAR">received</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number">
+                                    <field name="NUM">1</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                            <statement name="DO0">
+                              <block type="ll_serial_number">
+                                <field name="BASE">HEX</field>
+                                <field name="END">println</field>
+                                <value name="VALUE">
+                                  <block type="ll_i2c_read">
+                                    <field name="DEVICE">raw_sensor</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </statement>
+                          </block>
+                        </next>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="serial_print">
+                        <value name="CONTENT">
+                          <block type="text">
+                            <field name="TEXT">I2C status (0=OK):</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="ll_serial_number">
+                            <field name="BASE">DEC</field>
+                            <field name="END">println</field>
+                            <value name="VALUE">
+                              <block type="variables_get">
+                                <field name="VAR">status</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="base_delay">
+                                <value name="DELAY_TIME">
+                                  <block type="math_number">
+                                    <field name="NUM">1000</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

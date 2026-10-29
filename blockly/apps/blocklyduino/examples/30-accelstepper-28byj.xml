@@ -1,0 +1,79 @@
+<xml>
+  <block type="arduino_setup_section" x="30" y="30">
+    <statement name="DO">
+      <block type="accel_4wire_init">
+        <field name="MOTOR">1</field>
+        <field name="IN1">8</field>
+        <field name="IN2">9</field>
+        <field name="IN3">10</field>
+        <field name="IN4">11</field>
+        <value name="SPEED">
+          <block type="math_number">
+            <field name="NUM">500</field>
+          </block>
+        </value>
+        <value name="ACCEL">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+        <next>
+          <block type="accel_move_to">
+            <field name="MOTOR">1</field>
+            <value name="TARGET">
+              <block type="math_number">
+                <field name="NUM">2048</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="30" y="280">
+    <statement name="DO">
+      <block type="accel_run">
+        <field name="MOTOR">1</field>
+        <next>
+          <block type="controls_if">
+            <value name="IF0">
+              <block type="logic_compare">
+                <field name="OP">EQ</field>
+                <value name="A">
+                  <block type="accel_distance_to_go">
+                    <field name="MOTOR">1</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="accel_move_to">
+                <field name="MOTOR">1</field>
+                <value name="TARGET">
+                  <block type="math_arithmetic">
+                    <field name="OP">MINUS</field>
+                    <value name="A">
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="accel_current_position">
+                        <field name="MOTOR">1</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

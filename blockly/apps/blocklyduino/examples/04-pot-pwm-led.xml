@@ -1,0 +1,28 @@
+<xml>
+  <block type="inout_analog_write" x="30" y="30">
+    <field name="PIN">9</field>
+    <value name="NUM">
+      <block type="base_map">
+        <value name="NUM">
+          <block type="inout_analog_read">
+            <field name="PIN">A0</field>
+          </block>
+        </value>
+        <value name="DMAX">
+          <block type="math_number">
+            <field name="NUM">255</field>
+          </block>
+        </value>
+      </block>
+    </value>
+    <next>
+      <block type="base_delay">
+        <value name="DELAY_TIME">
+          <block type="math_number">
+            <field name="NUM">30</field>
+          </block>
+        </value>
+      </block>
+    </next>
+  </block>
+</xml>

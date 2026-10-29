@@ -1,0 +1,60 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_setup_section" x="375" y="25">
+    <statement name="DO">
+      <block type="serial_plot_header">
+        <field name="CONFIG">{"version":1,"id":"pot-dashboard","title":"Potentiometer dashboard","history":500,"fields":[{"id":"adc","label":"ADC","type":"number","min":0,"max":1023},{"id":"volts","label":"Voltage","unit":"V","type":"number","min":0,"max":5,"scale":0.004887585532746823}],"widgets":[{"type":"gauge","field":"volts"},{"type":"bar","field":"adc"},{"type":"line","fields":["adc"]},{"type":"xy","x":"adc","y":"volts"},{"type":"raw","fields":["adc","volts"]}]}</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="25" y="155">
+    <statement name="DO">
+      <block type="arduino_typed_variable">
+        <field name="VAR">sample</field>
+        <field name="TYPE">uint16_t</field>
+        <value name="VALUE">
+          <block type="inout_analog_read">
+            <field name="PIN">A0</field>
+          </block>
+        </value>
+        <next>
+          <block type="serial_send">
+            <field name="END">print</field>
+            <value name="VALUE">
+              <block type="variables_get">
+                <field name="VAR">sample</field>
+              </block>
+            </value>
+            <next>
+              <block type="serial_text">
+                <field name="TEXT">,</field>
+                <field name="END">print</field>
+                <next>
+                  <block type="serial_send">
+                    <field name="END">println</field>
+                    <value name="VALUE">
+                      <block type="variables_get">
+                        <field name="VAR">sample</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">50</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

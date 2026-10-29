@@ -1,0 +1,180 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_typed_variable" x="25" y="95">
+    <field name="VAR">leftCount</field>
+    <field name="TYPE">uint16_t</field>
+    <field name="QUALIFIER">volatile</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_typed_variable" x="25" y="165">
+    <field name="VAR">rightCount</field>
+    <field name="TYPE">uint16_t</field>
+    <field name="QUALIFIER">volatile</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="irq_pin_change" x="430" y="25">
+    <mutation uid="irq-left-input"></mutation>
+    <field name="NAME">leftInput</field>
+    <field name="PIN">4</field>
+    <field name="EDGE">FALLING</field>
+    <field name="INPUT">INPUT_PULLUP</field>
+    <field name="START">ENABLED</field>
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">leftCount</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="variables_get">
+                <field name="VAR">leftCount</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="irq_pin_change" x="430" y="185">
+    <mutation uid="irq-right-input"></mutation>
+    <field name="NAME">rightInput</field>
+    <field name="PIN">5</field>
+    <field name="EDGE">FALLING</field>
+    <field name="INPUT">INPUT_PULLUP</field>
+    <field name="START">ENABLED</field>
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">rightCount</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="variables_get">
+                <field name="VAR">rightCount</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_setup_section" x="25" y="285">
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">D4/D5 falling edges. Each button connects its pin to GND.</field>
+        <field name="END">println</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="430" y="385">
+    <statement name="DO">
+      <block type="arduino_typed_variable">
+        <field name="VAR">leftSnapshot</field>
+        <field name="TYPE">uint16_t</field>
+        <field name="QUALIFIER">normal</field>
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="arduino_typed_variable">
+            <field name="VAR">rightSnapshot</field>
+            <field name="TYPE">uint16_t</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="avr_atomic">
+                <statement name="DO">
+                  <block type="variables_set">
+                    <field name="VAR">leftSnapshot</field>
+                    <value name="VALUE">
+                      <block type="variables_get">
+                        <field name="VAR">leftCount</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="variables_set">
+                        <field name="VAR">rightSnapshot</field>
+                        <value name="VALUE">
+                          <block type="variables_get">
+                            <field name="VAR">rightCount</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+                <next>
+                  <block type="serial_text">
+                    <field name="TEXT">left:</field>
+                    <field name="END">print</field>
+                    <next>
+                      <block type="serial_send">
+                        <field name="END">print</field>
+                        <value name="VALUE">
+                          <block type="variables_get">
+                            <field name="VAR">leftSnapshot</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="serial_text">
+                            <field name="TEXT">,right:</field>
+                            <field name="END">print</field>
+                            <next>
+                              <block type="serial_send">
+                                <field name="END">println</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR">rightSnapshot</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="base_delay">
+                                    <value name="DELAY_TIME">
+                                      <block type="math_number">
+                                        <field name="NUM">100</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

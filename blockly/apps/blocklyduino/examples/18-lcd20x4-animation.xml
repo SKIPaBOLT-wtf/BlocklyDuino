@@ -1,0 +1,28 @@
+<xml>
+  <block type="lcd20x4_title" x="30" y="30">
+    <field name="TEXT">+++ ARDUINO SHOW +++</field>
+    <next>
+      <block type="lcd20x4_bounce">
+        <field name="TEXT">HELLO, WORLD!</field>
+        <next>
+          <block type="lcd20x4_ticker">
+            <field name="TEXT">TEXT MOVES ACROSS THE LCD!</field>
+            <next>
+              <block type="lcd20x4_heart">
+                <next>
+                  <block type="base_delay">
+                    <value name="DELAY_TIME">
+                      <block type="math_number">
+                        <field name="NUM">160</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

@@ -1,0 +1,94 @@
+<xml>
+  <block type="arduino_typed_variable" x="30" y="30">
+    <field name="TYPE">long</field>
+    <field name="VAR">skaicius</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_setup_section" x="30" y="150">
+    <statement name="DO">
+      <block type="inout_buildin_led">
+        <field name="STAT">LOW</field>
+        <next>
+          <block type="serial_print">
+            <value name="CONTENT">
+              <block type="text">
+                <field name="TEXT">Start</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="30" y="350">
+    <statement name="DO">
+      <block type="procedures_callnoreturn">
+        <mutation name="mirktelti" />
+        <next>
+          <block type="variables_set">
+            <field name="VAR">skaicius</field>
+            <value name="VALUE">
+              <block type="math_arithmetic">
+                <field name="OP">ADD</field>
+                <value name="A">
+                  <block type="variables_get">
+                    <field name="VAR">skaicius</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="serial_print">
+                <value name="CONTENT">
+                  <block type="variables_get">
+                    <field name="VAR">skaicius</field>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" x="440" y="30">
+    <field name="NAME">mirktelti</field>
+    <statement name="STACK">
+      <block type="inout_buildin_led">
+        <field name="STAT">HIGH</field>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+            <next>
+              <block type="inout_buildin_led">
+                <field name="STAT">LOW</field>
+                <next>
+                  <block type="base_delay">
+                    <value name="DELAY_TIME">
+                      <block type="math_number">
+                        <field name="NUM">300</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

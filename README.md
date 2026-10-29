@@ -1,3 +1,18 @@
+## Classic editor workbench extension
+
+This branch extends the classic BlocklyDuino editor with named devices, typed
+programming blocks, interrupts, streamed storage/images, music, workspace tools,
+and a shared Serial Monitor/Plotter. It includes 69 numbered examples and a
+Python 3 / Arduino CLI backend. The existing v2 subtree is unchanged.
+
+**Start here: [installation and usage](docs/GETTING-STARTED.md).**
+See [changes and architecture](docs/CLASSIC-EXTENSIONS.md),
+[testing and limits](docs/TESTING.md), and the in-app **Guide**.
+
+The following is the original upstream project documentation.
+
+---
+
 ### Welcome to BlocklyDuino
 
 > Check [BlockDuino v2](https://github.com/BlocklyDuino/BlocklyDuino/tree/v2)

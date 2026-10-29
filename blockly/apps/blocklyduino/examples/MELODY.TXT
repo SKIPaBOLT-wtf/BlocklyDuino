@@ -1,0 +1,11 @@
+# C major phrase. Note name and duration in milliseconds.
+# R means rest. Sharps/flats such as F#4 or Bb4 also work.
+C4 250
+D4 250
+E4 250
+G4 500
+R 100
+G4 250
+E4 250
+D4 250
+C4 750

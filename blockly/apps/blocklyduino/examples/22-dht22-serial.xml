@@ -1,0 +1,29 @@
+<xml>
+  <block type="serial_print" x="30" y="30">
+    <value name="CONTENT">
+      <block type="dht_temperature">
+        <field name="KIND">DHT22</field>
+        <field name="PIN">2</field>
+      </block>
+    </value>
+    <next>
+      <block type="serial_print">
+        <value name="CONTENT">
+          <block type="dht_humidity">
+            <field name="KIND">DHT22</field>
+            <field name="PIN">2</field>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">2000</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

@@ -1,0 +1,93 @@
+<xml>
+  <block type="st_sd" x="25" y="25">
+    <mutation uid="card36" />
+    <field name="NAME">card</field>
+    <field name="CS">10</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="170">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="st_sd_ok">
+            <field name="DEVICE">card36</field>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="st_bmp_create">
+            <field name="DEVICE">card36</field>
+            <value name="PATH">
+              <block type="text">
+                <field name="TEXT">RADAR.BMP</field>
+              </block>
+            </value>
+            <value name="WIDTH">
+              <block type="math_number">
+                <field name="NUM">128</field>
+              </block>
+            </value>
+            <value name="HEIGHT">
+              <block type="math_number">
+                <field name="NUM">128</field>
+              </block>
+            </value>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="st_sd_ok">
+                    <field name="DEVICE">card36</field>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="controls_for">
+                    <field name="VAR">x</field>
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">127</field>
+                      </block>
+                    </value>
+                    <value name="BY">
+                      <block type="math_number">
+                        <field name="NUM">1</field>
+                      </block>
+                    </value>
+                    <statement name="DO">
+                      <block type="st_bmp_pixel">
+                        <field name="DEVICE">card36</field>
+                        <field name="WHITE">true</field>
+                        <value name="X">
+                          <block type="variables_get">
+                            <field name="VAR">x</field>
+                          </block>
+                        </value>
+                        <value name="Y">
+                          <block type="variables_get">
+                            <field name="VAR">x</field>
+                          </block>
+                        </value>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="st_sd_flush">
+                        <field name="DEVICE">card36</field>
+                        <next>
+                          <block type="st_sd_close">
+                            <field name="DEVICE">card36</field>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

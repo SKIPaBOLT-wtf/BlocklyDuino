@@ -1,0 +1,39 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_setup_section" x="375" y="25">
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">Ready. Type in Monitor and press Send.</field>
+        <field name="END">println</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="25" y="155">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="serial_available" />
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="serial_write_byte">
+            <value name="VALUE">
+              <block type="serial_read" />
+            </value>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

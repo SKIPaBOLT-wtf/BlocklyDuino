@@ -1,0 +1,72 @@
+<xml>
+  <block type="device_servo" x="25" y="25">
+    <mutation uid="pan35" />
+    <field name="NAME">pan</field>
+    <field name="PIN">9</field>
+  </block>
+  <block type="device_ultrasonic" x="340" y="25">
+    <mutation uid="range35" />
+    <field name="NAME">range</field>
+    <field name="TRIG">5</field>
+    <field name="ECHO">6</field>
+  </block>
+  <block type="arduino_loop_section" x="25" y="160">
+    <statement name="DO">
+      <block type="controls_for">
+        <field name="VAR">angle</field>
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">180</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <statement name="DO">
+          <block type="device_servo_write">
+            <field name="DEVICE">pan35</field>
+            <value name="ANGLE">
+              <block type="variables_get">
+                <field name="VAR">angle</field>
+              </block>
+            </value>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">120</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="serial_print">
+                    <value name="CONTENT">
+                      <block type="variables_get">
+                        <field name="VAR">angle</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="serial_print">
+                        <value name="CONTENT">
+                          <block type="device_ultrasonic_read">
+                            <field name="DEVICE">range35</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

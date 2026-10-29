@@ -1,0 +1,38 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_loop_section" x="375" y="25">
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">adc:</field>
+        <field name="END">print</field>
+        <next>
+          <block type="serial_send">
+            <field name="END">print</field>
+            <value name="VALUE">
+              <block type="inout_analog_read">
+                <field name="PIN">A0</field>
+              </block>
+            </value>
+            <next>
+              <block type="serial_text">
+                <field name="TEXT">,reference:512</field>
+                <field name="END">println</field>
+                <next>
+                  <block type="base_delay">
+                    <value name="DELAY_TIME">
+                      <block type="math_number">
+                        <field name="NUM">50</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

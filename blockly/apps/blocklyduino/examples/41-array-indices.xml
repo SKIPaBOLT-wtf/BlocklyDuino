@@ -1,0 +1,215 @@
+<xml>
+  <block type="arduino_array_declare" x="20" y="20">
+    <field name="TYPE">uint8_t</field>
+    <field name="VAR">visits</field>
+    <field name="SIZE">3,4</field>
+  </block>
+  <block type="arduino_typed_variable" x="20" y="90">
+    <field name="TYPE">int</field>
+    <field name="VAR">i</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+    <next>
+      <block type="arduino_typed_variable">
+        <field name="TYPE">int</field>
+        <field name="VAR">j</field>
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+      </block>
+    </next>
+  </block>
+  <block type="procedures_defnoreturn" x="410" y="20">
+    <mutation>
+      <arg name="row" />
+      <arg name="column" />
+    </mutation>
+    <field name="NAME">visit</field>
+    <statement name="STACK">
+      <block type="arduino_typed_variable">
+        <field name="TYPE">uint8_t</field>
+        <field name="VAR">nextVisit</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="arduino_array_get">
+                <mutation rank="2" />
+                <field name="VAR">visits</field>
+                <value name="INDEX">
+                  <block type="variables_get">
+                    <field name="VAR">row</field>
+                  </block>
+                </value>
+                <value name="INDEX2">
+                  <block type="variables_get">
+                    <field name="VAR">column</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="arduino_array_set">
+            <mutation rank="2" />
+            <field name="VAR">visits</field>
+            <value name="INDEX">
+              <block type="variables_get">
+                <field name="VAR">row</field>
+              </block>
+            </value>
+            <value name="INDEX2">
+              <block type="variables_get">
+                <field name="VAR">column</field>
+              </block>
+            </value>
+            <value name="VALUE">
+              <block type="variables_get">
+                <field name="VAR">nextVisit</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="20" y="230">
+    <statement name="DO">
+      <block type="procedures_callnoreturn">
+        <mutation name="visit">
+          <arg name="row" />
+          <arg name="column" />
+        </mutation>
+        <value name="ARG0">
+          <block type="variables_get">
+            <field name="VAR">i</field>
+          </block>
+        </value>
+        <value name="ARG1">
+          <block type="variables_get">
+            <field name="VAR">j</field>
+          </block>
+        </value>
+        <next>
+          <block type="serial_print">
+            <value name="CONTENT">
+              <block type="arduino_array_get">
+                <mutation rank="2" />
+                <field name="VAR">visits</field>
+                <value name="INDEX">
+                  <block type="variables_get">
+                    <field name="VAR">i</field>
+                  </block>
+                </value>
+                <value name="INDEX2">
+                  <block type="variables_get">
+                    <field name="VAR">j</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="variables_set">
+                <field name="VAR">j</field>
+                <value name="VALUE">
+                  <block type="math_modulo">
+                    <value name="DIVIDEND">
+                      <block type="math_arithmetic">
+                        <field name="OP">ADD</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">j</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">1</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="DIVISOR">
+                      <block type="arduino_array_length">
+                        <field name="VAR">visits</field>
+                        <field name="AXIS">2</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">j</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="variables_set">
+                        <field name="VAR">i</field>
+                        <value name="VALUE">
+                          <block type="math_modulo">
+                            <value name="DIVIDEND">
+                              <block type="math_arithmetic">
+                                <field name="OP">ADD</field>
+                                <value name="A">
+                                  <block type="variables_get">
+                                    <field name="VAR">i</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number">
+                                    <field name="NUM">1</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                            <value name="DIVISOR">
+                              <block type="arduino_array_length">
+                                <field name="VAR">visits</field>
+                                <field name="AXIS">1</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">200</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

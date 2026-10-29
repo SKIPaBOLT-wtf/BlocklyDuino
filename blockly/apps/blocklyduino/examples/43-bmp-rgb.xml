@@ -1,0 +1,141 @@
+<xml>
+  <block type="st_sd" x="25" y="25">
+    <mutation uid="image_card" />
+    <field name="NAME">card</field>
+    <field name="CS">10</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="100">
+    <statement name="DO">
+      <block type="st_image_begin">
+        <field name="DEVICE">image_card</field>
+        <field name="FORMAT">BMP_RGB</field>
+        <field name="MODE">STREAM</field>
+        <value name="PATH">
+          <block type="text">
+            <field name="TEXT">COLOR.BMP</field>
+          </block>
+        </value>
+        <value name="WIDTH">
+          <block type="math_number">
+            <field name="NUM">16</field>
+          </block>
+        </value>
+        <value name="HEIGHT">
+          <block type="math_number">
+            <field name="NUM">16</field>
+          </block>
+        </value>
+        <value name="LEVELS">
+          <block type="math_number">
+            <field name="NUM">256</field>
+          </block>
+        </value>
+        <value name="RESERVE">
+          <block type="logic_boolean">
+            <field name="BOOL">FALSE</field>
+          </block>
+        </value>
+        <next>
+          <block type="controls_for">
+            <field name="VAR">y</field>
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">15</field>
+              </block>
+            </value>
+            <value name="BY">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <statement name="DO">
+              <block type="controls_for">
+                <field name="VAR">x</field>
+                <value name="FROM">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="TO">
+                  <block type="math_number">
+                    <field name="NUM">15</field>
+                  </block>
+                </value>
+                <value name="BY">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+                <statement name="DO">
+                  <block type="st_image_append_rgb">
+                    <field name="DEVICE">image_card</field>
+                    <value name="R">
+                      <block type="math_arithmetic">
+                        <field name="OP">MULTIPLY</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">x</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">17</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="G">
+                      <block type="math_arithmetic">
+                        <field name="OP">MULTIPLY</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">y</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">17</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number">
+                        <field name="NUM">128</field>
+                      </block>
+                    </value>
+                  </block>
+                </statement>
+              </block>
+            </statement>
+            <next>
+              <block type="st_image_finish">
+                <field name="DEVICE">image_card</field>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="st_image_ok">
+                        <field name="DEVICE">image_card</field>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="inout_digital_write">
+                        <field name="PIN">13</field>
+                        <field name="STAT">HIGH</field>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

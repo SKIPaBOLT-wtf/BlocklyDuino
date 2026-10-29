@@ -1,0 +1,132 @@
+<xml>
+  <block type="inout_tone" x="30" y="30">
+    <field name="PIN">8</field>
+    <value name="NUM">
+      <block type="math_number">
+        <field name="NUM">262</field>
+      </block>
+    </value>
+    <next>
+      <block type="base_delay">
+        <value name="DELAY_TIME">
+          <block type="math_number">
+            <field name="NUM">250</field>
+          </block>
+        </value>
+        <next>
+          <block type="inout_notone">
+            <field name="PIN">8</field>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">50</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="inout_tone">
+                    <field name="PIN">8</field>
+                    <value name="NUM">
+                      <block type="math_number">
+                        <field name="NUM">330</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">250</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="inout_notone">
+                            <field name="PIN">8</field>
+                            <next>
+                              <block type="base_delay">
+                                <value name="DELAY_TIME">
+                                  <block type="math_number">
+                                    <field name="NUM">50</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="inout_tone">
+                                    <field name="PIN">8</field>
+                                    <value name="NUM">
+                                      <block type="math_number">
+                                        <field name="NUM">392</field>
+                                      </block>
+                                    </value>
+                                    <next>
+                                      <block type="base_delay">
+                                        <value name="DELAY_TIME">
+                                          <block type="math_number">
+                                            <field name="NUM">250</field>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="inout_notone">
+                                            <field name="PIN">8</field>
+                                            <next>
+                                              <block type="base_delay">
+                                                <value name="DELAY_TIME">
+                                                  <block type="math_number">
+                                                    <field name="NUM">50</field>
+                                                  </block>
+                                                </value>
+                                                <next>
+                                                  <block type="inout_tone">
+                                                    <field name="PIN">8</field>
+                                                    <value name="NUM">
+                                                      <block type="math_number">
+                                                        <field name="NUM">523</field>
+                                                      </block>
+                                                    </value>
+                                                    <next>
+                                                      <block type="base_delay">
+                                                        <value name="DELAY_TIME">
+                                                          <block type="math_number">
+                                                            <field name="NUM">500</field>
+                                                          </block>
+                                                        </value>
+                                                        <next>
+                                                          <block type="inout_notone">
+                                                            <field name="PIN">8</field>
+                                                            <next>
+                                                              <block type="base_delay">
+                                                                <value name="DELAY_TIME">
+                                                                  <block type="math_number">
+                                                                    <field name="NUM">500</field>
+                                                                  </block>
+                                                                </value>
+                                                              </block>
+                                                            </next>
+                                                          </block>
+                                                        </next>
+                                                      </block>
+                                                    </next>
+                                                  </block>
+                                                </next>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

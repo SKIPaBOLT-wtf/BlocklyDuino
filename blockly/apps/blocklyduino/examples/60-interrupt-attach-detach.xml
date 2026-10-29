@@ -1,0 +1,201 @@
+<xml>
+  <block type="serial_config" x="25" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_typed_variable" x="25" y="100">
+    <field name="VAR">pulseCount</field>
+    <field name="TYPE">uint16_t</field>
+    <field name="QUALIFIER">volatile</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="irq_external" x="430" y="25">
+    <mutation uid="irq-attach-pulse"></mutation>
+    <field name="NAME">pulseInput</field>
+    <field name="PIN">2</field>
+    <field name="EDGE">FALLING</field>
+    <field name="INPUT">INPUT_PULLUP</field>
+    <field name="START">DISABLED</field>
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">pulseCount</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="variables_get">
+                <field name="VAR">pulseCount</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_setup_section" x="25" y="230">
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">a=attach, d=detach</field>
+        <field name="END">println</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="430" y="250">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="serial_available"></block>
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="arduino_typed_variable">
+            <field name="VAR">command</field>
+            <field name="TYPE">int</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="serial_read"></block>
+            </value>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="logic_compare">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="variables_get">
+                        <field name="VAR">command</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number">
+                        <field name="NUM">97</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="irq_control">
+                    <field name="SOURCE">irq-attach-pulse</field>
+                    <field name="ACTION">ENABLE</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">command</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">100</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="irq_control">
+                        <field name="SOURCE">irq-attach-pulse</field>
+                        <field name="ACTION">DISABLE</field>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <next>
+          <block type="arduino_typed_variable">
+            <field name="VAR">snapshot</field>
+            <field name="TYPE">uint16_t</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="avr_atomic">
+                <statement name="DO">
+                  <block type="variables_set">
+                    <field name="VAR">snapshot</field>
+                    <value name="VALUE">
+                      <block type="variables_get">
+                        <field name="VAR">pulseCount</field>
+                      </block>
+                    </value>
+                  </block>
+                </statement>
+                <next>
+                  <block type="serial_text">
+                    <field name="TEXT">attached:</field>
+                    <field name="END">print</field>
+                    <next>
+                      <block type="serial_send">
+                        <field name="END">print</field>
+                        <value name="VALUE">
+                          <block type="irq_enabled">
+                            <field name="SOURCE">irq-attach-pulse</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="serial_text">
+                            <field name="TEXT">,pulses:</field>
+                            <field name="END">print</field>
+                            <next>
+                              <block type="serial_send">
+                                <field name="END">println</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR">snapshot</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="base_delay">
+                                    <value name="DELAY_TIME">
+                                      <block type="math_number">
+                                        <field name="NUM">100</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <workspace-regions version="1">
+    <region id="area_irq" x="410" y="-30" width="520" height="230" color="#9067ac"><title>Interrupt handler</title><description>Record the event quickly. Keep Serial and other slow work in loop.</description></region>
+    <region id="area_loop" x="410" y="205" width="640" height="650" color="#3185b5"><title>Main loop</title><description>Attach or detach from Monitor; copy the shared counter atomically.</description></region>
+  </workspace-regions>
+</xml>

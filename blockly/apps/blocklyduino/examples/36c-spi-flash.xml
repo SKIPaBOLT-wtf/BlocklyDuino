@@ -1,0 +1,80 @@
+<xml>
+  <block type="st_spi_flash" x="25" y="25">
+    <mutation uid="memory36" />
+    <field name="NAME">flash</field>
+    <field name="CS">10</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="170">
+    <statement name="DO">
+      <block type="st_flash_erase">
+        <field name="DEVICE">memory36</field>
+        <value name="ADDRESS">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="st_memory_write">
+            <field name="DEVICE">memory36</field>
+            <field name="TYPE">uint16_t</field>
+            <value name="ADDRESS">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">1234</field>
+              </block>
+            </value>
+            <next>
+              <block type="st_memory_text_write">
+                <field name="DEVICE">memory36</field>
+                <value name="ADDRESS">
+                  <block type="math_number">
+                    <field name="NUM">16</field>
+                  </block>
+                </value>
+                <value name="TEXT">
+                  <block type="text">
+                    <field name="TEXT">Hello from EEPROM</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="serial_print">
+                    <value name="CONTENT">
+                      <block type="st_memory_read">
+                        <field name="DEVICE">memory36</field>
+                        <field name="TYPE">uint16_t</field>
+                        <value name="ADDRESS">
+                          <block type="math_number">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="st_memory_text_stream">
+                        <field name="DEVICE">memory36</field>
+                        <value name="ADDRESS">
+                          <block type="math_number">
+                            <field name="NUM">16</field>
+                          </block>
+                        </value>
+                        <value name="LIMIT">
+                          <block type="math_number">
+                            <field name="NUM">200</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

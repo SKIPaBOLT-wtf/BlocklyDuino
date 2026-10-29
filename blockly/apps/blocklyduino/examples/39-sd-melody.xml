@@ -1,0 +1,33 @@
+<xml>
+  <block type="st_sd" x="25" y="25">
+    <mutation uid="card39" />
+    <field name="NAME">card</field>
+    <field name="CS">10</field>
+  </block>
+  <block type="music_buzzer" x="320" y="25">
+    <mutation uid="speaker39" />
+    <field name="NAME">speaker</field>
+    <field name="PIN">4</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="160">
+    <statement name="DO">
+      <block type="sd_music_start">
+        <field name="DEVICE">card39</field>
+        <field name="BUZZER">speaker39</field>
+        <value name="PATH">
+          <block type="text">
+            <field name="TEXT">MELODY.TXT</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="25" y="340">
+    <statement name="DO">
+      <block type="sd_music_update">
+        <field name="DEVICE">card39</field>
+        <field name="BUZZER">speaker39</field>
+      </block>
+    </statement>
+  </block>
+</xml>

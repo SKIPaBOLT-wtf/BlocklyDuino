@@ -1,0 +1,110 @@
+<xml>
+  <block type="arduino_typed_variable" x="30" y="30">
+    <field name="TYPE">float</field>
+    <field name="VAR">rezultatas</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_setup_section" x="30" y="155">
+    <statement name="DO">
+      <block type="serial_print">
+        <value name="CONTENT">
+          <block type="text">
+            <field name="TEXT">Math</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="30" y="290">
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">rezultatas</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">ADD</field>
+            <value name="A">
+              <block type="math_arithmetic">
+                <field name="OP">ADD</field>
+                <value name="A">
+                  <block type="math_single">
+                    <field name="OP">ROOT</field>
+                    <value name="NUM">
+                      <block type="math_number">
+                        <field name="NUM">9</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_arithmetic">
+                    <field name="OP">POWER</field>
+                    <value name="A">
+                      <block type="math_number">
+                        <field name="NUM">2</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number">
+                        <field name="NUM">3</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_trig">
+                <field name="OP">SIN</field>
+                <value name="NUM">
+                  <block type="math_number">
+                    <field name="NUM">30</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="serial_print">
+            <value name="CONTENT">
+              <block type="variables_get">
+                <field name="VAR">rezultatas</field>
+              </block>
+            </value>
+            <next>
+              <block type="serial_print">
+                <value name="CONTENT">
+                  <block type="math_random_int">
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">1</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">6</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="base_delay">
+                    <value name="DELAY_TIME">
+                      <block type="math_number">
+                        <field name="NUM">1000</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

@@ -1,0 +1,46 @@
+<xml>
+  <block type="stepper_28byj_init" x="30" y="30">
+    <field name="IN1">8</field>
+    <field name="IN2">9</field>
+    <field name="IN3">10</field>
+    <field name="IN4">11</field>
+    <next>
+      <block type="stepper_28byj_move">
+        <field name="RPM">10</field>
+        <value name="STEPS">
+          <block type="math_number">
+            <field name="NUM">512</field>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">500</field>
+              </block>
+            </value>
+            <next>
+              <block type="stepper_28byj_move">
+                <field name="RPM">10</field>
+                <value name="STEPS">
+                  <block type="math_number">
+                    <field name="NUM">-512</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="base_delay">
+                    <value name="DELAY_TIME">
+                      <block type="math_number">
+                        <field name="NUM">500</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

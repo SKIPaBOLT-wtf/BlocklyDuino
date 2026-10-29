@@ -1,0 +1,60 @@
+<xml>
+  <block type="lcd_user_init" x="30" y="30">
+    <field name="ADDR">0x27</field>
+    <field name="COLS">20</field>
+    <field name="ROWS">4</field>
+    <next>
+      <block type="lcd_user_print">
+        <field name="COL">0</field>
+        <field name="ROW">0</field>
+        <value name="CONTENT">
+          <block type="text">
+            <field name="TEXT">A0 potentiometer</field>
+          </block>
+        </value>
+        <next>
+          <block type="lcd_user_print">
+            <field name="COL">0</field>
+            <field name="ROW">1</field>
+            <value name="CONTENT">
+              <block type="text">
+                <field name="TEXT">Value:</field>
+              </block>
+            </value>
+            <next>
+              <block type="lcd_user_print">
+                <field name="COL">9</field>
+                <field name="ROW">1</field>
+                <value name="CONTENT">
+                  <block type="text">
+                    <field name="TEXT">    </field>
+                  </block>
+                </value>
+                <next>
+                  <block type="lcd_user_print">
+                    <field name="COL">9</field>
+                    <field name="ROW">1</field>
+                    <value name="CONTENT">
+                      <block type="inout_analog_read">
+                        <field name="PIN">A0</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">250</field>
+                          </block>
+                        </value>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

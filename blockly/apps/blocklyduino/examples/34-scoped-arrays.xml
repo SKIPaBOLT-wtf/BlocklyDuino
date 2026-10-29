@@ -1,0 +1,15 @@
+<xml>
+  <block type="arduino_array_declare" x="25" y="25"><field name="TYPE">uint8_t</field><field name="VAR">grid</field><field name="SIZE">4,8</field></block>
+  <block type="procedures_defnoreturn" x="410" y="25"><field name="NAME">writeSample</field><statement name="STACK">
+    <block type="arduino_typed_variable"><field name="TYPE">int</field><field name="VAR">row</field><value name="VALUE"><block type="math_number"><field name="NUM">1</field></block></value><next>
+    <block type="arduino_typed_variable"><field name="TYPE">int</field><field name="VAR">column</field><value name="VALUE"><block type="math_number"><field name="NUM">2</field></block></value><next>
+    <block type="arduino_array_set"><mutation rank="2"/><field name="VAR">grid</field><field name="DIM">2</field><value name="INDEX"><block type="variables_get"><field name="VAR">row</field></block></value><value name="INDEX2"><block type="variables_get"><field name="VAR">column</field></block></value><value name="VALUE"><block type="math_number"><field name="NUM">42</field></block></value>
+    </block></next></block></next></block>
+  </statement></block>
+  <block type="arduino_setup_section" x="25" y="145"><statement name="DO"><block type="procedures_callnoreturn"><mutation name="writeSample"/></block></statement></block>
+  <block type="arduino_loop_section" x="25" y="285"><statement name="DO">
+    <block type="serial_print"><value name="CONTENT"><block type="arduino_array_get"><mutation rank="2"/><field name="VAR">grid</field><field name="DIM">2</field><value name="INDEX"><block type="math_number"><field name="NUM">1</field></block></value><value name="INDEX2"><block type="math_number"><field name="NUM">2</field></block></value></block></value><next>
+    <block type="base_delay"><value name="DELAY_TIME"><block type="math_number"><field name="NUM">1000</field></block></value></block>
+    </next></block>
+  </statement></block>
+</xml>

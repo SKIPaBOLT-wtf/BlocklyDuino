@@ -1,0 +1,31 @@
+<xml>
+  <block type="lcd1602_i2c_print" x="30" y="30">
+    <field name="ADDR">0x27</field>
+    <field name="ROW">0</field>
+    <value name="CONTENT">
+      <block type="text">
+        <field name="TEXT">Temperature C:</field>
+      </block>
+    </value>
+    <next>
+      <block type="lcd1602_i2c_print">
+        <field name="ADDR">0x27</field>
+        <field name="ROW">1</field>
+        <value name="CONTENT">
+          <block type="ds18b20_temperature">
+            <field name="PIN">2</field>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">1000</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

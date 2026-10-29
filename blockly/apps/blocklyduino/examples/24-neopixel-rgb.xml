@@ -1,0 +1,108 @@
+<xml>
+  <block type="neopixel_init" x="30" y="30">
+    <field name="COUNT">8</field>
+    <field name="PIN">6</field>
+    <next>
+      <block type="neopixel_set">
+        <value name="INDEX">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="RED">
+          <block type="math_number">
+            <field name="NUM">255</field>
+          </block>
+        </value>
+        <value name="GREEN">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="BLUE">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="neopixel_set">
+            <value name="INDEX">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <value name="RED">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="GREEN">
+              <block type="math_number">
+                <field name="NUM">255</field>
+              </block>
+            </value>
+            <value name="BLUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="neopixel_set">
+                <value name="INDEX">
+                  <block type="math_number">
+                    <field name="NUM">2</field>
+                  </block>
+                </value>
+                <value name="RED">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="GREEN">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="BLUE">
+                  <block type="math_number">
+                    <field name="NUM">255</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="neopixel_show">
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">500</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="neopixel_clear">
+                            <next>
+                              <block type="neopixel_show">
+                                <next>
+                                  <block type="base_delay">
+                                    <value name="DELAY_TIME">
+                                      <block type="math_number">
+                                        <field name="NUM">500</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

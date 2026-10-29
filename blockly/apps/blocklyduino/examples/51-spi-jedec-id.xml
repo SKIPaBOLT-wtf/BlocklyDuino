@@ -1,0 +1,156 @@
+<xml>
+  <block type="ll_spi_device" x="25" y="25">
+    <mutation uid="raw_flash" />
+    <field name="NAME">flashChip</field>
+    <field name="CS">10</field>
+    <field name="MODE">0</field>
+    <field name="HZ">1000000</field>
+    <field name="ORDER">MSBFIRST</field>
+  </block>
+  <block type="arduino_loop_section" x="25" y="140">
+    <statement name="DO">
+      <block type="arduino_typed_variable">
+        <field name="TYPE">uint8_t</field>
+        <field name="VAR">manufacturer</field>
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="arduino_typed_variable">
+            <field name="TYPE">uint8_t</field>
+            <field name="VAR">family</field>
+            <value name="VALUE">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="arduino_typed_variable">
+                <field name="TYPE">uint8_t</field>
+                <field name="VAR">capacity</field>
+                <value name="VALUE">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="ll_spi_transaction">
+                    <field name="DEVICE">raw_flash</field>
+                    <statement name="DO">
+                      <block type="ll_spi_send">
+                        <field name="DEVICE">raw_flash</field>
+                        <value name="VALUE">
+                          <block type="math_number">
+                            <field name="NUM">159</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="variables_set">
+                            <field name="VAR">manufacturer</field>
+                            <value name="VALUE">
+                              <block type="ll_spi_transfer">
+                                <field name="DEVICE">raw_flash</field>
+                                <value name="VALUE">
+                                  <block type="math_number">
+                                    <field name="NUM">0</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="variables_set">
+                                <field name="VAR">family</field>
+                                <value name="VALUE">
+                                  <block type="ll_spi_transfer">
+                                    <field name="DEVICE">raw_flash</field>
+                                    <value name="VALUE">
+                                      <block type="math_number">
+                                        <field name="NUM">0</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="variables_set">
+                                    <field name="VAR">capacity</field>
+                                    <value name="VALUE">
+                                      <block type="ll_spi_transfer">
+                                        <field name="DEVICE">raw_flash</field>
+                                        <value name="VALUE">
+                                          <block type="math_number">
+                                            <field name="NUM">0</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="serial_print">
+                        <value name="CONTENT">
+                          <block type="text">
+                            <field name="TEXT">JEDEC bytes (hex):</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="ll_serial_number">
+                            <field name="BASE">HEX</field>
+                            <field name="END">println</field>
+                            <value name="VALUE">
+                              <block type="variables_get">
+                                <field name="VAR">manufacturer</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="ll_serial_number">
+                                <field name="BASE">HEX</field>
+                                <field name="END">println</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR">family</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="ll_serial_number">
+                                    <field name="BASE">HEX</field>
+                                    <field name="END">println</field>
+                                    <value name="VALUE">
+                                      <block type="variables_get">
+                                        <field name="VAR">capacity</field>
+                                      </block>
+                                    </value>
+                                    <next>
+                                      <block type="base_delay">
+                                        <value name="DELAY_TIME">
+                                          <block type="math_number">
+                                            <field name="NUM">1000</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

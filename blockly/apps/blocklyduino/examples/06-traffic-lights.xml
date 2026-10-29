@@ -1,0 +1,75 @@
+<xml>
+  <block type="inout_digital_write" x="30" y="30">
+    <field name="PIN">2</field>
+    <field name="STAT">HIGH</field>
+    <next>
+      <block type="inout_digital_write">
+        <field name="PIN">3</field>
+        <field name="STAT">LOW</field>
+        <next>
+          <block type="inout_digital_write">
+            <field name="PIN">4</field>
+            <field name="STAT">LOW</field>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">2000</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="inout_digital_write">
+                    <field name="PIN">2</field>
+                    <field name="STAT">LOW</field>
+                    <next>
+                      <block type="inout_digital_write">
+                        <field name="PIN">3</field>
+                        <field name="STAT">HIGH</field>
+                        <next>
+                          <block type="base_delay">
+                            <value name="DELAY_TIME">
+                              <block type="math_number">
+                                <field name="NUM">700</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="inout_digital_write">
+                                <field name="PIN">3</field>
+                                <field name="STAT">LOW</field>
+                                <next>
+                                  <block type="inout_digital_write">
+                                    <field name="PIN">4</field>
+                                    <field name="STAT">HIGH</field>
+                                    <next>
+                                      <block type="base_delay">
+                                        <value name="DELAY_TIME">
+                                          <block type="math_number">
+                                            <field name="NUM">2000</field>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="inout_digital_write">
+                                            <field name="PIN">4</field>
+                                            <field name="STAT">LOW</field>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>

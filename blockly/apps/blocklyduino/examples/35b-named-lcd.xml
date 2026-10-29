@@ -1,0 +1,60 @@
+<xml>
+  <block type="device_lcd" x="25" y="25">
+    <mutation uid="lcd35" />
+    <field name="NAME">display</field>
+    <field name="ADDR">0x27</field>
+    <field name="COLS">20</field>
+    <field name="ROWS">4</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="140">
+    <statement name="DO">
+      <block type="device_lcd_print">
+        <field name="DEVICE">lcd35</field>
+        <value name="TEXT">
+          <block type="text">
+            <field name="TEXT">Named devices</field>
+          </block>
+        </value>
+        <value name="COL">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="ROW">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="25" y="330">
+    <statement name="DO">
+      <block type="device_lcd_print">
+        <field name="DEVICE">lcd35</field>
+        <value name="TEXT">
+          <block type="arduino_millis" />
+        </value>
+        <value name="COL">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="ROW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

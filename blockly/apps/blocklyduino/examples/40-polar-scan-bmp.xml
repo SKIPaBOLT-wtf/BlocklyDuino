@@ -1,0 +1,174 @@
+<xml>
+  <block type="st_sd" x="20" y="20">
+    <mutation uid="card40" />
+    <field name="NAME">card</field>
+    <field name="CS">10</field>
+  </block>
+  <block type="device_servo" x="300" y="20">
+    <mutation uid="pan40" />
+    <field name="NAME">pan</field>
+    <field name="PIN">9</field>
+  </block>
+  <block type="device_ultrasonic" x="540" y="20">
+    <mutation uid="range40" />
+    <field name="NAME">range</field>
+    <field name="TRIG">5</field>
+    <field name="ECHO">6</field>
+  </block>
+  <block type="arduino_setup_section" x="20" y="170">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="st_sd_ok">
+            <field name="DEVICE">card40</field>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="st_bmp_stream_create">
+            <field name="DEVICE">card40</field>
+            <field name="RESERVE">false</field>
+            <value name="PATH">
+              <block type="text">
+                <field name="TEXT">POLAR.BMP</field>
+              </block>
+            </value>
+            <value name="WIDTH">
+              <block type="math_number">
+                <field name="NUM">128</field>
+              </block>
+            </value>
+            <value name="HEIGHT">
+              <block type="math_number">
+                <field name="NUM">61</field>
+              </block>
+            </value>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="st_sd_ok">
+                    <field name="DEVICE">card40</field>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="controls_for">
+                    <field name="VAR">angle</field>
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">180</field>
+                      </block>
+                    </value>
+                    <value name="BY">
+                      <block type="math_number">
+                        <field name="NUM">3</field>
+                      </block>
+                    </value>
+                    <statement name="DO">
+                      <block type="device_servo_write">
+                        <field name="DEVICE">pan40</field>
+                        <value name="ANGLE">
+                          <block type="variables_get">
+                            <field name="VAR">angle</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="base_delay">
+                            <value name="DELAY_TIME">
+                              <block type="math_number">
+                                <field name="NUM">80</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="arduino_typed_variable">
+                                <field name="TYPE">int</field>
+                                <field name="VAR">distance</field>
+                                <value name="VALUE">
+                                  <block type="device_ultrasonic_read">
+                                    <field name="DEVICE">range40</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="controls_for">
+                                    <field name="VAR">radius</field>
+                                    <value name="FROM">
+                                      <block type="math_number">
+                                        <field name="NUM">0</field>
+                                      </block>
+                                    </value>
+                                    <value name="TO">
+                                      <block type="math_number">
+                                        <field name="NUM">127</field>
+                                      </block>
+                                    </value>
+                                    <value name="BY">
+                                      <block type="math_number">
+                                        <field name="NUM">1</field>
+                                      </block>
+                                    </value>
+                                    <statement name="DO">
+                                      <block type="st_bmp_append_pixel">
+                                        <field name="DEVICE">card40</field>
+                                        <value name="WHITE">
+                                          <block type="logic_operation">
+                                            <field name="OP">AND</field>
+                                            <value name="A">
+                                              <block type="logic_compare">
+                                                <field name="OP">GT</field>
+                                                <value name="A">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">distance</field>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="math_number">
+                                                    <field name="NUM">0</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                            <value name="B">
+                                              <block type="logic_compare">
+                                                <field name="OP">EQ</field>
+                                                <value name="A">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">radius</field>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">distance</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </statement>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="st_bmp_stream_finish">
+                        <field name="DEVICE">card40</field>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>
