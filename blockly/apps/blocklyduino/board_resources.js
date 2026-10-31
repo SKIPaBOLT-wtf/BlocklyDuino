@@ -50,7 +50,7 @@
   function error(r,msg){errors.push({id:r.id,message:(r.name||r.type)+': '+msg});}
   function claim(r,v,role,share){v=pin(p,v);if(!v)return;var c={id:r.id,name:r.name||r.type,role:role,share:share||'',pin:v,observer:!!(specs[r.type]&&specs[r.type].read),irq:!!(specs[r.type]&&specs[r.type].irq)};(claims[v]||(claims[v]=[])).push(c);return c;}
   var live=records.filter(active);
-  live.forEach(function(r){var s=specs[r.type];if(!s){if(/^(user_|arduino_raw)/.test(r.type))notes.push('Custom C++ may use resources beyond these declarations.');return;}
+  live.forEach(function(r){var s=specs[r.type];if(!s){if(/^(lcd|grove_|oled_|dht_|ds18b20_|neopixel_|stepper_|accel_|ultrasonic_|ir_nec_)/.test(r.type))notes.push('Legacy hardware blocks do not declare reusable devices. Replace them with Add device definitions for complete pin tracking.');if(/^(user_|arduino_raw)/.test(r.type))notes.push('Custom C++ may use resources beyond these declarations.');return;}
    if(!p.known){error(r,'choose a board with a verified pin profile.');return;}
    if(s.avr&&p.id!=='avr328')error(r,'this block requires ATmega168/328.');
    if(s.resource){if(!s.legacyServo||!servoPins[pin(p,r.fields.PIN)])counts[s.resource]=(counts[s.resource]||0)+1;if(s.legacyServo)servoPins[pin(p,r.fields.PIN)]=true;}

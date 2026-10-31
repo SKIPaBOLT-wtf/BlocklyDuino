@@ -38,6 +38,11 @@ blocks yet. A fixed bus selector does not imply the chip has only one bus.
 
 ## Allocation and sharing
 
+Automatic ownership covers named device definitions and the supported GPIO,
+interrupt and direct-register blocks. Historical peripheral blocks loaded from
+older XML do not declare reusable devices; the editor marks that limitation.
+Use Add device definitions when combining them with other hardware.
+
 - Signal dropdowns show compatible pins not occupied by another declared device.
   Adding a device allocates free pins or explains why resources are unavailable.
 - I²C modules share SDA/SCL and need different addresses. SPI modules share bus
