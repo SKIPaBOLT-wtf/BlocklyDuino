@@ -1,0 +1,51 @@
+<xml>
+  <block type="device_stepper_driver" x="25" y="25">
+    <mutation uid="wheel62" />
+    <field name="NAME">wheel</field>
+    <field name="STEP">3</field>
+    <field name="DIR">4</field>
+    <field name="SPEED">600</field>
+    <field name="DRIVE_MODE">CONTINUOUS</field>
+  </block>
+  <block type="arduino_loop_section" x="355" y="25">
+    <statement name="DO">
+      <block type="device_stepper_speed">
+        <field name="DEVICE">wheel62</field>
+        <value name="SPEED">
+          <block type="base_map">
+            <value name="NUM">
+              <block type="inout_analog_read">
+                <field name="PIN">A0</field>
+              </block>
+            </value>
+            <value name="FROM_LOW">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="FROM_HIGH">
+              <block type="math_number">
+                <field name="NUM">1023</field>
+              </block>
+            </value>
+            <value name="TO_LOW">
+              <block type="math_number">
+                <field name="NUM">-600</field>
+              </block>
+            </value>
+            <value name="DMAX">
+              <block type="math_number">
+                <field name="NUM">600</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="device_stepper_run">
+            <field name="DEVICE">wheel62</field>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

@@ -1,0 +1,53 @@
+<xml>
+  <block type="device_servo" x="25" y="25">
+    <mutation uid="fine63" />
+    <field name="NAME">servo</field>
+    <field name="PIN">9</field>
+  </block>
+  <block type="arduino_loop_section" x="355" y="25">
+    <statement name="DO">
+      <block type="device_servo_write">
+        <field name="DEVICE">fine63</field>
+        <field name="UNIT">MICROSECONDS</field>
+        <value name="ANGLE">
+          <block type="base_map">
+            <value name="NUM">
+              <block type="inout_analog_read">
+                <field name="PIN">A0</field>
+              </block>
+            </value>
+            <value name="FROM_LOW">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="FROM_HIGH">
+              <block type="math_number">
+                <field name="NUM">1023</field>
+              </block>
+            </value>
+            <value name="TO_LOW">
+              <block type="math_number">
+                <field name="NUM">1000</field>
+              </block>
+            </value>
+            <value name="DMAX">
+              <block type="math_number">
+                <field name="NUM">2000</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay">
+            <value name="DELAY_TIME">
+              <block type="math_number">
+                <field name="NUM">20</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

@@ -59,11 +59,13 @@ function generateSketch(){
 }
 function installEditorHelp(){
   if(window.PanelState)PanelState.install();
+  if(window.BlocklyResources)BlocklyResources.install();
   if(window.BlocklyTarget)BlocklyTarget.install();
   if(window.BlocklyEditorActions)BlocklyEditorActions.install();
   if(window.BlocklyWorkspaceZoom)BlocklyWorkspaceZoom.install();
   if(window.BlocklyWorkspaceRegions)BlocklyWorkspaceRegions.install();
   if(window.BlocklyProjectDevices)BlocklyProjectDevices.install();
+  if(window.WorkbenchUI)WorkbenchUI.install();
   function update(){var b=Blockly.selected;if(!b)return;var tip=b.tooltip;if(typeof tip==='function')tip=tip.call(b);var values=b.inputList.some(function(i){return i.type===Blockly.INPUT_VALUE;});document.getElementById('block_help').textContent=(tip||'Use the Guide for examples and wiring details.')+(values?' Value sockets accept variables and calculations; replace the existing number block.':'');Blockly.fireUiEvent(window,'resize');}
   document.addEventListener('mouseup',function(){setTimeout(update,50);});
   document.addEventListener('keyup',update);

@@ -46,3 +46,5 @@ See VALIDATION.md for the recorded publication-run results. Only a Pro Mini
 ATmega168 and a PCF8574 20x4 LCD were physically exercised during development.
 SD, memory ICs, music, motion and alternate-board examples have software/compile
 coverage, but are not presented as a complete physically verified hardware matrix.
+
+The usability suites cover board pin/resource contracts, all example declarations, recent target configurations, continuous stepper generation, servo pulse units, map inputs, and streaming image parsing/view/export. Browser checks should additionally exercise pin/unpin, catalogue ordering and a real PNG download.

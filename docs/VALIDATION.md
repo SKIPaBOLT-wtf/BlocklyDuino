@@ -1,3 +1,30 @@
+# Usability and resource validation — 2026-10-31
+
+- All 21 JavaScript suites pass, including new board-resource, real Blockly integration,
+  example-resource, motion/math, image protocol/UI and board-history tests.
+- All 72 numbered XML examples pass declared pin/peripheral validation for Pro Mini
+  ATmega168. The existing full compile suite passes for ATmega328P; the three SD
+  examples changed afterward to move their status LED off SCK were recompiled too.
+- New examples compile for ATmega168 / 16 MHz:
+
+| Example | Flash | Static RAM |
+| --- | ---: | ---: |
+| 61 · two-servo photocell scanner | 4,922 B | 236 B |
+| 62 · continuous signed-speed stepper | 5,886 B | 119 B |
+| 63 · microsecond servo pulses | 2,962 B | 50 B |
+
+- The scanner also compiles for Arduino-Pico 6.3.1 (58,132 B Flash / 9,048 B static
+  RAM) and STM32duino 3.0.0 Blue Pill F103C8 (20,716 B / 1,568 B). The Blue Pill
+  smoke build uses PA8/PB0 servo pins instead of the AVR example's numeric pins.
+- Browser checks covered tabs, pinned/revealed toolbox, per-device colours,
+  catalogue ordering, I2C pin exclusion with shared bus use, discard/reload, and
+  image demo/export. A real browser download decoded as a 160 × 100 RGBA PNG,
+  independent of the displayed size. Chart and image framing/UI also have automated tests.
+- These changes were not uploaded to physical hardware. Stepper movement and
+  photocell mechanics remain unverified. See [profile and library limits](BOARD-RESOURCES.md).
+
+---
+
 # Publication validation — 2026-10-29
 
 Validation performed on the sanitized, standalone publication checkout, rather

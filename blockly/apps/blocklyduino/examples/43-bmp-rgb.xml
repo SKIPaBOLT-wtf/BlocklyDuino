@@ -1,4 +1,5 @@
 <xml>
+  <!-- Optional external status LED: D6 through a suitable resistor, not SPI SCK D13. -->
   <block type="st_sd" x="25" y="25">
     <mutation uid="image_card" />
     <field name="NAME">card</field>
@@ -125,7 +126,7 @@
                     </value>
                     <statement name="DO0">
                       <block type="inout_digital_write">
-                        <field name="PIN">13</field>
+                        <field name="PIN">6</field>
                         <field name="STAT">HIGH</field>
                       </block>
                     </statement>

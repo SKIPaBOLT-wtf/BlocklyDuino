@@ -1,0 +1,178 @@
+<xml>
+  <block type="device_servo" x="25" y="25">
+    <mutation uid="scanpan" />
+    <field name="NAME">pan</field>
+    <field name="PIN">9</field>
+    <field name="DEVICE_HUE">210</field>
+  </block>
+  <block type="device_servo" x="355" y="25">
+    <mutation uid="scantilt" />
+    <field name="NAME">tilt</field>
+    <field name="PIN">10</field>
+    <field name="DEVICE_HUE">30</field>
+  </block>
+  <block type="serial_config" x="685" y="25">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_setup_section" x="25" y="215">
+    <statement name="DO">
+      <block type="serial_image_header">
+        <field name="ID">photocell</field>
+        <field name="MODE">gray</field>
+        <value name="WIDTH">
+          <block type="math_number">
+            <field name="NUM">64</field>
+          </block>
+        </value>
+        <value name="HEIGHT">
+          <block type="math_number">
+            <field name="NUM">48</field>
+          </block>
+        </value>
+        <value name="MAX">
+          <block type="math_number">
+            <field name="NUM">1023</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="355" y="215">
+    <statement name="DO">
+      <block type="controls_for">
+        <field name="VAR">y</field>
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">47</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <statement name="DO">
+          <block type="controls_for">
+            <field name="VAR">x</field>
+            <value name="FROM">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <value name="TO">
+              <block type="math_number">
+                <field name="NUM">63</field>
+              </block>
+            </value>
+            <value name="BY">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+            <statement name="DO">
+              <block type="device_servo_write">
+                <field name="DEVICE">scanpan</field>
+                <value name="ANGLE">
+                  <block type="base_map">
+                    <value name="NUM">
+                      <block type="variables_get">
+                        <field name="VAR">x</field>
+                      </block>
+                    </value>
+                    <value name="FROM_LOW">
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="FROM_HIGH">
+                      <block type="math_number">
+                        <field name="NUM">63</field>
+                      </block>
+                    </value>
+                    <value name="TO_LOW">
+                      <block type="math_number">
+                        <field name="NUM">35</field>
+                      </block>
+                    </value>
+                    <value name="DMAX">
+                      <block type="math_number">
+                        <field name="NUM">145</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="device_servo_write">
+                    <field name="DEVICE">scantilt</field>
+                    <value name="ANGLE">
+                      <block type="base_map">
+                        <value name="NUM">
+                          <block type="variables_get">
+                            <field name="VAR">y</field>
+                          </block>
+                        </value>
+                        <value name="FROM_LOW">
+                          <block type="math_number">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                        <value name="FROM_HIGH">
+                          <block type="math_number">
+                            <field name="NUM">47</field>
+                          </block>
+                        </value>
+                        <value name="TO_LOW">
+                          <block type="math_number">
+                            <field name="NUM">45</field>
+                          </block>
+                        </value>
+                        <value name="DMAX">
+                          <block type="math_number">
+                            <field name="NUM">135</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="base_delay">
+                        <value name="DELAY_TIME">
+                          <block type="math_number">
+                            <field name="NUM">20</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="serial_image_pixel_gray">
+                            <value name="X">
+                              <block type="variables_get">
+                                <field name="VAR">x</field>
+                              </block>
+                            </value>
+                            <value name="Y">
+                              <block type="variables_get">
+                                <field name="VAR">y</field>
+                              </block>
+                            </value>
+                            <value name="VALUE">
+                              <block type="inout_analog_read">
+                                <field name="PIN">A0</field>
+                              </block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

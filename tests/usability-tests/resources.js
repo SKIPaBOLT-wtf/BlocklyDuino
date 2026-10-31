@@ -1,0 +1,22 @@
+'use strict';
+const assert=require('node:assert/strict'),R=require('../../blockly/apps/blocklyduino/board_resources.js');
+const avr=R.profile('arduino:avr:pro:cpu=16MHzatmega168'),pico=R.profile('rp2040:rp2040:rpipico'),stm=R.profile('STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8,usb=CDCgen');
+let id=0;function r(type,fields){return{id:String(++id),type,fields,name:type+' '+id};}function errors(rs,p=avr){return R.analyze(rs,p).errors.map(e=>e.message).join('\n');}
+assert(avr.analog.includes('A7'));assert(!avr.digital.includes('A7'));assert(!R.profile('arduino:avr:uno').analog.includes('A7'));
+assert.deepEqual(pico.buses.I2C,{SDA:'4',SCL:'5'});assert.deepEqual(stm.buses.I2C,{SDA:'PB7',SCL:'PB6'});assert(!stm.digital.includes('PA13'));assert.equal(stm.servo,12);
+const lcd=r('device_lcd',{ADDR:'0x27'}),oled=r('device_oled',{ADDR:'0x3c'}),adc=r('inout_analog_read',{PIN:'A4'});
+assert.equal(errors([lcd,oled]),'');assert.match(errors([lcd,adc]),/occupied/);assert(!R.choices([adc,lcd],adc.id,'PIN',avr).includes('A4'));assert(R.choices([adc,lcd],adc.id,'PIN',avr).includes('A6'));assert.match(errors([lcd,r('device_lcd',{ADDR:'39'})]),/address/);
+let sd=r('st_sd',{CS:'10'}),flash=r('st_spi_flash',{CS:'8'});assert.equal(errors([sd,flash]),'');assert.match(errors([sd,r('st_spi_flash',{CS:'10'})]),/occupied/);assert.match(errors([r('st_sd',{CS:'7'}),r('device_servo',{PIN:'10'})]),/occupied/);
+assert.match(errors([sd,r('st_sd',{CS:'4'})]),/maximum 1 sd/);assert.match(errors([sd,r('inout_digital_write',{PIN:'13'})]),/occupied/);
+const motor=r('device_stepper_driver',{STEP:'3',DIR:'4'});assert(!R.choices([motor],motor.id,'STEP',avr).includes('4'));
+const servo=r('device_servo',{PIN:'7'}),pwm=r('inout_analog_write',{PIN:'9'});assert.match(errors([servo,pwm]),/PWM timer/);assert(!R.choices([pwm,servo],pwm.id,'PIN',avr).includes('10'));assert(R.choices([servo],servo.id,'PIN',avr).includes('2'));
+assert.match(errors([servo,r('irq_timer1',{})]),/Timer1/);assert.equal(errors(Array.from({length:12},(_,i)=>r('device_servo',{PIN:String(i)}))),'');assert.match(errors(Array.from({length:13},(_,i)=>r('device_servo',{PIN:String(i)}))),/maximum 12/);
+assert.equal(errors([2,3,4].map(PIN=>r('music_buzzer',{PIN}))), '');assert.match(errors([2,3,4,5].map(PIN=>r('music_buzzer',{PIN}))),/maximum 3/);assert.match(errors([r('music_buzzer',{PIN:'4'}),r('inout_tone',{PIN:'5'})]),/Timer2/);assert.match(errors([r('device_ir_nec',{PIN:'2'}),r('inout_analog_write',{PIN:'3'})]),/Timer2/);
+assert.match(errors([r('serial_config',{}),r('device_servo',{PIN:'1'})]),/occupied/);assert.match(errors([r('irq_external',{PIN:'4'})]),/compatible irq/);assert.match(errors([r('irq_external',{PIN:'2'})],pico),/requires ATmega/);
+assert.match(errors([r('device_servo',{PIN:'PA0'}),r('inout_analog_write',{PIN:'PA1'})],stm),/TIM2/);assert.match(errors([r('device_ir_nec',{PIN:'PA0'}),r('inout_analog_write',{PIN:'PB8'})],stm),/TIM4/);
+assert.match(errors(Array.from({length:8},(_,i)=>r('device_servo',{PIN:String(i)})).concat([r('device_neopixel',{PIN:'8'})]),pico),/state machines/);
+assert.match(errors([r('device_servo',{PIN:'9'})],R.profile('unknown:unknown:unknown')),/verified/);
+assert.equal(errors([{...lcd,disabled:true},adc]),'');assert.match(errors([r('avr_pin_write',{PIN:'C4'}),lcd]),/occupied/);assert.match(errors([r('avr_port_bits',{PORT:'C',_MASK:16}),lcd]),/occupied/);assert.equal(errors([r('avr_port_bits',{PORT:'C',_MASK:1}),lcd]),'');assert.match(errors([r('avr_register_write',{REGISTER:'TCCR1A'}),servo]),/Timer1/);
+const occupied=avr.digital.map(PIN=>r('device_servo',{PIN})),newmotor=r('device_stepper_driver',{STEP:'',DIR:''});assert.deepEqual(R.choices(occupied.concat([newmotor]),newmotor.id,'STEP',avr),[]);
+assert.match(errors([sd,r('inout_buildin_led',{})]),/occupied/);assert.equal(errors([r('irq_external',{PIN:'2'}),r('inout_digital_read',{PIN:'2'})]),'');
+console.log('PASS resource contracts: AVR/Pico/Blue Pill pins, shared buses, address/CS collisions, ADC, IRQ, PWM/timers, UART, PIO, limits, masks, exhaustion and unsupported boards');

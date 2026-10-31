@@ -157,11 +157,11 @@
   define('device_stepper_driver','stepper','STEP/DIR stepper','motor',function(){
     var i=this.appendDummyInput();pfield(i,'STEP','STEP');pfield(i,'DIR','DIR');
     this.setFieldValue('3','STEP');this.setFieldValue('4','DIR');
-    this.appendDummyInput().appendField('max steps/s').appendField(integer(600,1,100000),'SPEED').appendField('accel steps/s²').appendField(integer(200,1,100000),'ACCEL');
+    this.appendDummyInput().appendField('max steps/s').appendField(integer(600,1,100000),'SPEED');this.appendDummyInput('ACCEL_SETTING').appendField('accel steps/s²').appendField(integer(200,1,100000),'ACCEL');
   },'A4988/DRV8825-style STEP/DIR driver. Use its own motor supply and common ground. Call run repeatedly to move.');
   define('device_stepper_coils','stepper','28BYJ-48 stepper','motor',function(){
     var i=this.appendDummyInput();for(var j=1;j<=4;j++){pfield(i,'IN'+j,'IN'+j);this.setFieldValue(String(j+7),'IN'+j);}
-    this.appendDummyInput().appendField('max steps/s').appendField(integer(500,1,100000),'SPEED').appendField('accel steps/s²').appendField(integer(100,1,100000),'ACCEL');
+    this.appendDummyInput().appendField('max steps/s').appendField(integer(500,1,100000),'SPEED');this.appendDummyInput('ACCEL_SETTING').appendField('accel steps/s²').appendField(integer(100,1,100000),'ACCEL');
   },'28BYJ-48 via ULN2003, half-step mode. Connector order is IN1, IN2, IN3, IN4; the library coil order is handled for you.');
   define('device_servo','servo','Servo','pan',function(){pfield(this.appendDummyInput(),'signal','PIN');this.setFieldValue('9','PIN');},'Standard hobby servo. The servo supply must match its voltage/current requirements; share ground with Arduino.');
   define('device_lcd','LCD','I2C LCD','display',function(){
@@ -188,7 +188,7 @@
   A.device_stepper_position=function(){return [name(resolve(this,'stepper'))+'.'+(this.getFieldValue('READ')==='DISTANCE'?'distanceToGo':'currentPosition')+'()',A.ORDER_ATOMIC];};
   stmt('device_stepper_stop','stepper','stop',null,'Decelerate to a stop. Keep calling run until motion has stopped.');
   A.device_stepper_stop=function(){return name(resolve(this,'stepper'))+'.stop();\n';};
-  stmt('device_servo_write','servo','angle',function(){this.appendValueInput('ANGLE').setCheck('Number').appendField('degrees');},'Set servo angle from 0 to 180 degrees. Allow settling time before taking a range measurement.');
+  stmt('device_servo_write','servo','set',function(){this.appendValueInput('ANGLE').setCheck('Number').appendField('value');},'Set servo angle from 0 to 180 degrees. Allow settling time before taking a range measurement.');
   A.device_servo_write=function(){return name(resolve(this,'servo'))+'.write('+val(this,'ANGLE','90')+');\n';};
   stmt('device_lcd_print','LCD','print',function(){this.appendValueInput('TEXT').appendField('value');this.appendValueInput('COL').setCheck('Number').appendField('column');this.appendValueInput('ROW').setCheck('Number').appendField('row');},'Print text or a number at a zero-based column and row. Printing a shorter value leaves old trailing characters; clear the row or pad with spaces.');
   A.device_lcd_print=function(){var n=name(resolve(this,'LCD'));return n+'.setCursor('+val(this,'COL','0')+', '+val(this,'ROW','0')+');\n'+n+'.print('+val(this,'TEXT','""')+');\n';};

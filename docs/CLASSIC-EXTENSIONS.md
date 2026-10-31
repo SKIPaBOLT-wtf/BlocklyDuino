@@ -75,3 +75,7 @@ upstream better, the boundaries above permit separate reviews of workspace UX,
 named devices/types, serial/backend, and hardware/storage/music modules. A future
 port to v2 requires an explicit migration of the Blockly APIs and XML formats.
 Feedback and alternative integration plans are welcome in the pull request.
+
+## Board-aware editing and scanning images
+
+See [board resources and workflow](BOARD-RESOURCES.md) for tabs, the auto-revealing toolbox, searchable board history, catalogue ordering/colours, pin and timer validation, continuous stepper mode, precise servo pulses and the streaming image Plotter.

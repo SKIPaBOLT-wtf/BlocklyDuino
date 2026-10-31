@@ -80,13 +80,14 @@
     var xmlTab=document.getElementById('tab_xml');if(xmlTab)xmlTab.className='taboff';
     if(typeof tabClick==='function')tabClick('blocks');
   }
-  function newProject(){
-    try{preserve('Before New project');}catch(error){status('Could not save a recovery copy. Export the project before starting again: '+error,true);return false;}
+  function newProject(keepRecovery){
+    try{if(keepRecovery!==false)preserve('Before New project');}catch(error){status('Could not save a recovery copy. Export the project before starting again: '+error,true);return false;}
     setMode(false);moveUndo=null;resetEditor();(ws||Blockly.mainWorkspace).clear();
     if(typeof setWorkspaceSource==='function')setWorkspaceSource('');
     if(typeof renderContent==='function')renderContent();if(typeof showCompileUsage==='function')showCompileUsage('');
     var build=document.getElementById('build_output');if(build)build.textContent='';
-    status('New empty project. Your previous blocks and text edits are under Project → Recover blocks.');return true;
+    if(keepRecovery===false){localStorage.removeItem('arduino');localStorage.removeItem('arduino_source');}
+    status(keepRecovery===false?'Project discarded. No recovery copy created.':'New empty project. Previous work is under Project → Recover blocks.');return true;
   }
   function dialog(title,message,actionLabel,action){
     var old=document.getElementById('ea-confirm');if(old)old.remove();
@@ -97,7 +98,7 @@
     var cancel=document.createElement('button');cancel.textContent='Cancel';cancel.onclick=function(){d.close();};controls.appendChild(cancel);
     var go=document.createElement('button');go.textContent=actionLabel;go.className='primary';go.onclick=function(){if(action()!==false)d.close();};controls.appendChild(go);d.appendChild(controls);document.body.appendChild(d);d.showModal();cancel.focus();
   }
-  function askNew(){dialog('Start a new project?','The workspace will become empty. A recovery copy of the current blocks and any C++ / XML text edits will be kept on this browser. Nothing is uploaded to the board.','Start empty project',newProject);}
+  function askNew(){dialog('Close current project?','Start an empty project. Keep a local recovery copy, or discard this experiment without saving it.','Keep recovery & close',newProject);var d=document.getElementById('ea-confirm'),b=document.createElement('button');b.textContent='Discard without saving';b.onclick=function(){if(newProject(false)!==false)d.close();};d.querySelector('.ea-dialog-buttons').insertBefore(b,d.querySelector('.primary'));}
   function deleteSelected(){
     if(!chosen.length)return;
     dialog('Delete selected stacks?','Remove '+chosen.length+' complete stacks ('+count(chosen)+' blocks)? A copy of the whole project will be kept under Project → Recover blocks.','Delete selected',function(){
@@ -140,7 +141,7 @@
     if(document.getElementById('editor_actions'))return;ws=Blockly.mainWorkspace;
     bar=document.createElement('div');bar.id='editor_actions';bar.className='editor-actions';
     function button(id,text,click){var b=document.createElement('button');b.id=id;b.textContent=text;b.onclick=click;bar.appendChild(b);return b;}
-    var newButton=button('new_project','New project',askNew);newButton.title='Start empty; keep a recoverable copy of current blocks and text edits';
+    var newButton=button('new_project','New project',askNew);newButton.title='Start empty; choose recovery copy or discard without saving';
     selectButton=button('select_stacks','Select stacks',function(){if(!ensureBlocksMode())return;setMode(!mode);});selectButton.title='Select mode: drag a rectangle, Shift-click to add/remove; drag any selected stack to move the group. Arrow keys: 1 unit; Shift+arrows: 10; Escape: finish';
     allButton=button('select_all_stacks','Select all',function(){setSelection(ws.getTopBlocks(false));});
     undoButton=button('undo_group_move','Undo move',undoMove);deleteButton=button('delete_selected_stacks','Delete selected',deleteSelected);
