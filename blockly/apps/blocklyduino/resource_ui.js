@@ -22,10 +22,10 @@
  }
  function setTarget(fqbn){p=R.profile(fqbn);update();}
  function allocate(b){if(!p||!p.known)throw Error('Select a board with a verified pin profile before adding hardware.');var s=R.specs[b.type];if(!s)return;
-  var fields=Object.keys(s.pins||{});fields.forEach(function(k){b.setFieldValue('',k);});
+  var fields=Object.keys(s.pins||{}),defaults={};fields.forEach(function(k){defaults[k]=b.getFieldValue(k);b.setFieldValue('',k);});
   // Reserve bus lines before assigning CS/DC/RESET or general-purpose pins.
-  fields.forEach(function(k){var opts=R.choices(records(b.workspace),b.id,k,p);if(!opts.length)throw Error('No free '+s.pins[k]+' pin for '+k+'. Required pins are occupied.');var preferred=opts.filter(function(v){return !p.serial.includes(v);});b.setFieldValue((preferred.length?preferred:opts)[0],k);});
-  if(s.bus==='I2C'&&b.getField('ADDR')){var f=b.getField('ADDR'),used=records(b.workspace).filter(function(r){return r.id!==b.id&&!r.disabled&&R.specs[r.type]&&R.specs[r.type].bus==='I2C';}).map(function(r){return Number(r.fields.ADDR);});var opts=f.getOptions_?f.getOptions_():null;if(!opts)opts=[[f.getValue(),f.getValue()]];var free=opts.filter(function(x){return used.indexOf(Number(x[1]))<0;});if(!free.length)throw Error('All supported I2C addresses for this module are occupied.');if(used.indexOf(Number(f.getValue()))>=0)f.setValue(free[0][1]);}
+  fields.forEach(function(k){var opts=R.choices(records(b.workspace),b.id,k,p);if(!opts.length)throw Error('No free '+s.pins[k]+' pin for '+k+'. Required pins are occupied.');var preferred=opts.filter(function(v){return !p.serial.includes(v);});var available=preferred.length?preferred:opts;b.setFieldValue(available.indexOf(defaults[k])>=0?defaults[k]:available[0],k);});
+  if(s.bus==='I2C'&&b.getField('ADDR')){var f=b.getField('ADDR'),used=records(b.workspace).filter(function(r){return r.id!==b.id&&!r.disabled&&R.specs[r.type]&&R.specs[r.type].bus==='I2C';}).map(function(r){return Number(r.fields.ADDR);});var opts=f.getOptions_?f.getOptions_():null;if(!opts){opts=[];for(var address=8;address<0x78;address++)opts.push(['0x'+address.toString(16),'0x'+address.toString(16)]);}var free=opts.filter(function(x){return used.indexOf(Number(x[1]))<0;});if(!free.length)throw Error('All supported I2C addresses for this module are occupied.');if(used.indexOf(Number(f.getValue()))>=0)f.setValue(free[0][1]);}
   var a=analysis(b.workspace);var error=a.errors.find(function(e){return e.id===b.id||e.id==='limits'||e.id==='timers';});if(error)throw Error(error.message);
  }
  function install(){if(installed)return;installed=true;Blockly.mainWorkspace.addChangeListener(function(){clearTimeout(pending);pending=setTimeout(update,180);});update();}
