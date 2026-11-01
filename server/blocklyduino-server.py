@@ -227,8 +227,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 sketch.mkdir()
                 (sketch / 'sketch.ino').write_text(code + '\n')
                 build = Path(tmp) / 'build'
+                # Explicit libraries outrank older sketchbook copies, including
+                # an old architecture-specific copy of a portable bundled library.
+                bundled = [arg for folder in sorted((ROOT / 'arduino/libraries').iterdir())
+                           if (folder / 'library.properties').is_file()
+                           for arg in ('--library', str(folder))]
                 result = subprocess.run([str(CLI), 'compile', '--fqbn', config['fqbn'],
-                    '--libraries', str(ROOT / 'arduino/libraries'),
+                    *bundled,
                     '--build-path', str(build), str(sketch)],
                     capture_output=True, text=True, timeout=120)
                 if result.returncode:

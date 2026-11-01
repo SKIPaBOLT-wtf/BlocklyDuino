@@ -49,12 +49,23 @@ interrupt and direct-register blocks. Legacy pin-bearing blocks use the same cap
   different CS is used, since SPI master mode needs SS configured as an output.
 - Serial blocks reserve hardware UART pins; USB Serial on Pico does not reserve
   GPIO. The Blue Pill profile follows the selected USB option.
-- Servo accepts ordinary digital pins, not only PWM-marked pins. On AVR its
+- The core Servo engine accepts ordinary digital pins. On AVR its
   Timer1 disables PWM D9/D10; the pins remain usable as servo signals. Named
   Timer1 interrupts conflict with Servo. Music allows three buzzer voices on
   one Timer2 and conflicts with core tone, IRremote and Timer2 PWM. Blue Pill
-  Servo/Tone/IRremote reserve TIM2/TIM3/TIM4 respectively. Pico Servo and
+  Servo/Tone/IRremote reserve TIM2/TIM3/TIM4 respectively. Pico Servo, tone and
   NeoPixel share the eight PIO state machines.
+- Hardware Servo uses actual PWM channels: AVR D9/D10, Pico PWM GPIO or the
+  Blue Pill profile's non-complementary timer outputs. Calibrated pulse endpoints
+  and refresh rate are configured once on the definition. Channels sharing a
+  timer must use the same refresh rate; independent duties remain available.
+- Hardware buzzer uses AVR D9/Timer1 or D11/Timer2, a Blue Pill PWM timer, or
+  Pico PIO. Independent note frequencies require independent timers (one PIO
+  state machine per concurrent Pico tone). Timer use excludes conflicting
+  Servo, stepper, interrupt, core tone, IRremote and analogWrite operations.
+  The shared note/SD format works with either buzzer engine, including mixed
+  hardware/software polyphony. Hardware AVR/STM32 note expiry is serviced from
+  loop; long blocking code can prolong a note, although waveform edges continue.
 - One SD card and one IR receiver are supported by the corresponding libraries.
 - Direct AVR pin operations use the same physical ownership map. Constant port
   masks reserve their selected bits; variable masks conservatively reserve the
@@ -64,16 +75,32 @@ interrupt and direct-register blocks. Legacy pin-bearing blocks use the same cap
 
 ## Motion and arithmetic
 
-Stepper definitions choose **position with acceleration** or **continuous speed,
-no acceleration**. In continuous mode, signed speed controls direction and zero
-stops. Call run every loop pass, without long waits. This generates AccelStepper
-`runSpeed()`; position mode uses `run()`, a target, acceleration and deceleration.
-An unreachable speed, driver wiring, current limit, supply or missing repeated
-run calls can still prevent physical motion. See examples 35a and 62.
+STEP/DIR definitions choose a portable **AccelStepper loop** engine or an
+**ATmega168/328 FastAccelStepper Timer1** engine. The latter needs STEP D9/D10,
+reserves Timer1, supports two motors, and does not need a run block in loop.
+It rejects Timer1 Servo/interrupt/PWM conflicts. Older XML retains the loop engine
+and its wiring. The loop engine also supports direct four-coil drivers.
 
-Servo write offers 0–180 degrees or 544–2400 µs pulse width. These are clamped to
-the API range; the physical servo decides useful travel and actual precision.
-Example 63 maps a potentiometer to the narrower 1000–2000 µs range.
+Motion modes are position with acceleration, continuous with acceleration, and
+(loop engine only) continuous instant speed. Signed speed accepts expressions;
+zero stops and sign selects direction. The default maximum remains a ceiling.
+Example 62 samples its control every 20 ms instead of delaying every polled step
+with ADC and mapping. Example 70 demonstrates fine/coarse Serial target commands
+and timer-generated pulses. See the [motion and pulse-engine guide](../blockly/apps/blocklyduino/examples/motion-guide.html)
+for performance, timing quantization, driver pulse width and resource details.
+
+The audit also covers Pico tone PIO allocation and PWM slice/channel aliases,
+Blue Pill PWM channel/remap sharing, and the pinned core's TIM1 mapping for
+PA7/PB0/PB1. Timing notes distinguish compatible pin allocation from CPU/interrupt
+latency. `tone` permits sequential use of multiple pins, but AVR and Blue Pill
+have only one simultaneously active core tone.
+
+Servo write offers 0–180 degrees or microsecond pulse width. Both use the
+definition's calibrated minimum/maximum; defaults remain 544–2400 µs for old
+projects. The core engine uses that portable API range. Hardware PWM supports
+refresh rates 40–400 Hz and requires the maximum pulse to be shorter than the
+frame. The physical servo decides useful travel and actual precision. Example
+63 uses 1000–2000 µs; example 71 combines calibrated hardware Servo and sound.
 
 Map exposes value, input low/high and output low/high as expression sockets.
 Defaults are 0–1023 to 0–255. It returns an integer, does not clamp, and returns
@@ -101,7 +128,7 @@ upgrades. Primary references:
 
 Undo/redo stores up to 60 workspace snapshots (12 MiB budget), including device identities, wiring, colours, comments, arrays and labelled areas. Ctrl+Z undoes; Ctrl+Shift+Z or Ctrl+Y redoes. A new edit clears the redo branch. History is session-local; XML save/autosave and explicit recovery copies remain available across reloads. Text editors keep their native text undo.
 
-Connections shows a board-specific labelled map for the supported profiles, with pin capabilities and coloured ownership. Pro Mini/Nano/Pico/Blue Pill use their labelled header arrangements; Uno/Duemilanove use a logical header-group view. Clone auxiliary pads can move, so always match printed labels. Servo, music and STEP/DIR work on ordinary digital pins. PWM-labelled pins are required by analogWrite; the resource model also checks the corresponding timer.
+Connections shows a board-specific labelled map for the supported profiles, with pin capabilities and coloured ownership. Pro Mini/Nano/Pico/Blue Pill use their labelled header arrangements; Uno/Duemilanove use a logical header-group view. Clone auxiliary pads can move, so always match printed labels. Allowed pins depend on the selected pulse engine. Hardware engines restrict the menu to their actual peripheral outputs and check timer/channel ownership; software engines can use ordinary GPIO.
 
 Map and routine value operations use inline sockets. Serial text opens a multiline editor: recognised JSON headers are pretty-printed for editing and compacted to one wire line. The scanner example uses ordinary Serial text/send blocks; old dedicated image blocks remain import-compatible but are absent from the palette.
 

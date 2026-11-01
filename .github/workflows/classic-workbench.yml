@@ -50,3 +50,4 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: python3 tools/install-arduino.py
       - run: python3 tools/compile-examples.py
+      - run: python3 tools/compile-pulse-probes.py

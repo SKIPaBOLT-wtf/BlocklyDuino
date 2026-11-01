@@ -109,12 +109,14 @@
     switch(c.type) {
       case 'device_stepper_driver':
       case 'device_stepper_coils':
+        if (A.configureTimerStepper && A.configureTimerStepper(c)) break;
         include('stepper','AccelStepper.h');
         A.definitions_[key]='AccelStepper '+n+'('+(c.type==='device_stepper_driver'
           ?'AccelStepper::DRIVER, '+f('STEP')+', '+f('DIR')
           :'AccelStepper::HALF4WIRE, '+f('IN1')+', '+f('IN3')+', '+f('IN2')+', '+f('IN4'))+');';
         A.setups_[key]=n+'.setMaxSpeed('+f('SPEED')+');\n'+n+'.setAcceleration('+f('ACCEL')+');';break;
       case 'device_servo':
+        if (A.configureHardwareServo && A.configureHardwareServo(c)) break;
         include('servo','Servo.h');A.definitions_[key]='Servo '+n+';';A.setups_[key]=n+'.attach('+f('PIN')+');';break;
       case 'device_lcd':
         include('wire','Wire.h');include('lcd','LiquidCrystal_I2C.h');

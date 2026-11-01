@@ -13,7 +13,7 @@
     inout_digital_write:'Write HIGH or LOW to a digital pin. For a named peripheral use its device action blocks.',
     inout_digital_read:'Read a digital input. A switch needs a pull-up or pull-down; floating inputs are unreliable.',
     inout_analog_read:'Read an analog input: 0–1023 on this Pro Mini. A4/A5 are also the I2C bus.',
-    inout_analog_write:'Set PWM duty from 0 (off) to 255 (on). On this Pro Mini use D3, D5, D6, D9, D10 or D11.',
+    inout_analog_write:'Set PWM duty from 0 (off) to 255 (on). This is hardware PWM. Pin choices follow the board and exclude timers used by Servo, music, IR or Timer1 steppers. It changes duty cycle, not STEP pulse frequency.',
     serial_print:'Print a value followed by a new line. Defaults to 9600 baud; a serial baud block overrides it. Monitor and Plotter share the connection and pause automatically for upload.',
     math_modulo:'Integer remainder. The divisor must not be zero. Useful for cycling an array index from 0 to length−1.',
     math_arithmetic:'Add, subtract, multiply, divide or raise to a power. Division returns a fractional value; use an integer variable to truncate it.',

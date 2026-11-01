@@ -106,3 +106,30 @@ variables, SD lines or EEPROM strings. Timed SD records add time and voice:
 Example 69 and POLY.TXT demonstrate three voices. The engine still targets AVR
 Timer2; cooperative SD access can delay event dispatch. Read sd-music-guide.html
 for limits and how to keep the main loop responsive.
+
+## Pulse engines and resource audit
+
+The STEP/DIR engine selector keeps legacy AccelStepper projects intact while
+adding FastAccelStepper 2.0.1 on ATmega168/328 Timer1 outputs D9/D10. The small
+BlocklyMotion adapters unify signed velocity, acceleration, stop and relative
+position semantics; they do not implement a second timer pulse engine. Host
+tests cover the adapters and real AVR builds compile the upstream library.
+
+Pin menus track the chosen engine, timer ownership, Pico tone PIO consumption,
+PWM channel aliases and STM32 default/remapped channels. Timing notes explain
+interrupt-disabled peripherals and the difference between a library throughput
+rating, timer resolution and actual measured motor performance. Example 70 is
+a commented, initially stopped Serial speed-control experiment.
+
+Hardware Servo uses calibrated PWM outputs on AVR, Pico and Blue Pill. Hardware
+buzzers use AVR output compare, Pico PIO or STM32 PWM; waveform edges need no
+audio-rate interrupt. The AVR three-voice DDS engine remains available where
+pin flexibility or voice count matters more than CPU cost. Static allocation
+checks shared timer frequencies, channels, remaps and competing peripherals.
+Unchanged targets avoid reconfiguring a timer on every loop iteration.
+
+The same note records, flash melodies and timed SD scores drive either sound
+engine. A small type-erased adapter is instantiated only for scores that mix
+hardware and software outputs. Hardware-only programs do not link the AVR
+software audio ISR. Example 71 demonstrates autonomous servo and sound output;
+the guide explains which duration/score tasks still need loop service.

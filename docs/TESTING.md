@@ -62,3 +62,13 @@ edit an ordinary serial header and a Project devices colour, then undo/redo.
 Check that non-Blocks views have no selection/zoom/example controls. Compilation
 alone cannot establish SD latency, physical note synchronisation or spare runtime
 stack space on ATmega168.
+
+Pulse-engine tests cover calibrated PWM, shared timer frequencies, channel
+aliases/remaps, acceleration/reversal, and generation without a UI workspace.
+Run `python3 tools/compile-pulse-probes.py` for the AVR engine combinations;
+add `--all-cores` after installing the pinned Pico and STM32 cores to build those
+hardware waveforms and SD polyphony too. The AVR builds inspect ELF symbols:
+hardware-only programs must retain weak default Timer1/Timer2 vectors, without
+linking the software audio ISR. These checks run in CI for AVR. Compiler commands
+explicitly select the bundled libraries so an older sketchbook copy cannot
+silently override them.

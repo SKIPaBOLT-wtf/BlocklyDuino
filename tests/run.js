@@ -7,6 +7,8 @@ const tests=[
   "tests/usability-tests/resource-ui.js",
   "tests/usability-tests/example-resources.js",
   "tests/usability-tests/motion.js",
+  "tests/motion-tests/check.js",
+  "tests/motion-tests/pulse-engines.js",
   "tests/usability-tests/image.js",
   "tests/usability-tests/image-ui.js",
   "tests/usability-tests/target.js",

@@ -17,7 +17,7 @@
    if(s.bus){var bus=p.buses[s.bus],f=b.getField('BOARD_BUS');if(f)f.setText(bus?s.bus+' · '+Object.keys(bus).map(function(k){return k+' '+R.label(p,bus[k]);}).join(' · '):'No compatible '+s.bus+' bus');}
    var errs=a.errors.filter(function(e){return e.id===b.id;});b.setWarningText(errs.length?errs.map(function(e){return e.message;}).join('\n'):null);
   });
-  var badge=document.getElementById('resource-status');if(badge){badge.textContent=a.errors.length?a.errors[0].message:(!p.known?'Pin validation unavailable for this board.':(a.notes.length?'Known pins checked · legacy / custom code needs review':'Pins and peripherals: no conflicts'));badge.className=a.errors.length||!p.known?'error':'';}
+  var badge=document.getElementById('resource-status');if(badge){badge.textContent=a.errors.length?a.errors[0].message:(!p.known?'Pin validation unavailable for this board.':(a.notes.length?'Pins checked · '+a.notes.length+' timing / resource note(s) in Connections':'Pins and peripherals: no conflicts'));badge.title=a.notes.join('\n');badge.className=a.errors.length||!p.known?'error':'';}
   if(window.selected==='connections'&&window.renderConnections)renderConnections();
  }
  function setTarget(fqbn){p=R.profile(fqbn);update();}

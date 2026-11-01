@@ -1,10 +1,6 @@
 #ifndef BLOCKLY_MUSIC_H
 #define BLOCKLY_MUSIC_H
-#include <Arduino.h>
-#include <avr/pgmspace.h>
-#include "BlocklyNote.h"
-
-struct BlocklyMusicNote { uint16_t frequency; uint16_t duration; };
+#include <BlocklyMusicTypes.h>
 
 class BlocklyBuzzer {
 public:

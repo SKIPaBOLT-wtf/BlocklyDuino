@@ -1,0 +1,384 @@
+<xml>
+  <block type="device_stepper_driver" x="25" y="25">
+    <mutation uid="timer70" />
+    <field name="NAME">motor</field>
+    <field name="ENGINE">TIMER</field>
+    <field name="STEP">9</field>
+    <field name="DIR">4</field>
+    <field name="SPEED">30000</field>
+    <field name="ACCEL">5000</field>
+    <field name="DRIVE_MODE">RAMPED</field>
+    <field name="DIR_DELAY_US">40</field>
+    <comment pinned="false" w="380" h="190">Purpose: Smooth continuous STEP/DIR control using Timer1, without polling pulses from loop. ATmega168/328: STEP=D9 (D10 also supported), DIR=D4. These are MCU signals; follow your driver module input wiring and voltage requirements. Timer1 is unavailable to Servo/PWM/Timer1 interrupt blocks. The sketch starts stopped. Read the Motion guide before connecting a motor.</comment>
+  </block>
+  <block type="serial_config" x="25" y="360">
+    <field name="BAUD">115200</field>
+    <comment pinned="false" w="380" h="190">Open Serial Monitor at 115200 baud. Send + or - for small signed speed changes, &gt; or &lt; for larger changes, r to reverse the target, and 0 to ramp to a stop. Newline/CR are ignored.</comment>
+  </block>
+  <block type="arduino_typed_variable" x="25" y="450">
+    <field name="VAR">targetSpeed</field>
+    <field name="TYPE">int32_t</field>
+    <field name="QUALIFIER">normal</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+    <comment pinned="false" w="380" h="190">Requested signed speed in driver pulses per second. This is not measured motor speed. Integer steps/s are sufficient here; actual pulse periods are quantized to timer ticks.</comment>
+  </block>
+  <block type="arduino_setup_section" x="25" y="570">
+    <comment pinned="false" w="380" h="190">The device definition initializes Timer1. No movement starts until a nonzero speed command is sent.</comment>
+    <statement name="DO">
+      <block type="serial_text">
+        <field name="TEXT">+/-:10  &lt;&gt;:1000  r:reverse  0:stop</field>
+        <field name="END">println</field>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_loop_section" x="500" y="25">
+    <comment pinned="false" w="380" h="190">No run block is required for the Timer1 engine. The loop handles commands while the library generates motor pulses. Do not disable interrupts for long periods.</comment>
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="serial_available" />
+            </value>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="arduino_typed_variable">
+            <field name="VAR">command</field>
+            <field name="TYPE">int</field>
+            <field name="QUALIFIER">normal</field>
+            <value name="VALUE">
+              <block type="serial_read" />
+            </value>
+            <comment pinned="false" w="380" h="190">Read one available byte. This local variable lives only in this if body.</comment>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="logic_operation">
+                    <field name="OP">AND</field>
+                    <value name="A">
+                      <block type="logic_compare">
+                        <field name="OP">NEQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">command</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">10</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="logic_compare">
+                        <field name="OP">NEQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">command</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">13</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">command</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">43</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <comment pinned="false" w="380" h="190">ASCII 43 is +. Change the target by 10 steps/s. The acceleration setting controls how smoothly the new speed is reached.</comment>
+                    <statement name="DO0">
+                      <block type="variables_set">
+                        <field name="VAR">targetSpeed</field>
+                        <value name="VALUE">
+                          <block type="math_arithmetic">
+                            <field name="OP">ADD</field>
+                            <value name="A">
+                              <block type="variables_get">
+                                <field name="VAR">targetSpeed</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <block type="math_number">
+                                <field name="NUM">10</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="controls_if">
+                        <value name="IF0">
+                          <block type="logic_compare">
+                            <field name="OP">EQ</field>
+                            <value name="A">
+                              <block type="variables_get">
+                                <field name="VAR">command</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <block type="math_number">
+                                <field name="NUM">45</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <comment pinned="false" w="380" h="190">ASCII 45 is -. Change the target by -10 steps/s. The acceleration setting controls how smoothly the new speed is reached.</comment>
+                        <statement name="DO0">
+                          <block type="variables_set">
+                            <field name="VAR">targetSpeed</field>
+                            <value name="VALUE">
+                              <block type="math_arithmetic">
+                                <field name="OP">ADD</field>
+                                <value name="A">
+                                  <block type="variables_get">
+                                    <field name="VAR">targetSpeed</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number">
+                                    <field name="NUM">-10</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                          </block>
+                        </statement>
+                        <next>
+                          <block type="controls_if">
+                            <value name="IF0">
+                              <block type="logic_compare">
+                                <field name="OP">EQ</field>
+                                <value name="A">
+                                  <block type="variables_get">
+                                    <field name="VAR">command</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number">
+                                    <field name="NUM">62</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                            <comment pinned="false" w="380" h="190">ASCII 62 is &gt;. Change the target by 1000 steps/s. The acceleration setting controls how smoothly the new speed is reached.</comment>
+                            <statement name="DO0">
+                              <block type="variables_set">
+                                <field name="VAR">targetSpeed</field>
+                                <value name="VALUE">
+                                  <block type="math_arithmetic">
+                                    <field name="OP">ADD</field>
+                                    <value name="A">
+                                      <block type="variables_get">
+                                        <field name="VAR">targetSpeed</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="math_number">
+                                        <field name="NUM">1000</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                              </block>
+                            </statement>
+                            <next>
+                              <block type="controls_if">
+                                <value name="IF0">
+                                  <block type="logic_compare">
+                                    <field name="OP">EQ</field>
+                                    <value name="A">
+                                      <block type="variables_get">
+                                        <field name="VAR">command</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="math_number">
+                                        <field name="NUM">60</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <comment pinned="false" w="380" h="190">ASCII 60 is &lt;. Change the target by -1000 steps/s. The acceleration setting controls how smoothly the new speed is reached.</comment>
+                                <statement name="DO0">
+                                  <block type="variables_set">
+                                    <field name="VAR">targetSpeed</field>
+                                    <value name="VALUE">
+                                      <block type="math_arithmetic">
+                                        <field name="OP">ADD</field>
+                                        <value name="A">
+                                          <block type="variables_get">
+                                            <field name="VAR">targetSpeed</field>
+                                          </block>
+                                        </value>
+                                        <value name="B">
+                                          <block type="math_number">
+                                            <field name="NUM">-1000</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </statement>
+                                <next>
+                                  <block type="controls_if">
+                                    <value name="IF0">
+                                      <block type="logic_compare">
+                                        <field name="OP">EQ</field>
+                                        <value name="A">
+                                          <block type="variables_get">
+                                            <field name="VAR">command</field>
+                                          </block>
+                                        </value>
+                                        <value name="B">
+                                          <block type="math_number">
+                                            <field name="NUM">114</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                    <comment pinned="false" w="380" h="190">ASCII 114 is r. The library brakes before reversing direction.</comment>
+                                    <statement name="DO0">
+                                      <block type="variables_set">
+                                        <field name="VAR">targetSpeed</field>
+                                        <value name="VALUE">
+                                          <block type="math_arithmetic">
+                                            <field name="OP">MINUS</field>
+                                            <value name="A">
+                                              <block type="math_number">
+                                                <field name="NUM">0</field>
+                                              </block>
+                                            </value>
+                                            <value name="B">
+                                              <block type="variables_get">
+                                                <field name="VAR">targetSpeed</field>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </statement>
+                                    <next>
+                                      <block type="controls_if">
+                                        <value name="IF0">
+                                          <block type="logic_compare">
+                                            <field name="OP">EQ</field>
+                                            <value name="A">
+                                              <block type="variables_get">
+                                                <field name="VAR">command</field>
+                                              </block>
+                                            </value>
+                                            <value name="B">
+                                              <block type="math_number">
+                                                <field name="NUM">48</field>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </value>
+                                        <comment pinned="false" w="380" h="190">ASCII 48 is 0. A zero target requests a decelerating stop.</comment>
+                                        <statement name="DO0">
+                                          <block type="variables_set">
+                                            <field name="VAR">targetSpeed</field>
+                                            <value name="VALUE">
+                                              <block type="math_number">
+                                                <field name="NUM">0</field>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </statement>
+                                        <next>
+                                          <block type="variables_set">
+                                            <field name="VAR">targetSpeed</field>
+                                            <value name="VALUE">
+                                              <block type="math_constrain">
+                                                <value name="VALUE">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">targetSpeed</field>
+                                                  </block>
+                                                </value>
+                                                <value name="LOW">
+                                                  <block type="math_number">
+                                                    <field name="NUM">-30000</field>
+                                                  </block>
+                                                </value>
+                                                <value name="HIGH">
+                                                  <block type="math_number">
+                                                    <field name="NUM">30000</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                            <next>
+                                              <block type="device_stepper_speed">
+                                                <field name="DEVICE">timer70</field>
+                                                <value name="SPEED">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">targetSpeed</field>
+                                                  </block>
+                                                </value>
+                                                <comment pinned="false" w="380" h="190">Submit a changed target to the timer engine. It plans acceleration and emits pulses in the background. Repeating an unchanged target does not restart the ramp.</comment>
+                                                <next>
+                                                  <block type="serial_send">
+                                                    <field name="END">println</field>
+                                                    <value name="VALUE">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">targetSpeed</field>
+                                                      </block>
+                                                    </value>
+                                                    <comment pinned="false" w="380" h="190">Print the requested speed only after commands. This avoids flooding Serial. At 30000 steps/s, one 16 MHz timer tick changes the obtainable rate by about 56 steps/s: several tiny requests may map to the same period.</comment>
+                                                  </block>
+                                                </next>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

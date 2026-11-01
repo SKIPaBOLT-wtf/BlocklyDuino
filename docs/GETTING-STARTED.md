@@ -27,9 +27,9 @@ fix for STM32duino 3.x: omit an unused private header that core no longer provid
 The original source is kept beside the library with a `.blocklyduino-original`
 suffix. If an Arduino IDE library update replaces it, rerun
 `python3 tools/arduino_compat.py` (or the dependency installer). Other library
-versions require review instead of being patched blindly. Custom BlocklyStorage, BlocklyMusic, BlocklySDMusic and BlocklyBuffers sources are
+versions require review instead of being patched blindly. Custom BlocklyStorage, BlocklyMusic, BlocklySDMusic, BlocklyBuffers and BlocklyMotion sources are
 bundled under `arduino/libraries`; the server supplies that directory to the
-compiler. To use exported code in Arduino IDE, copy those four library folders
+compiler. To use exported code in Arduino IDE, copy those five library folders
 into the IDE sketchbook's `libraries` folder as well.
 
 If Arduino CLI is not on PATH, pass `--cli /path/to/arduino-cli` to both scripts.

@@ -9,9 +9,10 @@ p.add_argument('--examples',nargs='*',help='Optional example filename prefixes')
 a=p.parse_args(); root=Path(__file__).resolve().parents[1]; os.chdir(root)
 subprocess.run(['node','tests/variables-validation/integration.js'],check=True,env={**os.environ,'GENERATE_SKETCHES':'1'})
 results=[]
+bundled=[arg for folder in sorted((root/'arduino/libraries').iterdir()) if (folder/'library.properties').is_file() for arg in ('--library',str(folder))]
 for sketch in sorted((root/'.test-build/sketches').iterdir()):
  if a.examples and not any(sketch.name.startswith(x) for x in a.examples): continue
- cmd=[a.cli,'compile','--fqbn',a.fqbn,'--libraries',str(root/'arduino/libraries'),str(sketch)]
+ cmd=[a.cli,'compile','--fqbn',a.fqbn,*bundled,str(sketch)]
  r=subprocess.run(cmd,capture_output=True,text=True,timeout=180)
  (sketch/'build.log').write_text(r.stdout+r.stderr)
  result={'example':sketch.name,'ok':r.returncode==0}

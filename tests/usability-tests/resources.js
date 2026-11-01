@@ -25,3 +25,44 @@ assert.match(errors([r('device_lcd',{ADDR:'0x27'}),r('dht_temperature',{PIN:'A4'
 assert.match(errors([r('ll_serial_number',{}),r('device_servo',{PIN:'0'})]),/occupied/);
 assert.match(errors([r('st_sd_list',{}),r('device_servo',{PIN:'1'})]),/occupied/);
 console.log('PASS resource contracts: AVR/Pico/Blue Pill pins, shared buses, address/CS collisions, ADC, IRQ, PWM/timers, UART, PIO, limits, masks, exhaustion and unsupported boards');
+
+// Audit pulse engines against the pinned core/library contracts.
+const fast=r('device_stepper_driver',{ENGINE:'TIMER',STEP:'9',DIR:'4'});
+assert.deepEqual(R.choices([fast],fast.id,'STEP',avr),['9','10']);
+assert.match(errors([fast,servo]),/Timer1/);assert.deepEqual(R.choices([fast,servo],servo.id,'PIN',avr),[]);
+assert.match(errors([fast,r('irq_timer1',{})]),/Timer1/);assert.match(errors([fast,r('inout_analog_write',{PIN:'10'})]),/PWM timer/);
+assert.equal(errors([fast,r('device_stepper_driver',{ENGINE:'TIMER',STEP:'10',DIR:'5'})]),'');
+assert.match(errors([r('device_stepper_driver',{ENGINE:'TIMER',STEP:'3',DIR:'4'})]),/compatible faststep/);
+assert.match(errors([fast],pico),/requires ATmega/);
+assert.deepEqual(R.choices([pwm],pwm.id,'PIN',avr),['3','5','6','9','10','11']);
+assert.equal(errors([r('device_servo',{PIN:'4'}),r('music_buzzer',{PIN:'7'})]),'');
+assert.equal(stm.pwmTimer.PA7,'TIM1');assert.equal(stm.pwmTimer.PB0,'TIM1');assert.equal(stm.pwmTimer.PB1,'TIM1');
+assert.equal(errors([r('inout_tone',{PIN:'PA0'}),r('inout_analog_write',{PIN:'PA7'})],stm),'');
+assert.match(errors([r('inout_analog_write',{PIN:'PA7'}),r('inout_analog_write',{PIN:'PA8'})],stm),/PWM channel/);
+assert.match(errors([r('inout_analog_write',{PIN:'PA6'}),r('inout_analog_write',{PIN:'PB5'})],stm),/PWM remap/);
+assert.equal(errors([r('inout_analog_write',{PIN:'PB10'}),r('inout_analog_write',{PIN:'PB11'})],stm),'');
+assert.match(errors([r('inout_analog_write',{PIN:'0'}),r('inout_analog_write',{PIN:'16'})],pico),/PWM channel/);
+const pios=Array.from({length:7},(_,i)=>r('device_servo',{PIN:String(i)}));
+assert.equal(errors(pios.concat([r('inout_tone',{PIN:'8'}),r('inout_tone',{PIN:'8'})]),pico),'');
+assert.match(errors(pios.concat([r('inout_tone',{PIN:'8'}),r('inout_tone',{PIN:'9'})]),pico),/state machines/);
+console.log('PASS PWM engine audit: Timer1 STEP pins, shared timer rejection, STM32 mappings/remaps, Pico PWM channel aliases and tone PIO budgets');
+
+const hwServo=(PIN,FRAME_HZ='50')=>r('device_servo',{ENGINE:'HARDWARE',PIN,FRAME_HZ});
+const hwSound=PIN=>r('music_buzzer',{ENGINE:'HARDWARE',PIN});
+assert.equal(errors([hwServo('9'),hwServo('10'),hwSound('11')]),'');
+assert.match(errors([hwServo('9'),hwServo('10','100')]),/same refresh/);
+assert.match(errors([hwServo('10'),hwSound('9')]),/one independent note frequency/);
+assert.match(errors([hwSound('9'),r('device_stepper_driver',{ENGINE:'TIMER',STEP:'10',DIR:'4'})]),/Timer1/);
+assert.match(errors([hwSound('11'),r('music_buzzer',{PIN:'4'})]),/Timer2/);
+assert.match(errors([hwSound('11'),sd]),/occupied/);
+assert.equal(errors([hwSound('9'),sd]),'');
+assert.equal(errors([hwSound('9'),r('music_buzzer',{PIN:'4'}),r('music_buzzer',{PIN:'5'})]),'');
+assert.equal(errors([hwServo('0'),hwServo('1')],pico),'');
+assert.match(errors([hwServo('0'),hwServo('16')],pico),/PWM channel/);
+assert.match(errors([hwServo('0'),hwServo('1','100')],pico),/same refresh/);
+assert.match(errors(pios.concat([hwSound('8'),hwSound('9')]),pico),/state machines/);
+assert.equal(errors([hwServo('PA0'),hwServo('PA1'),hwSound('PA6')],stm),'');
+assert.match(errors([hwServo('PA7')],stm),/compatible servopwm/);
+assert.match(errors([hwSound('PA0'),hwSound('PA1')],stm),/one independent note frequency/);
+assert.equal(errors([hwSound('PA0'),hwSound('PA6'),hwSound('PA8'),hwSound('PB6')],stm),'');
+console.log('PASS hardware waveform allocation: shared servo rates, independent audio timers, SPI collisions, mixed engines and board-specific channel budgets');

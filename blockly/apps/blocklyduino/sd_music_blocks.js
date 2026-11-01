@@ -8,10 +8,14 @@ function player(b){
  var extra=[];for(var v=2;start&&v<=Number(start.getFieldValue('VOICES')||1);v++)extra.push('&'+Blockly.MusicRegistry.name(Blockly.MusicRegistry.resolve(start,'buzzer','VOICE'+v)));
  var names=[buzzer].concat(extra.map(function(x){return x.slice(1);}));if(new Set(names).size!==names.length)throw Error('Choose a different buzzer for each score voice.');
  var format=start&&start.getFieldValue('VOICES')||'1';
- var declaration=(format==='1'?'BxSDMelody':'BxSDScore')+'<decltype('+card+')> bxScore('+card+', '+buzzer+(extra.length?', '+extra.join(', '):'')+');';
+
+ var configs=names.map(function(n){return b.workspace.getAllBlocks().filter(function(x){return x.type==='music_buzzer'&&Blockly.MusicRegistry.name(x)===n;})[0];});
+ var hard=configs.filter(function(c){return c.getFieldValue('ENGINE')==='HARDWARE';}).length,type=hard===0?'':hard===configs.length?', BxHardwareBuzzer':', BxBuzzerRef';
+ if(hard&&hard!==configs.length){A.definitions_.sd_output_adapter='#include <BlocklyHardwareBuzzer.h>';names=names.map(function(n){var ref=n+'_score_ref';A.definitions_['sd_ref_'+n]='BxBuzzerRef '+ref+'('+n+');';return ref;});}
+ var declaration=(format==='1'?'BxSDMelody':'BxSDScore')+(hard?'T':'')+'<decltype('+card+')'+type+'> bxScore('+card+', '+names[0]+names.slice(1).map(function(n){return ', &'+n;}).join('')+');';
  if(A.definitions_.sd_score_object&&A.definitions_.sd_score_object!==declaration)
    throw Error('Use one SD score player per program. Select the same card and buzzer in all score actions.');
- A.definitions_.sd_score_include='#include <BlocklySDMusic.h>';
+ A.definitions_.sd_score_include=hard?'#include <BlocklySDMusicCore.h>':'#include <BlocklySDMusic.h>';
  A.definitions_.sd_score_object=declaration;return 'bxScore';
 }
 function def(type,label,output,tip,extra){

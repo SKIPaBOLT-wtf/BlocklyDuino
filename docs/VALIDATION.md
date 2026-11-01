@@ -1,3 +1,52 @@
+# Pulse engines and timing audit — 2026-11-01
+
+- All 24 JavaScript suites and 20 Python backend tests pass. All 80 numbered XML
+  examples generate C++, pass declared pin/resource validation, and compile for
+  Pro Mini ATmega328P / 16 MHz with explicitly selected bundled libraries.
+- Host simulations exercise continuous ramps/reversal, stepper adapter semantics,
+  AVR servo/audio registers at 8/16 MHz, shared timer/channel ownership, unchanged
+  target phase preservation, note expiry/rollover and mixed-output score dispatch.
+  Existing buffer, note/SD, image and exhaustive Timer1 simulations also pass.
+- Ten additional pulse-engine combinations compile with pinned AVR, Pico and
+  STM32 cores. Hardware-only AVR ELF files retain weak default Timer1/Timer2
+  vectors and contain no software `BlocklyBuzzer` implementation. That avoids
+  the software mixer's unused ISR and state, rather than merely disabling it.
+
+| Build | Flash | Static RAM |
+| --- | ---: | ---: |
+| 70 · Timer1 speed commands, ATmega168 / 16 MHz | 13,504 B | 636 B |
+| 70 · Timer1 speed commands, ATmega168 / 8 MHz | 13,578 B | 642 B |
+| 71 · hardware Servo + sound, ATmega168 / 16 MHz | 3,526 B | 66 B |
+| 71 · hardware Servo + sound, ATmega168 / 8 MHz | 3,500 B | 66 B |
+| Hardware text-note SD player, ATmega168 | 13,046 B | 755 B |
+| Hardware timed SD score, one voice, ATmega168 | 12,896 B | 817 B |
+| Mixed hardware + software SD score, ATmega328P | 14,448 B | 889 B |
+| Hardware Servo + sound, Pico | 59,364 B | 9,044 B |
+| Hardware timed SD score, three voices, Pico | 74,236 B | 12,404 B |
+| Hardware Servo + sound, Blue Pill F103C8 | 31,500 B | 4,172 B |
+| Hardware timed SD score, three voices, Blue Pill | 36,132 B | 5,628 B |
+
+The mixed SD variant exceeds the standard ATmega168 bootloader's 14,336-byte
+application limit. The one-voice hardware SD score leaves 207 bytes of its
+1,024-byte SRAM for stack/runtime work. Static RAM counts exclude heap and do
+not establish worst-case runtime margin. FastAccelStepper's 16 MHz speed ratings
+are upstream library figures, not measurements of the tested hardware; 8 MHz
+compile success does not imply the same throughput.
+
+Generation checks include a workspace without `Blockly.mainWorkspace`: hardware
+melody service must still appear in loop and must not leak into another project.
+Browser checks cover Timer1 STEP choices restricted to D9/D10, acceleration/mode
+fields, hardware Servo/buzzer ownership and generated code. No firmware was
+uploaded and no pulse rate, motor movement or physical audio was measured.
+
+The installed local HTTP compile endpoint builds examples 70 and 71 for
+ATmega168 using normal sketchbook libraries, with the sizes reported above.
+Served editor assets, examples and the pulse guide match the tested sources.
+
+Earlier dated runs below describe their then-current versions.
+
+---
+
 # Editing, buffers and polyphonic scores — 2026-11-01
 
 - All 22 JavaScript suites pass. Real bundled Blockly generates 177 static toolbox
