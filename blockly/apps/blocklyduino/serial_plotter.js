@@ -6,7 +6,7 @@ var KEY='blocklyduino.plotter.profiles.v1',MODE='blocklyduino.plotter.mode.v1',A
 var profiles=Object.create(null),profile=null,samples=[],total=0,ignored=0,errors=0,paused=false,dirty=true,lastRender=0;
 var capture=null,captured=[],captureRecords=[],captureBytes=0,profileRevision=0,captureName='serial',demo=null,priorDemo=null,connected=false,diagnostic=[];
 var messageHistory=[],controlNodes=Object.create(null),controlGeneration=0,waitingNotice=false,resetBeforeSequence=0;
-var widgetNodes=[],imageWidgets=[],inlineImagesActive=true,legacyImageKey='',acquisition='idle',startRetry=null,startAttempts=0,sendBusy=false,startGeneration=0,startAfterSequence=0,currentEventSequence=0;
+var widgetNodes=[],imageWidgets=[],inlineImagesActive=true,legacyImageKey='',acquisition='idle',startRetry=null,startAttempts=0,sendBusy=false,startGeneration=0,startAfterSequence=0,currentEventSequence=0,startHeaderDeadline=0,startHeaderProgress=0;
 function load(key,fallback){try{var v=localStorage.getItem(key);return v==null?fallback:JSON.parse(v);}catch(e){return fallback;}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){notice('Browser storage is full. Export your profile to a file.','error');return false;}}
 function node(tag,text,cls){var n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
@@ -32,10 +32,10 @@ function captureConfiguration(){
  else if(profile)captureRecord({kind:'configuration',revision:profileRevision,ts:Date.now(),profile:profile},false);
 }
 function apply(next,source,parsed){
- var p=P.validate(next),fromImage=!inlineImagesActive;if(!parsed)parser.setProfile(p);inlineImagesActive=true;
- if(profile&&JSON.stringify(profile)===JSON.stringify(p)&&!fromImage)return;
+ var p=P.validate(next),fromImage=!inlineImagesActive,keepControls=!!(parsed&&profile&&profile.id===p.id);if(!parsed)parser.setProfile(p);inlineImagesActive=true;
+ if(profile&&JSON.stringify(profile)===JSON.stringify(p)&&!fromImage){if(parsed)updateControlState(headerControlValues(p),true);return;}
  if(window.PlotterImage)PlotterImage.show(false);
- profile=p;profileRevision++;samples=[];total=0;messageHistory=[];$('board-message').hidden=true;dirty=true;waitingNotice=false;buildWidgets();buildControls();captureConfiguration();
+ profile=p;profileRevision++;samples=[];total=0;messageHistory=[];$('board-message').hidden=true;dirty=true;waitingNotice=false;buildWidgets();buildControls(keepControls);if(parsed&&!keepControls)updateControlState(headerControlValues(p),true);captureConfiguration();
  $('dashboard-title').textContent=p.title;$('dashboard-meta').textContent=p.id+' · '+p.fields.length+' fields · '+p.history+' history samples · '+source;
  $('profiles').value=Object.prototype.hasOwnProperty.call(profiles,p.id)?p.id:'';
  $('dashboard-description').textContent=p.description||'';$('dashboard-description').hidden=!p.description;
@@ -45,7 +45,7 @@ function streamControls(){
  $('stream-start').disabled=!connected||sendBusy||acquisition==='waiting';$('stream-stop').disabled=!connected||sendBusy;refreshControlAvailability();
  $('stream-status').textContent=!connected?'Connect, then Start':acquisition==='waiting'?(parser.mode==='manual'?'Waiting for the first sample…':profile?'Waiting for the board…':'Waiting for the board’s dashboard…'):acquisition==='running'?'Receiving · controller started':acquisition==='stopped'?'Stopped · connection stays open':profile?'Dashboard ready':'Waiting for dashboard · press Start';
 }
-function cancelStart(){clearTimeout(startRetry);startRetry=null;startGeneration++;}
+function cancelStart(){clearTimeout(startRetry);startRetry=null;startGeneration++;startHeaderDeadline=0;startHeaderProgress=0;}
 function headerReceived(){if(acquisition==='waiting'&&(!currentEventSequence||currentEventSequence>startAfterSequence)){cancelStart();acquisition='running';streamControls();}else if(acquisition==='idle'&&profile){streamControls();}}
 function sampleReceived(){headerReceived();if(acquisition==='idle'){acquisition='running';streamControls();}if(!demo&&$('notice').className!=='error')notice('');}
 async function sendStart(generation){
@@ -56,11 +56,16 @@ async function sendStart(generation){
  finally{sendBusy=false;streamControls();}
  if(generation!==startGeneration||acquisition!=='waiting')return;
  // Port opening resets many AVR boards. Three bounded attempts cover their bootloader.
- startRetry=setTimeout(function(){
+ function retry(){
   if(generation!==startGeneration||acquisition!=='waiting')return;
+  // A fresh partial header proves the board is answering. Let its bounded line
+  // finish instead of restarting the sketch while a slow UART is transmitting.
+  var now=Date.now();if(startHeaderDeadline&&now<startHeaderDeadline&&now-startHeaderProgress<2000){startRetry=setTimeout(retry,Math.min(1800,startHeaderDeadline-now));return;}
+  if(startHeaderDeadline){lines.reset();startHeaderDeadline=0;startHeaderProgress=0;}
   if(startAttempts<3)sendStart(generation);
   else{acquisition='idle';startRetry=null;streamControls();notice('No dashboard header or valid sample received. Check the sketch and baud rate, then press Start again. Existing serial data still reaches Monitor.','error');}
- },1800);
+ }
+ startRetry=setTimeout(retry,1800);
 }
 $('stream-start').onclick=async function(){
  if(!connected){notice('Choose a serial port above and connect first.','error');return;}
@@ -108,52 +113,93 @@ var lines=new P.Lines(data,function(message){reportError(message);});
 var client=new window.SerialClient({
  onReset:function(){lines.reset();resetBeforeSequence=0;if(parser.mode!=='manual')resetView(false);},
  onGap:function(count){lines.reset();log('Serial history gap: '+count+' events lost; partial sample discarded.');notice('Some serial data was lost before this view received it.','error');},
- onEvents:function(events){if(demo)return;events.forEach(function(e){if(e.seq&&e.seq<=resetBeforeSequence)return;currentEventSequence=e.seq||0;if(e.direction==='rx')lines.push(e.text,e.ts);else if(e.direction==='system'){lines.reset();log(e.text);}});},
+ onEvents:function(events){if(demo)return;events.forEach(function(e){if(e.seq&&e.seq<=resetBeforeSequence)return;currentEventSequence=e.seq||0;if(e.direction==='rx'){
+  lines.push(e.text,e.ts);
+  if(acquisition==='waiting'&&(!e.seq||e.seq>startAfterSequence)&&/^@plot(?:\s|$)/.test(lines.buffer)){
+   var now=Date.now();if(!startHeaderDeadline){var baud=Math.max(50,Number(client.state.baud)||115200);startHeaderDeadline=now+Math.min(45000,Math.max(6000,Math.ceil(32768*10*1000/baud)+1000));}startHeaderProgress=now;
+  }
+ }else if(e.direction==='system'){lines.reset();log(e.text);}});},
  onStatus:function(state){if(connected&&!state.connected){lines.reset();cancelStart();acquisition='idle';}connected=!!state.connected;streamControls();},
  onError:function(message){if(message)notice(message,'error');}
 });
 window.SerialClient.mountControls($('serial-connection'),client);client.start({replay:true});streamControls();
 function showBoardMessage(message,level){messageHistory.push(message);if(messageHistory.length>8)messageHistory.shift();$('board-message').hidden=false;$('board-message').dataset.level=level||'info';var textOnly=profile&&!profile.fields.length&&!profile.widgets.length;$('board-message').classList.toggle('message-console',!!textOnly);$('board-message-text').textContent=textOnly?messageHistory.join('\n'):message;}
-function refreshControlAvailability(){Object.keys(controlNodes).forEach(function(id){var ref=controlNodes[id];ref.elements.forEach(function(el){el.disabled=!connected||!!demo||!!ref.busy;});});}
+function fixedControl(control){return(control.type==='number'||control.type==='slider')&&control.min!=null&&control.min===control.max;}
+function refreshControlAvailability(){Object.keys(controlNodes).forEach(function(id){var ref=controlNodes[id];ref.elements.forEach(function(el){el.disabled=!connected||!!demo||!!ref.busy||fixedControl(ref.control);});});}
 function setControlInput(ref,value){if(ref.control.type==='checkbox')ref.input.checked=!!value;else ref.input.value=value==null?'':String(value);if(ref.output)ref.output.textContent=String(value)+(ref.control.unit?' '+ref.control.unit:'');}
 function controlInputValue(ref){return ref.control.type==='checkbox'?ref.input.checked:ref.input.value;}
 function sameControlValue(ref,value){try{return P.controlValue(ref.control,controlInputValue(ref))===value;}catch(error){return false;}}
-function updateControlState(values){Object.keys(values).forEach(function(id){
- var ref=controlNodes[id];if(!ref)return;var value=values[id];ref.boardValue=value;
- if(ref.pending&&value===ref.sentValue)ref.pending=false;
+function clearControlConfirmation(ref){clearTimeout(ref.confirmTimer);ref.confirmTimer=null;ref.pending=false;}
+function waitControlConfirmation(ref,token){
+ clearTimeout(ref.confirmTimer);var baud=Math.max(50,Number(client.state.baud)||115200),timeout=Math.min(45000,Math.max(8000,Math.ceil(32768*10*1000/baud)+2000));
+ ref.confirmTimer=setTimeout(function(){if(controlNodes[ref.control.id]!==ref||ref.requestToken!==token||!ref.pending)return;clearControlConfirmation(ref);ref.dirty=!sameControlValue(ref,ref.boardValue);ref.feedback.textContent='No confirmation · last board value: '+String(ref.boardValue)+' · send again to retry';ref.feedback.className='control-feedback error';},timeout);
+}
+function updateControlState(values,fromHeader){var ids=Object.keys(values);ids.forEach(function(id){
+ var ref=controlNodes[id];if(!ref)return;var sequence=currentEventSequence||0,value=values[id];
+ if(sequence&&((ref.pending&&sequence<=ref.requestSequence)||sequence<ref.lastStateSequence))return;
+ // A fresh single-key state is an explicit reply for this control, including
+ // a rejected/clamped value. A full state may belong to another pending send.
+ var explicitReply=!fromHeader&&ids.length===1&&sequence>ref.requestSequence,adjusted=ref.pending&&explicitReply&&value!==ref.sentValue;
+ if(ref.pending&&(value===ref.sentValue||(fromHeader&&value!==ref.boardValue)||explicitReply))clearControlConfirmation(ref);
+ ref.boardValue=value;if(sequence)ref.lastStateSequence=sequence;
  if((ref.dirty||ref.pending)&&!sameControlValue(ref,value)){
   ref.feedback.textContent='Board: '+String(value)+(ref.pending?' · waiting for confirmation':' · edit not sent');
- }else{setControlInput(ref,value);ref.dirty=false;ref.feedback.textContent=ref.pending?'Sent · waiting for board confirmation':'Confirmed by board';}
+ }else{setControlInput(ref,value);ref.dirty=false;ref.feedback.textContent=ref.pending?'Sent · waiting for board confirmation':adjusted?'Board applied '+String(value)+' · requested '+String(ref.sentValue):'Confirmed by board';}
  ref.feedback.className='control-feedback';
 });}
-function buildControls(){
- controlGeneration++;controlNodes=Object.create(null);$('control-list').replaceChildren();var controls=profile.controls||[];$('board-controls').hidden=!controls.length;
- controls.forEach(function(control){
-  var box=node('div',null,'program-control'),row=node('div',null,'control-input-row'),label=node('label',control.label||control.id),feedback=node('span','','control-feedback'),element,send=null,output=null;
-  if(control.type==='button'){element=node('button',control.label||control.id);element.type='button';label.textContent='';}
-  else if(control.type==='select'){element=node('select');control.options.forEach(function(o){element.add(new Option(o.label,o.value));});}
-  else{element=node('input');element.type=control.type==='slider'?'range':control.type==='checkbox'?'checkbox':control.type==='number'?'number':'text';if(control.min!=null)element.min=control.min;if(control.max!=null)element.max=control.max;if(control.step!=null)element.step=control.step;else if(control.type==='number')element.step='any';if(control.maxLength!=null)element.maxLength=control.maxLength;}
-  element.id='program-control-'+control.id;element.setAttribute('aria-label',control.label||control.id);label.htmlFor=element.id;row.appendChild(element);var ref={control:control,input:element,feedback:feedback,elements:[element],busy:false,pending:false,dirty:false,boardValue:control.value,sentValue:undefined,output:null};
-  if(control.type==='slider'){output=node('output',null,'control-output');output.htmlFor=element.id;row.appendChild(output);ref.output=output;}
-  if(control.type==='number'||control.type==='text'){send=node('button','Send');send.type='button';send.setAttribute('aria-label','Send '+(control.label||control.id));row.appendChild(send);ref.elements.push(send);}
-  if(control.type!=='button'){setControlInput(ref,control.value);element.oninput=function(){ref.dirty=true;if(ref.output)ref.output.textContent=element.value+(control.unit?' '+control.unit:'');ref.feedback.textContent='Not sent yet';};}
-  async function transmit(){
-   if(!connected||demo||ref.busy)return;var generation=controlGeneration,command;
-   try{command=P.controlCommand(control,controlInputValue(ref));ref.sentValue=control.type==='button'?undefined:P.controlValue(control,controlInputValue(ref));}catch(error){feedback.textContent=error.message;feedback.className='control-feedback error';return;}
-   ref.busy=true;ref.pending=control.type!=='button';ref.dirty=false;feedback.textContent='Sending…';feedback.className='control-feedback';refreshControlAvailability();
-   try{await client.write(command,'lf');if(generation===controlGeneration){if(ref.pending)feedback.textContent='Sent · waiting for board confirmation';else if(control.type==='button')feedback.textContent='Command sent';}}
-   catch(error){if(generation===controlGeneration){feedback.textContent=error.message;feedback.className='control-feedback error';ref.pending=false;}}
-   finally{ref.busy=false;if(generation===controlGeneration)refreshControlAvailability();}
+function headerControlValues(next){var values=Object.create(null);(next.controls||[]).forEach(function(c){if(c.type!=='button')values[c.id]=c.value;});return values;}
+function makeControl(control){
+ var box=node('div',null,'program-control'),row=node('div',null,'control-input-row'),label=node('label'),feedback=node('span','','control-feedback'),help=node('p','','hint'),element,send=null;
+ if(control.type==='button'){element=node('button');element.type='button';}
+ else if(control.type==='select')element=node('select');
+ else{element=node('input');element.type=control.type==='slider'?'range':control.type==='checkbox'?'checkbox':control.type==='number'?'number':'text';}
+ element.id='program-control-'+control.id;label.htmlFor=element.id;row.appendChild(element);var ref={control:control,box:box,input:element,feedback:feedback,elements:[element],busy:false,pending:false,dirty:false,boardValue:control.value,sentValue:undefined,requestSequence:0,lastStateSequence:0,requestToken:0,confirmTimer:null,output:null};
+ if(control.type==='slider'){ref.output=node('output',null,'control-output');ref.output.htmlFor=element.id;row.appendChild(ref.output);}
+ if(control.type==='number'||control.type==='text'){send=node('button','Send');send.type='button';row.appendChild(send);ref.elements.push(send);}
+ ref.define=function(next){control=next;ref.control=next;label.textContent=next.type==='button'?'':next.label||next.id;element.setAttribute('aria-label',next.label||next.id);if(next.type==='button')element.textContent=next.label||next.id;
+  ['min','max','step','maxLength'].forEach(function(key){if(next[key]!=null)element.setAttribute(key,String(next[key]));else element.removeAttribute(key);});if(next.type==='number'&&next.step==null)element.step='any';
+  if(next.type==='select'){element.replaceChildren();next.options.forEach(function(o){element.add(new Option(o.label,o.value));});}
+  if(send)send.setAttribute('aria-label','Send '+(next.label||next.id));var fixed=fixedControl(next),reason=fixed?'Fixed at '+String(next.min)+(next.unit?' '+next.unit:'')+'; the current limits allow only this value.':'';
+  help.textContent=[reason,next.help||''].filter(Boolean).join(' ');help.hidden=!help.textContent;box.classList.toggle('fixed-control',fixed);ref.elements.forEach(function(el){if(reason)el.title=reason;else el.removeAttribute('title');});
+ };
+ ref.define(control);if(control.type!=='button'){setControlInput(ref,control.value);element.oninput=function(){ref.dirty=true;if(ref.output)ref.output.textContent=element.value+(control.unit?' '+control.unit:'');ref.feedback.textContent='Not sent yet';ref.feedback.className='control-feedback';};}
+ async function transmit(){
+  if(!connected||demo||ref.busy||fixedControl(control))return;var token,command;
+  try{command=P.controlCommand(control,controlInputValue(ref));ref.sentValue=control.type==='button'?undefined:P.controlValue(control,controlInputValue(ref));}catch(error){feedback.textContent=error.message;feedback.className='control-feedback error';return;}
+  token=++ref.requestToken;clearTimeout(ref.confirmTimer);ref.confirmTimer=null;ref.requestSequence=Math.max(Number(client.state.seq)||0,Number(client.cursor)||0,currentEventSequence||0);ref.busy=true;ref.pending=control.type!=='button';ref.dirty=false;feedback.textContent='Sending…';feedback.className='control-feedback';refreshControlAvailability();
+  try{var response=await client.write(command,'lf');if(controlNodes[control.id]===ref&&token===ref.requestToken){if(response&&Number.isSafeInteger(response.seq))ref.requestSequence=Math.max(ref.requestSequence,response.seq);if(ref.pending){feedback.textContent='Sent · waiting for board confirmation';waitControlConfirmation(ref,token);}else if(control.type==='button')feedback.textContent='Command sent';}}
+  catch(error){if(controlNodes[control.id]===ref&&token===ref.requestToken){feedback.textContent=error.message;feedback.className='control-feedback error';clearControlConfirmation(ref);}}
+  finally{if(token===ref.requestToken)ref.busy=false;if(controlNodes[control.id]===ref)refreshControlAvailability();}
+ }
+ if(control.type==='button')element.onclick=transmit;else if(send){send.onclick=transmit;element.onkeydown=function(event){if(event.key==='Enter'){event.preventDefault();transmit();}};}else element.onchange=transmit;
+ box.append(label,row,feedback,help);return ref;
+}
+function buildControls(preserve){
+ controlGeneration++;var oldNodes=controlNodes,previous=preserve?controlNodes:Object.create(null),next=Object.create(null),controls=profile.controls||[],list=$('control-list'),active=document.activeElement,selection=active&&active.selectionStart!=null?[active.selectionStart,active.selectionEnd]:null,invalidated=[];
+ $('board-controls').hidden=!controls.length;
+ controls.forEach(function(control,index){
+  var ref=previous[control.id];if(!ref||ref.control.type!==control.type)ref=makeControl(control);
+  else{
+   var draft=controlInputValue(ref),edited=ref.dirty||ref.pending;ref.define(control);
+   if(control.type!=='button'){
+    var valid=true;try{P.controlValue(control,draft);}catch(error){valid=false;}
+    if(edited&&valid)setControlInput(ref,draft);
+    else if(edited&&!valid){ref.dirty=false;clearControlConfirmation(ref);setControlInput(ref,control.value);invalidated.push(ref);}
+    else setControlInput(ref,control.value);
+   }
   }
-  if(control.type==='button')element.onclick=transmit;else if(send){send.onclick=transmit;element.onkeydown=function(event){if(event.key==='Enter'){event.preventDefault();transmit();}};}else element.onchange=transmit;
-  box.append(label,row,feedback);if(control.help)box.appendChild(node('p',control.help,'hint'));$('control-list').appendChild(box);controlNodes[control.id]=ref;
- });refreshControlAvailability();
+  next[control.id]=ref;if(list.children[index]!==ref.box)list.insertBefore(ref.box,list.children[index]||null);
+ });
+ Array.prototype.slice.call(list.children).forEach(function(box){if(!controls.some(function(c){return next[c.id].box===box;}))box.remove();});Object.keys(oldNodes).forEach(function(id){if(next[id]!==oldNodes[id])clearControlConfirmation(oldNodes[id]);});controlNodes=next;
+ if(preserve){updateControlState(headerControlValues(profile),true);invalidated.forEach(function(ref){ref.feedback.textContent='Allowed values changed · board value applied';});}
+ if(active&&active.isConnected&&document.activeElement!==active){active.focus();if(selection&&active.setSelectionRange)active.setSelectionRange(selection[0],selection[1]);}
+ refreshControlAvailability();
 }
 function resetView(explicit){
  cancelStart();acquisition='idle';lines.reset();waitingNotice=false;paused=false;$('pause').textContent='Pause view';$('pause').classList.remove('paused-label');if(window.PlotterImage){PlotterImage.pause(false);if(PlotterImage.reset)PlotterImage.reset();else PlotterImage.show(false);}
  if(explicit)resetBeforeSequence=Math.max(Number(client.state.seq)||0,Number(client.cursor)||0);messageHistory=[];$('board-message').hidden=true;$('board-message-text').textContent='';
  if(parser.mode==='manual'&&profile){parser.setProfile(profile);samples=[];total=0;dirty=true;if(explicit)imageWidgets=[];buildWidgets();buildControls();}
- else{parser.reset();profile=null;samples=[];total=0;widgetNodes=[];imageWidgets=[];inlineImagesActive=true;legacyImageKey='';controlGeneration++;controlNodes=Object.create(null);$('control-list').replaceChildren();$('board-controls').hidden=true;$('dashboard-description').hidden=true;$('dashboard-title').textContent='Waiting for your board';$('dashboard-meta').textContent='The program supplies its own dashboard.';$('dashboard').replaceChildren(node('div','Connect, then press Start. The program’s header will create its readings and controls here.','empty'));}
+ else{parser.reset();profile=null;samples=[];total=0;widgetNodes=[];imageWidgets=[];inlineImagesActive=true;legacyImageKey='';controlGeneration++;Object.keys(controlNodes).forEach(function(id){clearControlConfirmation(controlNodes[id]);});controlNodes=Object.create(null);$('control-list').replaceChildren();$('board-controls').hidden=true;$('dashboard-description').hidden=true;$('dashboard-title').textContent='Waiting for your board';$('dashboard-meta').textContent='The program supplies its own dashboard.';$('dashboard').replaceChildren(node('div','Connect, then press Start. The program’s header will create its readings and controls here.','empty'));}
  $('sample-stats').textContent='0 samples';notice(parser.mode==='manual'?'Manual dashboard cleared; waiting for matching data.':'View reset. Waiting for a fresh dashboard header; press Start to request it.');streamControls();
 }
 $('reset-view').onclick=function(){if(demo)stopDemo();resetView(true);};

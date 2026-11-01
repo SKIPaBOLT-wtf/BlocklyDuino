@@ -4,7 +4,7 @@ const out=path.resolve('blockly/apps/blocklyduino');
 const app=path.join(sourceRoot,'apps/blocklyduino/index.html');
 const win=new JSDOM(fs.readFileSync(app,'utf8'),{url:'http://127.0.0.1:8080/blockly/apps/blocklyduino/index.html',runScripts:'outside-only'}).window;
 const files=['blockly_compressed.js','blocks_compressed.js','arduino_compressed.js','msg/js/en.js'].map(f=>fs.readFileSync(path.join(sourceRoot,f),'utf8'));
-for(const f of ['board_capabilities.js','extra_blocks.js','lcd20x4_blocks.js','popular_blocks.js','program_blocks.js','math_blocks.js','user_blocks.js','device_blocks.js','storage_blocks.js','image_blocks.js','music_blocks.js','sd_music_blocks.js','logic_blocks.js','bit_blocks.js','avr_blocks.js','bus_blocks.js','ux_blocks.js','device_catalog.js','buffer_blocks.js','project_devices.js','motion_math.js','field_message.js','serial_blocks.js','serial_image_blocks.js'])files.push(fs.readFileSync(path.join(out,f),'utf8'));
+for(const f of ['board_capabilities.js','extra_blocks.js','lcd20x4_blocks.js','popular_blocks.js','program_blocks.js','math_blocks.js','user_blocks.js','device_blocks.js','storage_blocks.js','image_blocks.js','music_blocks.js','sd_music_blocks.js','logic_blocks.js','bit_blocks.js','avr_blocks.js','bus_blocks.js','ux_blocks.js','device_catalog.js','buffer_blocks.js','project_devices.js','motion_math.js','field_message.js','serial_blocks.js','serial_message_blocks.js','serial_image_blocks.js'])files.push(fs.readFileSync(path.join(out,f),'utf8'));
 win.eval(files.join('\n')+'\nwindow.TestBlockly=Blockly;');const B=win.TestBlockly;
 function load(xml){const ws=new B.Workspace();B.mainWorkspace=ws;B.Xml.domToWorkspace(ws,B.Xml.textToDom(xml));return ws;}
 function save(ws){return B.Xml.domToText(B.Xml.workspaceToDom(ws));}

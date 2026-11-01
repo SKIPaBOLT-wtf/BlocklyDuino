@@ -39,10 +39,13 @@ function controlDefinition(input){
  if(input.help!=null)output.help=boundedText(input.help,240,key+' help');
  if(input.unit!=null)output.unit=boundedText(input.unit,24,key+' unit');
  if(type==='slider'||type==='number'){
-  bounds(input,output,'min','max',key);output.step=input.step==null?1:finite(input.step,key+' step');if(output.step<=0)fail(key+' step must be positive');
+  // A device can temporarily allow one value; chart axes still use strict bounds().
+  if(input.min!=null)output.min=finite(input.min,key+' min');if(input.max!=null)output.max=finite(input.max,key+' max');
+  if(output.min!=null&&output.max!=null&&output.min>output.max)fail(key+': min must not exceed max');
+  output.step=input.step==null?1:finite(input.step,key+' step');if(output.step<=0)fail(key+' step must be positive');
   if(type==='slider'&&(output.min==null||output.max==null))fail(key+' slider needs min and max');
   if(output.min!=null&&output.max!=null&&!Number.isFinite(output.max-output.min))fail(key+' range is too large');
-  if(output.min!=null&&output.min+output.step===output.min||output.max!=null&&output.max-output.step===output.max)fail(key+' step is too small for its range');
+  if(output.min!==output.max&&(output.min!=null&&output.min+output.step===output.min||output.max!=null&&output.max-output.step===output.max))fail(key+' step is too small for its range');
   var initial=input.value==null?(output.min==null?(output.max==null||output.max>=0?0:Math.floor(output.max/output.step)*output.step):output.min):input.value;
   output.value=controlValue(output,initial);
  }else if(type==='checkbox')output.value=controlValue(output,input.value==null?false:input.value);

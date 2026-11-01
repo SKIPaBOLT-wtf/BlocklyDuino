@@ -3735,7 +3735,7 @@
     {
       "id": "61",
       "file": "61-serial-image-scanner.xml",
-      "title": "Photocell scanner: image + chart",
+      "title": "Continuous photocell scan: image + controls",
       "group": "Serial Monitor and Plotter",
       "level": "advanced",
       "recommended": true,
@@ -3746,7 +3746,7 @@
         },
         {
           "id": "analog-input",
-          "label": "Analog source / potentiometer"
+          "label": "Light-sensor voltage divider"
         },
         {
           "id": "serial",
@@ -3754,28 +3754,33 @@
         }
       ],
       "libraries": [
-        "BlocklyMotion"
+        "BlocklyMotion",
+        "BlocklySerial"
       ],
       "libraryEvidence": {
         "source": "audited-generated-sketch-includes",
         "headers": [
-          "BlocklyHardwareServo.h"
+          "BlocklyHardwareServo.h",
+          "BlocklySerial.h"
         ],
         "transitive": []
       },
-      "description": "After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.",
+      "description": "Start a continuous serpentine photocell sweep with two hardware servos. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
       "lesson": {
-        "wiring": "Servo: PIN D9; Servo: PIN D10; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
-        "observe": "After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.",
-        "change": "Move light across the sensor and change scan bounds or settle time to match the mechanism.",
+        "wiring": "Light-sensor/resistor divider midpoint A0; pan servo D9, tilt D10. Suitable servo supply with common GND. Both signals use Timer1 hardware PWM at 50 Hz.",
+        "observe": "Start a continuous serpentine photocell sweep with two hardware servos. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
+        "change": "Use the Parameters area or live controls: resolution, row time, averaging, gain/offset, black/white signal, brightness levels and servo pulse endpoints. Gain 100% = 1x. Accepted changes restart a clean image; Stop holds. Use Areas → Parameters to focus the editable settings.",
         "serial": "plotter",
         "baud": 115200
       },
-      "notes": [],
+      "notes": [
+        "Small remaining memory margin: 264 bytes Flash and 611 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
+        "Coordinates follow commanded motion, not measured servo position. Mechanical lag and sensor response limit useful speed. The native ADC is 10-bit; 2–65536 output levels rescale its readings. Live bounds follow UART/ADC time and the PC image limit."
+      ],
       "plotterModes": [
         "image-gray",
         "line",
-        "gauge"
+        "controls"
       ],
       "startCommand": "START\n",
       "stopCommand": "STOP\n",
@@ -3784,14 +3789,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "sketchSha256": "50aed817063805fb472d207fb54f90564fe7c9b2d35f08e16f44d7f623e79e2e",
-        "flash": 5258,
+        "sketchSha256": "a18fa09bc026c808435b19aceee1a80dee6c3df1f1bdd367ecbf110cab2e95a3",
+        "flash": 14072,
         "flashLimit": 14336,
-        "staticRam": 222,
+        "staticRam": 413,
         "staticRamLimit": 1024,
-        "flashRemaining": 9078,
-        "ramRemaining": 802,
-        "classification": "fits"
+        "flashRemaining": 264,
+        "ramRemaining": 611,
+        "classification": "tight"
       }
     },
     {

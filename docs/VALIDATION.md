@@ -1,3 +1,41 @@
+# Configurable continuous photocell scanner — 2026-11-01
+
+- Example 61 has 15 editable global parameters and matching live Plotter controls.
+  The actual generated sketch uses **14,072 Flash / 413 static SRAM bytes** on
+  `arduino:avr:pro:cpu=16MHzatmega168`: **264 Flash / 611 SRAM bytes remain** before
+  stack use. This is a tight Flash fit; compile after adding code or longer text.
+- Two Timer1 outputs use microsecond Servo commands. A timed serpentine trajectory
+  runs independently of ADC averaging. There is no per-pixel stop or framebuffer.
+  Accepted settings regenerate the header, clear the image, and restart from the
+  held commanded pose. Startup attaches at 1500 microseconds; scanning waits for Start.
+- Reusable Serial templates stream fixed text from Flash with expression sockets.
+  A bounded receiver handles complete lines and assigns numeric globals only after
+  validation. Integer ranges retain full 32-bit precision. Scanner gain uses percent
+  (125% = 1.25x), preserving 0.01x increments while avoiding a float command parser.
+- All **35 JavaScript suites**, **20 Python backend tests** and existing host C++
+  simulations pass. Scanner tests execute the generated C++ with ADC/UART timing,
+  validate emitted headers, check all controls, serpentine coordinates, single-pixel
+  dimensions, 65,535 samples, 65,536 brightness levels, rejection, restart and rollover.
+  The remaining examples are unchanged and retain their matching compile audit;
+  CI compiles the full 78-example reference set.
+- Browser + PTY runs the exact generated scanner with a synthetic photocell.
+  Connect/Start creates its dashboard; changing width, brightness range and gain
+  updates the controller variables and returned header. Unsent edits survive another
+  setting's acknowledgement. Invalid fractional dimensions are rejected in the UI.
+  The image and chart fit the viewport. This is transport/UI/simulation evidence,
+  not a physical measurement of servo arrival or sensor accuracy.
+- Plotter reconciles changed headers without replacing focused inputs. Keyed state
+  replies report rejected/adjusted values, missing confirmations time out, and long
+  partial headers defer bounded START retries. A single permitted numeric value is
+  shown disabled; expanding its range enables the control again.
+
+This iteration updates scanner 61 and reusable Serial/Plotter support. Other lessons
+have not been rewritten to this parameter pattern yet. The next pass should migrate
+applicable lessons individually: visible globals, ordinary variable-filled messages,
+validated commands and actual-target compilation. No physical board was reflashed.
+
+---
+
 # Interactive lessons and automatic Plotter layout — 2026-11-01
 
 - All **33 JavaScript suites**, **20 Python backend tests** and host C++

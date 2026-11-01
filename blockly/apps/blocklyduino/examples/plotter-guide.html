@@ -11,7 +11,7 @@
 <tr><td><a href="../index.html?url=examples/56-serial-dashboard.xml">56 · Potentiometer</a></td><td>Wiper A0; outer legs VCC/GND</td><td>Turn the knob. One ADC reading feeds a chart, voltage gauge and bar.</td></tr>
 <tr><td><a href="../index.html?url=examples/73-plotter-mixed-dashboard.xml">73 · Several instruments</a></td><td>Potentiometer A0</td><td>Compare A0 with a triangle using overlaid lines, two needles, grouped bars, XY traces and a table.</td></tr>
 <tr><td><a href="../index.html?url=examples/74-plotter-live-math.xml">74 · PC mathematics</a></td><td>Potentiometer A0</td><td>The PC computes mean, RMS, slope and integral. A later header changes the averaging window while running.</td></tr>
-<tr><td><a href="../index.html?url=examples/61-serial-image-scanner.xml">61 · Photocell scanner</a></td><td>Light divider A0; servos D9/D10</td><td>Start a 32×24 scan. Image pixels remain on the computer; the board sends each new reading.</td></tr>
+<tr><td><a href="../index.html?url=examples/61-serial-image-scanner.xml">61 · Photocell scanner</a></td><td>Light divider A0; servos D9/D10</td><td>Continuous sweep with live resolution, timing, sampling and brightness controls. <a href="scan-image-guide.html">Scanner variables and message templates</a>.</td></tr>
 <tr><td><a href="../index.html?url=examples/75-plotter-rgb-paint.xml">75 · RGB painting</a></td><td>USB–Serial only</td><td>Start paints a generated RGB image, with colour traces and bars alongside it.</td></tr>
 <tr><td><a href="../index.html?url=examples/07-ds18b20-serial.xml">7 · DS18B20</a> / <a href="../index.html?url=examples/22-dht22-serial.xml">22 · DHT22</a> / <a href="../index.html?url=examples/23-hc-sr04-serial.xml">23 · Distance</a></td><td>See each lesson’s Wiring card</td><td>The sketch names its measurements and explains missing sensor readings.</td></tr></table>
 <h2>Build your own: three kinds of line</h2>
@@ -21,6 +21,13 @@
 512
 650</pre>
 <p>The first line defines the interface. The message tells the person what to do. Each later number is one ADC sample. This JSON is an ordinary Serial text block stored in Flash; click its message to edit formatted JSON. There is no JSON parser on the Arduino.</p>
+<h3>Where to find the blocks</h3>
+<p>Open <strong>Text &amp; serial</strong> in the toolbox. Use <strong>serial text</strong> for fixed messages, or <strong>serial template</strong> when values come from variables. Click the compact message field to open the multiline editor. Write <code>{{width}}</code> in the message, save it, then connect the <code>width</code> variable to the new value socket. Repeated placeholders share a socket; <code>{{gain:3}}</code> requests three decimal places. The same block can send headers, samples, pixel coordinates or explanatory messages.</p>
+<pre>@plot {"version":1,"id":"meter","fields":[{"id":"light","min":0,"max":{{maximum}}}],"widgets":[{"type":"gauge","field":"light"}]}
+@msg Current width: {{width}}
+@pixel scan {{x}},{{y}},{{brightness}}</pre>
+<p>Each example above is a separate template ending in <strong>new line</strong>. Numeric placeholders are unquoted in JSON. Values print directly, so arbitrary text needs its own JSON quoting/escaping. The fixed parts stay in Flash and the values stream out; no full header is assembled in AVR RAM. Large headers take time to transmit, so send them at configuration boundaries, not between time-critical samples.</p>
+<p>For incoming commands, put <strong>read serial lines</strong> in loop (or a function called from loop). Inside it, <strong>when command START</strong> handles an exact command; <strong>when number</strong> validates a number and updates a declared global variable. Its min, max and step sockets accept variables or expressions. Use its <strong>accepted</strong> branch to announce the new configuration, and <strong>invalid</strong> branch to explain rejection. The bounded receiver waits for a complete line without pausing loop. Lesson 61 shows these blocks together; expand <strong>readPlotterCommand</strong>, <strong>announcePlotter</strong> and <strong>publishPixel</strong> to edit the protocol.</p>
 <details><summary><strong>Add controls the board can receive</strong></summary>
 <p>The header’s <code>controls</code> array creates inputs. Copy one control first, then add the others you need. A control ID names the setting in messages; its label is shown to the person.</p>
 <pre>"controls": [
@@ -42,6 +49,7 @@
 <pre>@state {"period":700,"enabled":false,"pattern":"steady"}
 @msg Steady light selected. Choose Blink to use the interval again.</pre>
 <p>A state reply updates existing controls without sending another command. Initial control values in the header must match the sketch; send @state after a header when current values differ. Step constraints apply from min. A slider sends its committed value, not a flood of intermediate commands. The sketch must still validate incoming commands; someone can also type them in Monitor.</p></details>
+<p>For a rejected or adjusted setting, reply with that one control's actual value, for example <code>@state {"width":32}</code>, and an <code>@msg</code> explanation. The input then shows what the board applied. A later full header can update ranges and image geometry while keeping unrelated unsent edits. A numeric range with min equal to max displays its only possible value as a disabled control; widening the range enables it again. Missing confirmations time out visibly; sending a command alone is never shown as proof that the board accepted it.</p>
 <details><summary><strong>A message-only dashboard</strong></summary>
 <pre>@plot {"version":1,"id":"memory","title":"EEPROM result","description":"Write once, then read the test records.","fields":[],"widgets":[]}
 @msg Stored value: 1234

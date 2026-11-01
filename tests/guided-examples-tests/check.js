@@ -30,7 +30,13 @@ for(const e of plotFiles){
  assert(code.slice(code.indexOf('void setup()')).includes('announcePlotter();'),'Boot announces a header '+e.file);
  assert(!/^\s*String\s+[A-Za-z_]\w*\s*[=;]/m.test(code),'No heap-allocated command String '+e.file);
  const dom=B.Xml.textToDom(xml);
- let headers=0;for(const node of dom.querySelectorAll('field[name="TEXT"]'))if(node.textContent.startsWith('@plot ')){P.validate(JSON.parse(node.textContent.slice(6)));headers++;}
+ let headers=0;
+ if(e.id==='61'){
+  // Its Serial template fills geometry, bounds and defaults from live variables.
+  // Execute the generated C++ and validate its real boot/changed headers.
+  const scanner=require('../scanner-tests/check').run({quiet:true});
+  scanner.headers.forEach(h=>P.validate(h));headers=scanner.headers.length;
+ }else for(const node of dom.querySelectorAll('field[name="TEXT"]'))if(node.textContent.startsWith('@plot ')){P.validate(JSON.parse(node.textContent.slice(6)));headers++;}
  assert(headers>0,'Every Serial lesson describes its output '+e.file);
  assert(!Array.from(dom.querySelectorAll('block')).some(n=>/^serial_(plot_header|image)/.test(n.getAttribute('type'))),'Ordinary Serial messages '+e.file);
  ws.dispose();

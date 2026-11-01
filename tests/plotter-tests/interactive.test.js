@@ -105,10 +105,26 @@ const imageOnly = P.validate({version: 1, id: 'image', fields: [], widgets: [{ty
 equal(imageOnly.widgets[0].type, 'image');
 reject(() => P.validate({...empty, controls: []}), /needs instruments, controls or a description/);
 
+// A dynamic hardware limit may leave exactly one permitted control value.
+// Numeric controls accept it; chart axes must still have a nonzero range.
+for (const type of ['number', 'slider']) {
+  const fixed = P.validate({...empty, controls: [{id: 'fixed', type, min: 1, max: 1}]}).controls[0];
+  equal(fixed.value, 1); equal(P.controlValue(fixed, '1'), 1);
+  equal(P.controlCommand(fixed, 1), '@set fixed 1');
+  reject(() => P.controlValue(fixed, 2), /within/);
+  reject(() => P.validate({...empty, controls: [{...fixed, value: 0}]}), /within/);
+  equal(P.validate({...empty, controls: [{id: 'fixed', type, min: 1e300, max: 1e300}]}).controls[0].value, 1e300);
+}
+reject(() => P.validate({...definition, fields: [{id: 'led', min: 1, max: 1}]}), /less than/);
+for (const type of ['line', 'gauge', 'bar'])
+  reject(() => P.validate({...definition, widgets: [{type, fields: ['led'], min: 1, max: 1}]}), /less than/);
+reject(() => P.validate({...definition, widgets: [{type: 'xy', x: 'led', y: 'led', xMin: 1, xMax: 1}]}), /less than/);
+
 // Schema rejects malformed ranges, ambiguous options, oversized definitions and
 // duplicate/prototype IDs before replacing the current valid profile.
 for (const control of [
-  {id: 'x', type: 'slider'}, {id: 'x', type: 'slider', min: 1, max: 1},
+  {id: 'x', type: 'slider'}, {id: 'x', type: 'slider', min: 2, max: 1},
+  {id: 'x', type: 'number', min: 2, max: 1},
   {id: 'x', type: 'slider', min: 0, max: 10, step: 0}, {id: 'x', type: 'number', step: Infinity},
   {id: 'x', type: 'number', min: NaN}, {id: 'x', type: 'number', min: 0, max: 10, value: 11},
   {id: 'x', type: 'slider', min: -1e308, max: 1e308}, {id: 'x', type: 'number', min: 1e300, step: 1},

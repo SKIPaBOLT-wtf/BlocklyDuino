@@ -47,9 +47,10 @@ The additions are Apache-2.0; original notices and the separate v2 license remai
 | Interrupts | named external/pin-change handlers, attach/detach, atomic access, configurable Timer1 | `interrupt_blocks.js`, `timer_interrupt_blocks.js` |
 | Workspace | undo/redo, stack selection, new/recover project, pointer-anchored 1–300% zoom, labelled areas | `editor_history.js`, `editor_actions.js`, `workspace_zoom.js`, `workspace_regions.js`, `blockly_helper.js` |
 | Serial | shared bidirectional connection, header-configured Plotter views and controls, board messages, saved layouts and capture | `serial_client.js`, `serial_monitor.js`, `serial_plotter.js`, `serial_protocol.js` |
+| Serial blocks | editable Flash-streamed templates with variable sockets; bounded line reception and validated command-to-variable assignment | `serial_message_blocks.js`, `arduino/libraries/BlocklySerial` |
 | Build target | actual installed board menus, port selection, applied target persistence, compact panels | `target_picker.js`, `panel_state.js`, `server/` |
 
-The static toolbox has 177 block types, supplemented by 20 device configurations
+The static toolbox is supplemented by 20 device configurations
 and 111 bound action entries. Seventy-eight commented numbered XML examples cover beginner
 circuits through interrupt control, music, files and streaming images. English
 guides explain wiring, constraints and extension templates. Legacy block types

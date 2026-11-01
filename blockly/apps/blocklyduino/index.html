@@ -21,7 +21,7 @@
   <script type="text/javascript" src="user_blocks.js?v=workbench5"></script>
   <script src="device_blocks.js?v=workbench5"></script>
   <script src="storage_blocks.js?v=workbench5"></script>
-  <script src="music_blocks.js?v=workbench5"></script><script src="sd_music_blocks.js?v=workbench5"></script><script src="image_blocks.js?v=workbench5"></script><script src="bit_blocks.js?v=workbench5"></script><script src="logic_blocks.js?v=workbench5"></script><script src="avr_blocks.js?v=workbench5"></script><script src="bus_blocks.js?v=workbench5"></script><script src="workspace_inspector.js?v=workbench5"></script><script src="ux_blocks.js?v=workbench5"></script><script src="device_catalog.js?v=workbench5"></script><script src="buffer_blocks.js?v=workbench5"></script><script src="project_devices.js?v=workbench5"></script><script src="field_message.js?v=workbench5"></script><script src="serial_blocks.js?v=workbench5"></script><script src="interrupt_blocks.js?v=dialog1"></script><script src="timer_interrupt_blocks.js?v=dialog1"></script><script src="editor_actions.js?v=workbench5"></script><link rel="stylesheet" href="editor_actions.css?v=workbench5">
+  <script src="music_blocks.js?v=workbench5"></script><script src="sd_music_blocks.js?v=workbench5"></script><script src="image_blocks.js?v=workbench5"></script><script src="bit_blocks.js?v=workbench5"></script><script src="logic_blocks.js?v=workbench5"></script><script src="avr_blocks.js?v=workbench5"></script><script src="bus_blocks.js?v=workbench5"></script><script src="workspace_inspector.js?v=workbench5"></script><script src="ux_blocks.js?v=workbench5"></script><script src="device_catalog.js?v=workbench5"></script><script src="buffer_blocks.js?v=workbench5"></script><script src="project_devices.js?v=workbench5"></script><script src="field_message.js?v=workbench5"></script><script src="serial_blocks.js?v=workbench5"></script><script src="serial_message_blocks.js?v=scanner1"></script><script src="interrupt_blocks.js?v=dialog1"></script><script src="timer_interrupt_blocks.js?v=dialog1"></script><script src="editor_actions.js?v=workbench5"></script><link rel="stylesheet" href="editor_actions.css?v=workbench5">
   <script src="workspace_zoom.js?v=areas3"></script><link rel="stylesheet" href="workspace_zoom.css?v=areas3">
   <script src="workspace_regions.js?v=areas3"></script><link rel="stylesheet" href="workspace_regions.css?v=areas3">
   <script src="panel_state.js?v=layout1" defer></script><script src="target_picker.js?v=workbench5"></script><link rel="stylesheet" href="target_picker.css?v=layout1">
@@ -297,7 +297,21 @@ header{padding:7px 12px;display:flex;align-items:center;justify-content:space-be
   <block type="avr_isr"></block>
  </category><category name="Loops &amp; time"><block type="controls_for"><value name="FROM"><block type="math_number"><field name="NUM">0</field></block></value><value name="TO"><block type="math_number"><field name="NUM">9</field></block></value></block><block type="controls_whileUntil"></block><block type="base_delay"><value name="DELAY_TIME"><block type="math_number"><field name="NUM">100</field></block></value></block><block type="arduino_millis"></block><block type="arduino_micros"></block></category>
 <category name="Math"><block type="math_number"></block><block type="math_arithmetic"></block><block type="math_single"></block><block type="math_trig"></block><block type="math_constant"></block><block type="math_round"></block><block type="math_modulo"></block><block type="math_constrain"></block><block type="arduino_math_minmax"></block><block type="math_random_int"></block><block type="math_random_float"></block><block type="arduino_random_seed"></block><block type="base_map"><value name="FROM_LOW"><block type="math_number"><field name="NUM">0</field></block></value><value name="FROM_HIGH"><block type="math_number"><field name="NUM">1023</field></block></value><value name="TO_LOW"><block type="math_number"><field name="NUM">0</field></block></value></block></category>
-<category name="Text &amp; serial"><block type="ll_serial_number"><field name="BASE">BIN</field><field name="END">println</field><value name="VALUE"><block type="math_number"><field name="NUM">165</field></block></value></block><block type="serial_config"></block><block type="serial_send"><value name="VALUE"><block type="math_number"><field name="NUM">42</field></block></value></block><block type="serial_text"></block><block type="serial_plot_header"></block><block type="serial_available"></block><block type="serial_read"></block><block type="serial_write_byte"><value name="VALUE"><block type="math_number"><field name="NUM">65</field></block></value></block><block type="text"></block><block type="serial_print"></block></category>
+<category name="Text &amp; serial">
+  <block type="serial_config"></block>
+  <block type="serial_text"></block>
+  <block type="serial_template"><value name="ARG_value"><block type="math_number"><field name="NUM">42</field></block></value></block>
+  <block type="serial_send"><value name="VALUE"><block type="math_number"><field name="NUM">42</field></block></value></block>
+  <block type="serial_receive_line"></block>
+  <block type="serial_when_command"></block>
+  <block type="serial_set_number"><value name="MIN"><block type="math_number"><field name="NUM">0</field></block></value><value name="MAX"><block type="math_number"><field name="NUM">1023</field></block></value><value name="STEP"><block type="math_number"><field name="NUM">1</field></block></value></block>
+  <block type="text"></block>
+  <block type="serial_print"></block>
+  <block type="ll_serial_number"><field name="BASE">BIN</field><field name="END">println</field><value name="VALUE"><block type="math_number"><field name="NUM">165</field></block></value></block>
+  <block type="serial_available"></block>
+  <block type="serial_read"></block>
+  <block type="serial_write_byte"><value name="VALUE"><block type="math_number"><field name="NUM">65</field></block></value></block>
+</category>
 <category name="Devices">
     <block type="device_stepper_driver"></block>
     <block type="device_stepper_coils"></block>
