@@ -138,7 +138,8 @@ for (const control of [
   {id: 'x', type: 'eval'}, {id: 'x', type: 'button', help: 'x'.repeat(241)}
 ]) reject(() => P.validate({...empty, controls: [control]}));
 reject(() => P.validate({...empty, controls: [definition.controls[5], definition.controls[5]]}), /Duplicate/);
-reject(() => P.validate({...empty, controls: Array.from({length: 17}, (_, i) => ({id: 'c'+i, type: 'button'}))}), /16 controls/);
+assert.equal(P.validate({...empty, controls: Array.from({length: 32}, (_, i) => ({id: 'c'+i, type: 'button'}))}).controls.length, 32);
+reject(() => P.validate({...empty, controls: Array.from({length: 33}, (_, i) => ({id: 'c'+i, type: 'button'}))}), /32 controls/);
 reject(() => P.validate({...empty, description: 'x'.repeat(1001)}), /1000/);
 const old = parser.profile;
 equal(parser.mode = 'auto', 'auto');

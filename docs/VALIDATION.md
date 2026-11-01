@@ -1,3 +1,31 @@
+# Scanner direction, resolution and delayed capture — 2026-11-01
+
+- Example 61 adds a bidirectional checkbox and Skip line start pixels: all 17
+  parameters remain ordinary globals with live controls. One-way scans return
+  without sampling; delayed capture retains every column and its original x.
+- Width now follows the PC limit (16384 per side / 16 MP total) and maximum row
+  duration, rather than the current sweep speed. A larger width automatically
+  lengthens the row only when ADC/UART throughput needs it; the returned header
+  reports that time. At the default averaging, 1024 columns require 6001 ms.
+- The generated sketch uses **14,306 Flash / 413 static SRAM bytes** on
+  `arduino:avr:pro:cpu=16MHzatmega168`: **30 Flash / 611 SRAM bytes remain** before
+  stack. Compile after editing code or header text. The bootloader is retained.
+- Generated-C++ tests cover one/both directions, odd-height frame wrap, delayed
+  synthetic-sensor alignment, retained edge columns, zero/max skip, direct high
+  resolution, cross-dependent rejection, and a maximum-duration row spanning
+  micros rollover. Existing averaging, brightness, command and timing checks pass.
+- Necessary shared changes: the Plotter accepts up to 32 controls; Serial template
+  output joins a trailing Flash literal and newline in one call, preserving wire
+  bytes while saving program space. No board/library support was expanded.
+- All 35 JavaScript suites pass. Browser + isolated PTY verified both direction
+  choices, skip=2, width=1024 with a returned 6001 ms row, and a complete smaller
+  raster. The non-real-time host can overrun the fastest schedule; it then reports
+  the timing error as intended. This does not measure physical AVR scan speed.
+- Eight installed app files match HTTP responses. The installed compile endpoint
+  confirms the same 14306/413-byte result. No hardware upload was performed.
+
+---
+
 # Configurable continuous photocell scanner — 2026-11-01
 
 - Example 61 has 15 editable global parameters and matching live Plotter controls.

@@ -40,8 +40,8 @@ def micros_servo(uid, value):
 # One definition supplies the initial parameter block, control and receive rule.
 # Dynamic bounds use derived variables recalculated whenever a setting changes.
 PARAMETERS = [
-    ('width', 'imageWidth', 'int32_t', 32, 'Image width', 'px', 1, 'maxWidth', 1,
-     'Columns in the computer image. More columns divide the same row sweep more finely.'),
+    ('width', 'imageWidth', 'int32_t', 32, 'Image width', 'px', 'minWidth', 'maxWidth', 1,
+     'Columns in the computer image. Higher resolution automatically lengthens Time per row if ADC or Serial throughput requires it. Width must exceed Skip line start pixels.'),
     ('height', 'imageHeight', 'int32_t', 24, 'Image height', 'px', 1, 'maxHeight', 1,
      'Rows in the computer image. Its size does not allocate an image buffer on Arduino.'),
     ('levels', 'brightnessLevels', 'int32_t', 1024, 'Brightness levels', '', 2, 65536, 1,
@@ -57,7 +57,7 @@ PARAMETERS = [
     ('high', 'signalHigh', 'int32_t', 1023, 'White signal', 'ADC', 'highMinimum', 1023, 1,
      'Corrected readings at or above this become white. Must be higher than Black signal.'),
     ('sweep', 'sweepMs', 'int32_t', 3000, 'Time per row', 'ms', 'minSweepMs', 2147483, 1,
-     'Pan moves from one endpoint to the other in this time. Larger means slower; resolution does not change this speed.'),
+     'Pan moves from one endpoint to the other in this time. Larger means slower. A higher resolution automatically increases this time only if ADC/Serial throughput requires it.'),
     ('pan0', 'panStartUs', 'int32_t', 1100, 'Pan start', 'us', PULSE_MIN, PULSE_MAX, 1,
      'Servo pulse for the left edge. It may be greater than Pan end to reverse the physical axis.'),
     ('pan1', 'panEndUs', 'int32_t', 1900, 'Pan end', 'us', PULSE_MIN, PULSE_MAX, 1,
@@ -70,6 +70,10 @@ PARAMETERS = [
      'Time to interpolate from the held pose to the next row. This also handles return from the last row to the first.'),
     ('settle', 'settleMs', 'int32_t', 100, 'Row settling', 'ms', 0, 2147483, 1,
      'Extra wait after a row transition. There is no stop or settling delay between pixels.'),
+    ('both', 'bidirectional', 'int32_t', 1, 'Scan both directions', '', 0, 1, 1,
+     '1: alternate forward/reverse rows. 0: scan every row from Pan start to Pan end; return without taking measurements.'),
+    ('skip', 'skipPixels', 'int32_t', 0, 'Skip line start pixels', '', 0, 'maxSkip', 1,
+     'Delay measurements by this many pixel periods without shifting their image coordinates. Try 1, 2... to align alternate rows with sensor/mechanical lag. Every image column is still sent; the servo holds at the row end while the last delayed samples arrive. This is a lag approximation, not position feedback. Must be less than image width.'),
 ]
 
 
@@ -86,13 +90,16 @@ def header_block():
                 'max': '{{' + hi + '}}' if isinstance(hi, str) else hi,
                 'value': '{{' + name + (':2' if kind == 'float' else '') + '}}'}
         if step != 1: spec['step'] = step
+        if id_ == 'both':
+            spec['type'] = 'checkbox'
+            del spec['min'], spec['max']
         controls.append(spec)
         bindings[name] = var(name)
         for bound in (lo, hi):
             if isinstance(bound, str): bindings[bound] = var(bound)
     profile = {
         'version': 1, 'id': 'photocell', 'title': 'Photocell scanner',
-        'description': 'A0 light; pan D9, tilt D10. Start scans; changes restart. Position is commanded, not measured.',
+        'description': 'A0 light; D9 pan, D10 tilt. Start scans; changes restart.',
         'fields': [{'id': 'adc', 'min': 0, 'max': 1023}],
         'widgets': [{'type': 'image', 'image': {'id': 'scan', 'width': '{{imageWidth}}', 'height': '{{imageHeight}}', 'mode': 'gray', 'max': '{{maximumValue}}'}},
                     {'type': 'line', 'fields': ['adc']}],
@@ -117,37 +124,43 @@ def build():
         ('currentPanUs', 'int16_t', 1500), ('currentTiltUs', 'int16_t', 1500),
         ('fromPanUs', 'int16_t', 1500), ('fromTiltUs', 'int16_t', 1500),
         ('targetPanUs', 'int16_t', 1500), ('targetTiltUs', 'int16_t', 1500),
-        ('maxWidth', 'int32_t', 0), ('maxHeight', 'int32_t', 0), ('maxSamples', 'int32_t', 0),
-        ('minSweepMs', 'int32_t', 0), ('lowMaximum', 'int32_t', 0), ('highMinimum', 'int32_t', 0),
+        ('minWidth', 'int16_t', 0), ('maxWidth', 'int16_t', 0), ('maxHeight', 'int16_t', 0), ('maxSamples', 'int32_t', 0), ('maxSkip', 'int16_t', 0),
+        ('minSweepMs', 'int32_t', 0), ('lowMaximum', 'int16_t', 0), ('highMinimum', 'int16_t', 0),
     ]
     parameters = [declare(name, kind, n(initial), note) for _, name, kind, initial, _, _, _, _, _, note in PARAMETERS]
     globals_ = [declare(name, kind, flag(initial) if kind == 'bool' else n(initial)) for name, kind, initial in state_specs]
     # 45 bytes covers worst-case pixel coordinates/value + a short ADC CSV line.
     # 10 UART bits/byte; 1.5 reserves one third of wire time for overhead.
-    globals_.insert(0, declare('serialPixelBudgetUs', 'uint32_t', n(5860),
+    globals_.insert(0, declare('serialPixelBudgetUs', 'uint16_t', n(5860),
         'ceil(45 bytes × 10 bits × 1000000 / 115200 × 1.5) = 5860 us. This leaves UART headroom; do not lower it without recalculating the actual message length.'))
-    globals_.insert(1, declare('minimumAdcUs', 'uint32_t', n(250),
+    globals_.insert(1, declare('minimumAdcUs', 'uint16_t', n(250),
         'One standard AVR analogRead takes about 104 us at its default ADC clock. Reserve 250 us per read for conversion plus loop/motion work. Late service stops instead of inventing correctly positioned samples.'))
 
     update_limits = collapsed('updateLimits', chain(
-        assign('rowTimeUs', op('MULTIPLY', var('sweepMs'), n(1000))),
         declare('minimumPixelUs', 'uint32_t', maximum(var('serialPixelBudgetUs'), op('MULTIPLY', var('minimumAdcUs'), var('multiSamples')))),
-        assign('maxWidth', minimum(n(16384), minimum(idiv(n(16777216), var('imageHeight')), idiv(var('rowTimeUs'), var('minimumPixelUs'))))),
+        assign('minWidth', op('ADD', var('skipPixels'), n(1))),
+        assign('maxSkip', op('MINUS', var('imageWidth'), n(1))),
+        assign('maxWidth', minimum(n(16384), minimum(idiv(n(16777216), var('imageHeight')), idiv(n(2147483000), var('minimumPixelUs'))))),
         assign('maxHeight', minimum(n(16384), idiv(n(16777216), var('imageWidth')))),
-        assign('maxSamples', minimum(n(65535), idiv(var('rowTimeUs'), op('MULTIPLY', var('imageWidth'), var('minimumAdcUs'))))),
         assign('minSweepMs', n(2147484)),
-        iff(compare('LTE', var('imageWidth'), var('maxWidth')), assign('minSweepMs', idiv(op('ADD', op('MULTIPLY', var('imageWidth'), var('minimumPixelUs')), n(999)), n(1000)))),
+        iff(compare('LTE', var('imageWidth'), var('maxWidth')), chain(
+            assign('minSweepMs', idiv(op('ADD', op('MULTIPLY', var('imageWidth'), var('minimumPixelUs')), n(999)), n(1000))),
+            assign('sweepMs', maximum(var('sweepMs'), var('minSweepMs'))))),
+        assign('rowTimeUs', op('MULTIPLY', var('sweepMs'), n(1000))),
+        assign('maxSamples', minimum(n(65535), idiv(var('rowTimeUs'), op('MULTIPLY', var('imageWidth'), var('minimumAdcUs'))))),
         assign('pixelPeriodUs', idiv(var('rowTimeUs'), var('imageWidth'))),
         assign('samplePeriodUs', idiv(var('pixelPeriodUs'), var('multiSamples'))),
         assign('firstSampleUs', idiv(op('MINUS', var('pixelPeriodUs'), op('MULTIPLY', op('MINUS', var('multiSamples'), n(1)), var('samplePeriodUs'))), n(2))),
+        assign('firstSampleUs', op('ADD', var('firstSampleUs'), op('MULTIPLY', var('skipPixels'), var('pixelPeriodUs')))),
         assign('lowMaximum', op('MINUS', var('signalHigh'), n(1))),
         assign('highMinimum', op('ADD', var('signalLow'), n(1))),
-    ), 'Recalculate limits from the actual resolution, averaging, baud budget and row time. The same named bounds drive Plotter controls and command validation. The PC accepts dimensions up to 16384 and 16 megapixels total; AVR timing may allow fewer columns at the chosen speed.')
+    ), 'The PC accepts dimensions up to 16384 and 16 megapixels total without an Arduino image buffer. Width is limited by this capacity and maximum row duration, not the current speed. More columns automatically lengthen the row when ADC/UART throughput requires it. Skip adds a sampling delay while preserving pixel coordinates; skip < width keeps each whole row below one unsigned micros() wrap.')
 
     checks = [within('imageWidth', n(1), n(16384)), within('imageHeight', n(1), n(16384)),
               compare('LTE', op('MULTIPLY', var('imageWidth'), var('imageHeight')), n(16777216)),
               within('multiSamples', n(1), n(65535)), within('sweepMs', n(1), n(2147483)),
               within('transitionMs', n(0), n(2147483)), within('settleMs', n(0), n(2147483)),
+              within('bidirectional', n(0), n(1)), within('skipPixels', n(0), op('MINUS', var('imageWidth'), n(1))),
               within('brightnessLevels', n(2), n(65536)), within('gainPercent', n(0), n(1600)),
               within('offset', n(-16384), n(16384)), within('signalLow', n(0), n(1022)), compare('LT', var('signalLow'), var('signalHigh')),
               compare('LTE', var('signalHigh'), n(1023))]
@@ -155,10 +168,10 @@ def build():
     validate = collapsed('validateSettings', chain(
         assign('settingsValid', conditions(*checks)),
         iff(var('settingsValid'), chain(call('updateLimits'), assign('settingsValid', both(compare('GTE', var('sweepMs'), var('minSweepMs')), compare('GTE', var('samplePeriodUs'), var('minimumAdcUs'))))))
-    ), 'Check edited defaults before any division or motion. Time phases stay below half the micros() wrap period. Runtime controls use these same cross-dependent limits and retain the previous value when rejected.')
+    ), 'Check edited defaults before division or motion. Row time is at most 2147483 ms; skip < width keeps row plus delayed samples below one unsigned micros() wrap. Runtime controls use the same limits and retain rejected values.')
 
     announce = collapsed('announcePlotter', iff(var('settingsValid'), header_block(),
-        message('@plot {"version":1,"id":"photocell-error","description":"Invalid defaults: check Parameters and upload again.","fields":[],"widgets":[]}')),
+        message('@plot {"version":1,"id":"error","description":"Fix Parameters and upload again.","fields":[],"widgets":[]}')),
         'Send the current header from setup, Start and every accepted setting change. No stale copied defaults: the template inputs are the actual parameters. Motion is held while this long header is transmitted.')
 
     write_servos = collapsed('writeServoTargets', chain(micros_servo('scanpan', var('currentPanUs')), micros_servo('scantilt', var('currentTiltUs'))),
@@ -173,21 +186,21 @@ def build():
         assign('phase', n(1)), assign('phaseStartedUs', block('arduino_micros')),
         assign('lastServoUs', op('MINUS', var('phaseStartedUs'), n(5000))),
         assign('pixel', n(0)), assign('samplesTaken', n(0)), assign('sampleSum', n(0)),
-    ), 'Phase 1 interpolates from the held pose to the next row; phase 2 allows extra settling. No samples are assigned during either phase. Each new row reverses pan direction, avoiding a flyback across the whole image.')
+    ), 'Phase 1 moves to the next row; phase 2 allows extra settling. Neither assigns samples. Bidirectional scanning reverses each row; one-direction scanning returns to Pan start without measuring.')
     restart = collapsed('restartScan', chain(assign('row', n(0)), assign('reverseRow', flag(False)), call('beginRowTransition')),
         'Start a new image at its first row after the header is sent. The servo begins from its last commanded pose, so changing settings does not jump to a new pulse during header transmission.')
     changed = collapsed('settingsChanged', chain(assign('phase', n(0)), iff(var('settingsValid'), call('updateLimits')), call('announcePlotter'), message('@image-clear scan'),
         iff(both(var('streaming'), var('settingsValid')), call('restartScan'), assign('streaming', flag(False)))) ,
         'An accepted change holds the current servo pulses, regenerates the header from the new parameters, then restarts coherently. The explicit image-clear message starts a clean image; a completed unchanged raster simply overwrites pixels.')
     rejected = collapsed('rejectSetting', chain(assign('phase', n(0)), assign('streaming', flag(False)), call('announcePlotter'),
-        message('@msg Rejected; previous value kept. Check limits, then Start.')),
+        message('@msg Rejected. Check limits; press Start.')),
         'A bad input never replaces its parameter. Pause, resend canonical values to restore the controls, and tell the user what to do next.')
 
     # The generic reader is bounded and consumes only available bytes. All scanner
     # logic below remains ordinary named functions, variables and math blocks.
     receive_cases = [block('serial_when_command', {'COMMAND': 'START'}, statements={'DO': chain(assign('streaming', flag(True)), assign('settingsDirty', flag(True)))}),
         block('serial_when_command', {'COMMAND': 'STOP'}, statements={'DO': chain(
-            assign('streaming', flag(False)), assign('phase', n(0)), message('@msg Stopped; servos hold. Start begins a new scan.'))})]
+            assign('streaming', flag(False)), assign('phase', n(0)), message('@msg Stopped. Start scans again.'))})]
     for id_, name, kind, initial, label, unit, lo, hi, step, note in PARAMETERS:
         receive_cases.append(block('serial_set_number', {'COMMAND': '@set ' + id_, 'VAR': name},
             {'MIN': limit(lo), 'MAX': limit(hi), 'STEP': n(step)},
@@ -196,10 +209,11 @@ def build():
         'Ordinary newline commands: START, STOP, @set name number. The reusable Serial reader buffers at most 47 bytes, never waits for more input, and validates each complete numeric token and its current bounds before assignment.')
 
     fraction = op('DIVIDE', var('trajectoryElapsedUs'), op('MULTIPLY', var('transitionMs'), n(1000)))
-    smooth_transition = chain(declare('fraction', 'float', n(1)), iff(compare('GT', var('transitionMs'), n(0)), assign('fraction', fraction)), assign('fraction', clamp(var('fraction'), n(0), n(1))),
+    # Elapsed times and durations are non-negative; only the upper clamp is needed.
+    smooth_transition = chain(declare('fraction', 'float', n(1)), iff(compare('GT', var('transitionMs'), n(0)), assign('fraction', fraction)), assign('fraction', minimum(var('fraction'), n(1))),
         assign('currentPanUs', op('ADD', var('fromPanUs'), op('MULTIPLY', op('MINUS', var('targetPanUs'), var('fromPanUs')), var('fraction')))),
         assign('currentTiltUs', op('ADD', var('fromTiltUs'), op('MULTIPLY', op('MINUS', var('targetTiltUs'), var('fromTiltUs')), var('fraction')))))
-    smooth_sweep = chain(declare('fraction', 'float', op('DIVIDE', var('trajectoryElapsedUs'), var('rowTimeUs'))), assign('fraction', clamp(var('fraction'), n(0), n(1))),
+    smooth_sweep = chain(declare('fraction', 'float', op('DIVIDE', var('trajectoryElapsedUs'), var('rowTimeUs'))), assign('fraction', minimum(var('fraction'), n(1))),
         iff(var('reverseRow'), assign('fraction', op('MINUS', n(1), var('fraction')))),
         assign('currentPanUs', op('ADD', var('panStartUs'), op('MULTIPLY', op('MINUS', var('panEndUs'), var('panStartUs')), var('fraction')))))
     motion = collapsed('serviceMotion', iff(compare('GTE', elapsed('lastServoUs'), n(5000)), chain(
@@ -226,21 +240,22 @@ def build():
             assign('pixel', op('ADD', var('pixel'), n(1))), assign('samplesTaken', n(0)), assign('sampleSum', n(0)),
             assign('nextSampleUs', op('ADD', op('MULTIPLY', var('pixel'), var('pixelPeriodUs')), var('firstSampleUs'))))))
     late = chain(assign('streaming', flag(False)), assign('phase', n(0)),
-        message('@msg Timing overrun: slow the row or reduce columns/samples, then Start.'))
-    sample_service = collapsed('serviceSamples', iff(both(compare('LT', var('pixel'), var('imageWidth')), compare('GTE', elapsed('phaseStartedUs'), var('nextSampleUs'))),
-        iff(compare('GT', op('MINUS', elapsed('phaseStartedUs'), var('nextSampleUs')), var('samplePeriodUs')), late, sample)),
+        message('@msg Timing overrun: slower row or fewer samples; Start.'))
+    sample_service = collapsed('serviceSamples', chain(declare('sampleElapsedUs', 'uint32_t', elapsed('phaseStartedUs')),
+        iff(both(compare('LT', var('pixel'), var('imageWidth')), compare('GTE', var('sampleElapsedUs'), var('nextSampleUs'))),
+        iff(compare('GT', op('MINUS', var('sampleElapsedUs'), var('nextSampleUs')), var('samplePeriodUs')), late, sample))),
         'At most one due analogRead per loop pass. Samples follow planned times through the continuously moving row. If service falls a complete sample interval behind, stop visibly instead of labelling a late reading as an earlier pixel. analogRead itself is one short synchronous conversion, not a per-pixel motor pause.')
 
     finish_transition = chain(assign('currentPanUs', var('targetPanUs')), assign('currentTiltUs', var('targetTiltUs')), call('writeServoTargets'), assign('phase', n(2)), assign('phaseStartedUs', block('arduino_micros')))
     start_row = chain(assign('phase', n(3)), assign('phaseStartedUs', block('arduino_micros')), assign('nextSampleUs', var('firstSampleUs')))
     next_row = chain(iff(var('reverseRow'), assign('currentPanUs', var('panStartUs')), assign('currentPanUs', var('panEndUs'))), call('writeServoTargets'),
         assign('row', op('ADD', var('row'), n(1))), iff(compare('GTE', var('row'), var('imageHeight')), assign('row', n(0))),
-        assign('reverseRow', block('logic_negate', values={'BOOL': var('reverseRow')})), call('beginRowTransition'))
+        assign('reverseRow', both(var('bidirectional'), block('logic_negate', values={'BOOL': var('reverseRow')}))), call('beginRowTransition'))
     advance = collapsed('advanceScanPhase', iff(compare('EQ', var('phase'), n(1)),
         iff(compare('GTE', elapsed('phaseStartedUs'), op('MULTIPLY', var('transitionMs'), n(1000))), finish_transition),
         iff(compare('EQ', var('phase'), n(2)), iff(compare('GTE', elapsed('phaseStartedUs'), op('MULTIPLY', var('settleMs'), n(1000))), start_row),
             iff(conditions(compare('EQ', var('phase'), n(3)), compare('GTE', var('pixel'), var('imageWidth')), compare('GTE', elapsed('phaseStartedUs'), var('rowTimeUs'))), next_row))),
-        'Phases: 0 hold, 1 move between rows, 2 settle, 3 continuous row sweep. Start the next serpentine row only after its last pixel and sweep duration. Unsigned elapsed-time subtraction survives micros() rollover.')
+        'Phases: 0 hold, 1 move between rows, 2 settle, 3 continuous sweep. Start the next row only after all delayed pixels arrive and the sweep ends. Skip delays sampling, not motion; at the endpoint the servo holds for the remaining delayed readings. Unsigned elapsed-time subtraction survives micros() rollover.')
 
     devices = [block('serial_config', {'BAUD': BAUD}, comment='Purpose: continuously sweep a photocell and build its image on the PC. Wiring: A0 light divider, pan D9, tilt D10, suitable servo supply and common GND. Upload, Plotter 115200, Connect, Start. Change the named Parameters blocks or live controls. No image RAM on Arduino.'),
         config('device_servo', 'scanpan', 'pan', {'PIN': 9, 'ENGINE': 'HARDWARE', 'MIN_US': PULSE_MIN, 'MAX_US': PULSE_MAX, 'FRAME_HZ': 50}, 'D9 / OC1A: hardware Timer1 pulse output. Endpoint parameters are microseconds, not 0–180 degree commands.'),
@@ -256,7 +271,7 @@ def build():
         if i: b.set('collapsed', 'true')
         place(b, 40 + i * 360, 30)
     # Separate the parameters from the algorithm and internal state.
-    for indices, x in ((range(0, 3), 40), (range(3, 8), 400), (range(8, 15), 760)):
+    for indices, x in (([0, 1, 2, 15, 16], 40), (range(3, 8), 400), (range(8, 15), 760)):
         place(chain(*(parameters[i] for i in indices)), x, 165)
     place(startup, 40, 630); place(main, 490, 630)
     for i, b in enumerate(functions): place(b, 40 + (i % 3) * 470, 1000 + (i // 3) * 95)

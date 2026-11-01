@@ -157,7 +157,7 @@ purposes={
 '58':'Use pin-change interrupts on D4 and D5 to keep separate counters, then copy the values safely in loop.',
 '59':'The counter rises ten times per second. Plotter shows it five times per second; Running pauses/resumes Timer1, Clear resets the count, and Restart begins a fresh timer period.',
 '60':'Starts detached. Check Attached, then press the D2 button. Detach pauses counting while preserving the count; Clear resets it.',
-'61':'Start a continuous serpentine photocell sweep with two hardware servos. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.',
+'61':'Choose one-way or bidirectional photocell sweeps with two hardware servos; adjust delayed sampling to align rows. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.',
 '62':'Use a potentiometer to set signed continuous stepper speed with acceleration. The software loop engine must still be serviced every pass.',
 '63':'Map a potentiometer to servo pulse microseconds for finer command increments than whole degree values.',
 '64':'Prepare an 80-byte LCD character grid in RAM, then send the finished 20×4 frame once. Legacy text mode treats zero as a space.',

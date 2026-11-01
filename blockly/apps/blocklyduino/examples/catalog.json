@@ -3765,16 +3765,16 @@
         ],
         "transitive": []
       },
-      "description": "Start a continuous serpentine photocell sweep with two hardware servos. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
+      "description": "Choose one-way or bidirectional photocell sweeps with two hardware servos; adjust delayed sampling to align rows. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
       "lesson": {
         "wiring": "Light-sensor/resistor divider midpoint A0; pan servo D9, tilt D10. Suitable servo supply with common GND. Both signals use Timer1 hardware PWM at 50 Hz.",
-        "observe": "Start a continuous serpentine photocell sweep with two hardware servos. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
+        "observe": "Choose one-way or bidirectional photocell sweeps with two hardware servos; adjust delayed sampling to align rows. The computer builds the image while the board averages scheduled ADC readings without a framebuffer.",
         "change": "Use the Parameters area or live controls: resolution, row time, averaging, gain/offset, black/white signal, brightness levels and servo pulse endpoints. Gain 100% = 1x. Accepted changes restart a clean image; Stop holds. Use Areas → Parameters to focus the editable settings.",
         "serial": "plotter",
         "baud": 115200
       },
       "notes": [
-        "Small remaining memory margin: 264 bytes Flash and 611 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
+        "Small remaining memory margin: 30 bytes Flash and 611 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
         "Coordinates follow commanded motion, not measured servo position. Mechanical lag and sensor response limit useful speed. The native ADC is 10-bit; 2–65536 output levels rescale its readings. Live bounds follow UART/ADC time and the PC image limit."
       ],
       "plotterModes": [
@@ -3789,12 +3789,12 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "sketchSha256": "a18fa09bc026c808435b19aceee1a80dee6c3df1f1bdd367ecbf110cab2e95a3",
-        "flash": 14072,
+        "sketchSha256": "8acbcf565df929d1eafb93d97c022d8d5fafe4b627b68599b8d27afc15d9bc3f",
+        "flash": 14306,
         "flashLimit": 14336,
         "staticRam": 413,
         "staticRamLimit": 1024,
-        "flashRemaining": 264,
+        "flashRemaining": 30,
         "ramRemaining": 611,
         "classification": "tight"
       }

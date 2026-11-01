@@ -125,8 +125,18 @@
     serial(); var parsed = templateParts(jsonTemplate(this.getFieldValue('TEXT'), false, false)), self = this, code = '';
     this.inputList.forEach(function (input) { if (input.name.indexOf('ARG_') === 0 && parsed.names.indexOf(input.name.slice(4)) < 0 && input.connection && input.connection.targetBlock()) throw Error('Serial template value ' + input.name.slice(4) + ' is unused. Restore its {{placeholder}} or disconnect that value.'); });
     var values = Object.create(null); parsed.names.forEach(function (name) { values[name] = value(self, 'ARG_' + name); });
-    parsed.pieces.forEach(function (piece) { if (piece.name) code += 'Serial.print(' + (piece.precision == null ? values[piece.name] : '(double)(' + values[piece.name] + '), ' + piece.precision) + ');\n'; else if (piece.text) code += 'Serial.print(F(' + JSON.stringify(piece.text) + '));\n'; });
-    if (this.getFieldValue('END') === 'println') code += 'Serial.println();\n';
+    var newline = this.getFieldValue('END') === 'println';
+    parsed.pieces.forEach(function (piece, i) {
+      if (piece.name) code += 'Serial.print(' + (piece.precision == null ? values[piece.name] : '(double)(' + values[piece.name] + '), ' + piece.precision) + ');\n';
+      else if (piece.text) {
+        // Finish a literal and its newline in one call. The wire text is identical,
+        // but repeated short state replies cost less Flash on small AVR boards.
+        var end = newline && i === parsed.pieces.length - 1;
+        code += 'Serial.' + (end ? 'println' : 'print') + '(F(' + JSON.stringify(piece.text) + '));\n';
+        if (end) newline = false;
+      }
+    });
+    if (newline) code += 'Serial.println();\n';
     return code;
   };
   Blockly.Blocks.serial_receive_line = {init:function () {

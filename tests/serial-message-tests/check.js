@@ -23,6 +23,10 @@ fails(()=>s.compact('bad {{ name }}'),/Use/);
 fails(()=>s.compact('@plot {"width":{{width}},}'),/Invalid JSON/);
 const basic=workspace(template('Count {{value:3}}', {value:n(12)}));
 check(h.generate(basic).includes('Serial.print((double)(12), 3);'),'Explicit precision casts integer inputs instead of selecting base 3');
+const literalEnd=workspace(template('Value {{n}} done', {n:n(12)}));
+check(h.generate(literalEnd).includes('Serial.println(F(" done"));'),'Final Flash literal and newline share one call');
+const sameLine=workspace(block('serial_template',{TEXT:'Value {{n}} done',END:'print'},{ARG_n:n(12)}));
+check(h.generate(sameLine).includes('Serial.print(F(" done"));')&&!h.generate(sameLine).includes('Serial.println('),'Same-line templates add no newline');
 const renamed=workspace(template('Count {{count}} / {{count}}', {count:n(12)}));
 eq(Array.from(renamed.getAllBlocks().find(b=>b.type==='serial_template').inputList.filter(i=>i.name.indexOf('ARG_')===0).map(i=>i.name)),['ARG_count']);
 const renamedAgain=h.load(h.save(renamed));eq(h.generate(renamedAgain),h.generate(renamed),'Mutation restores names before expression children');
@@ -115,6 +119,7 @@ class FakeSerial : public Stream {
  template<typename T> void print(T value){std::ostringstream text;text<<value;output+=text.str();}
  void print(double value,int precision){std::ostringstream text;text<<std::fixed<<std::setprecision(precision)<<value;output+=text.str();}
  void println(){output+='\n';}
+ template<typename T> void println(T value){print(value);println();}
 } Serial;
 `+code+String.raw`
 void send(const std::string &s){Serial.incoming+=s;while(Serial.available())loop();}

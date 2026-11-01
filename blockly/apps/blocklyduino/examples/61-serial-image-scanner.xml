@@ -31,7 +31,7 @@
         <field name="NUM">32</field>
       </block>
     </value>
-    <comment pinned="false" w="390" h="170">Columns in the computer image. More columns divide the same row sweep more finely.</comment>
+    <comment pinned="false" w="390" h="170">Columns in the computer image. Higher resolution automatically lengthens Time per row if ADC or Serial throughput requires it. Width must exceed Skip line start pixels.</comment>
     <next>
       <block type="arduino_typed_variable">
         <field name="VAR">imageHeight</field>
@@ -52,6 +52,30 @@
               </block>
             </value>
             <comment pinned="false" w="390" h="170">Output values are 0 through levels-1. The ADC is still 10-bit; rescaling does not add sensor information.</comment>
+            <next>
+              <block type="arduino_typed_variable">
+                <field name="VAR">bidirectional</field>
+                <field name="TYPE">int32_t</field>
+                <value name="VALUE">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+                <comment pinned="false" w="390" h="170">1: alternate forward/reverse rows. 0: scan every row from Pan start to Pan end; return without taking measurements.</comment>
+                <next>
+                  <block type="arduino_typed_variable">
+                    <field name="VAR">skipPixels</field>
+                    <field name="TYPE">int32_t</field>
+                    <value name="VALUE">
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <comment pinned="false" w="390" h="170">Delay measurements by this many pixel periods without shifting their image coordinates. Try 1, 2... to align alternate rows with sensor/mechanical lag. Every image column is still sent; the servo holds at the row end while the last delayed samples arrive. This is a lag approximation, not position feedback. Must be less than image width.</comment>
+                  </block>
+                </next>
+              </block>
+            </next>
           </block>
         </next>
       </block>
@@ -123,7 +147,7 @@
         <field name="NUM">3000</field>
       </block>
     </value>
-    <comment pinned="false" w="390" h="170">Pan moves from one endpoint to the other in this time. Larger means slower; resolution does not change this speed.</comment>
+    <comment pinned="false" w="390" h="170">Pan moves from one endpoint to the other in this time. Larger means slower. A higher resolution automatically increases this time only if ADC/Serial throughput requires it.</comment>
     <next>
       <block type="arduino_typed_variable">
         <field name="VAR">panStartUs</field>
@@ -285,105 +309,73 @@
   <block type="procedures_defnoreturn" collapsed="true" x="40" y="1000">
     <field name="NAME">updateLimits</field>
     <statement name="STACK">
-      <block type="variables_set">
-        <field name="VAR">rowTimeUs</field>
+      <block type="arduino_typed_variable">
+        <field name="VAR">minimumPixelUs</field>
+        <field name="TYPE">uint32_t</field>
         <value name="VALUE">
-          <block type="math_arithmetic">
-            <field name="OP">MULTIPLY</field>
+          <block type="arduino_math_minmax">
+            <field name="OP">max</field>
             <value name="A">
               <block type="variables_get">
-                <field name="VAR">sweepMs</field>
+                <field name="VAR">serialPixelBudgetUs</field>
               </block>
             </value>
             <value name="B">
-              <block type="math_number">
-                <field name="NUM">1000</field>
+              <block type="math_arithmetic">
+                <field name="OP">MULTIPLY</field>
+                <value name="A">
+                  <block type="variables_get">
+                    <field name="VAR">minimumAdcUs</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="variables_get">
+                    <field name="VAR">multiSamples</field>
+                  </block>
+                </value>
               </block>
             </value>
           </block>
         </value>
         <next>
-          <block type="arduino_typed_variable">
-            <field name="VAR">minimumPixelUs</field>
-            <field name="TYPE">uint32_t</field>
+          <block type="variables_set">
+            <field name="VAR">minWidth</field>
             <value name="VALUE">
-              <block type="arduino_math_minmax">
-                <field name="OP">max</field>
+              <block type="math_arithmetic">
+                <field name="OP">ADD</field>
                 <value name="A">
                   <block type="variables_get">
-                    <field name="VAR">serialPixelBudgetUs</field>
+                    <field name="VAR">skipPixels</field>
                   </block>
                 </value>
                 <value name="B">
-                  <block type="math_arithmetic">
-                    <field name="OP">MULTIPLY</field>
-                    <value name="A">
-                      <block type="variables_get">
-                        <field name="VAR">minimumAdcUs</field>
-                      </block>
-                    </value>
-                    <value name="B">
-                      <block type="variables_get">
-                        <field name="VAR">multiSamples</field>
-                      </block>
-                    </value>
+                  <block type="math_number">
+                    <field name="NUM">1</field>
                   </block>
                 </value>
               </block>
             </value>
             <next>
               <block type="variables_set">
-                <field name="VAR">maxWidth</field>
+                <field name="VAR">maxSkip</field>
                 <value name="VALUE">
-                  <block type="arduino_math_minmax">
-                    <field name="OP">min</field>
+                  <block type="math_arithmetic">
+                    <field name="OP">MINUS</field>
                     <value name="A">
-                      <block type="math_number">
-                        <field name="NUM">16384</field>
+                      <block type="variables_get">
+                        <field name="VAR">imageWidth</field>
                       </block>
                     </value>
                     <value name="B">
-                      <block type="arduino_math_minmax">
-                        <field name="OP">min</field>
-                        <value name="A">
-                          <block type="ll_bits_integer_math">
-                            <field name="OP">DIV</field>
-                            <field name="WIDTH">32</field>
-                            <value name="A">
-                              <block type="math_number">
-                                <field name="NUM">16777216</field>
-                              </block>
-                            </value>
-                            <value name="B">
-                              <block type="variables_get">
-                                <field name="VAR">imageHeight</field>
-                              </block>
-                            </value>
-                          </block>
-                        </value>
-                        <value name="B">
-                          <block type="ll_bits_integer_math">
-                            <field name="OP">DIV</field>
-                            <field name="WIDTH">32</field>
-                            <value name="A">
-                              <block type="variables_get">
-                                <field name="VAR">rowTimeUs</field>
-                              </block>
-                            </value>
-                            <value name="B">
-                              <block type="variables_get">
-                                <field name="VAR">minimumPixelUs</field>
-                              </block>
-                            </value>
-                          </block>
-                        </value>
+                      <block type="math_number">
+                        <field name="NUM">1</field>
                       </block>
                     </value>
                   </block>
                 </value>
                 <next>
                   <block type="variables_set">
-                    <field name="VAR">maxHeight</field>
+                    <field name="VAR">maxWidth</field>
                     <value name="VALUE">
                       <block type="arduino_math_minmax">
                         <field name="OP">min</field>
@@ -393,17 +385,38 @@
                           </block>
                         </value>
                         <value name="B">
-                          <block type="ll_bits_integer_math">
-                            <field name="OP">DIV</field>
-                            <field name="WIDTH">32</field>
+                          <block type="arduino_math_minmax">
+                            <field name="OP">min</field>
                             <value name="A">
-                              <block type="math_number">
-                                <field name="NUM">16777216</field>
+                              <block type="ll_bits_integer_math">
+                                <field name="OP">DIV</field>
+                                <field name="WIDTH">32</field>
+                                <value name="A">
+                                  <block type="math_number">
+                                    <field name="NUM">16777216</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="variables_get">
+                                    <field name="VAR">imageHeight</field>
+                                  </block>
+                                </value>
                               </block>
                             </value>
                             <value name="B">
-                              <block type="variables_get">
-                                <field name="VAR">imageWidth</field>
+                              <block type="ll_bits_integer_math">
+                                <field name="OP">DIV</field>
+                                <field name="WIDTH">32</field>
+                                <value name="A">
+                                  <block type="math_number">
+                                    <field name="NUM">2147483000</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="variables_get">
+                                    <field name="VAR">minimumPixelUs</field>
+                                  </block>
+                                </value>
                               </block>
                             </value>
                           </block>
@@ -412,13 +425,13 @@
                     </value>
                     <next>
                       <block type="variables_set">
-                        <field name="VAR">maxSamples</field>
+                        <field name="VAR">maxHeight</field>
                         <value name="VALUE">
                           <block type="arduino_math_minmax">
                             <field name="OP">min</field>
                             <value name="A">
                               <block type="math_number">
-                                <field name="NUM">65535</field>
+                                <field name="NUM">16384</field>
                               </block>
                             </value>
                             <value name="B">
@@ -426,23 +439,13 @@
                                 <field name="OP">DIV</field>
                                 <field name="WIDTH">32</field>
                                 <value name="A">
-                                  <block type="variables_get">
-                                    <field name="VAR">rowTimeUs</field>
+                                  <block type="math_number">
+                                    <field name="NUM">16777216</field>
                                   </block>
                                 </value>
                                 <value name="B">
-                                  <block type="math_arithmetic">
-                                    <field name="OP">MULTIPLY</field>
-                                    <value name="A">
-                                      <block type="variables_get">
-                                        <field name="VAR">imageWidth</field>
-                                      </block>
-                                    </value>
-                                    <value name="B">
-                                      <block type="variables_get">
-                                        <field name="VAR">minimumAdcUs</field>
-                                      </block>
-                                    </value>
+                                  <block type="variables_get">
+                                    <field name="VAR">imageWidth</field>
                                   </block>
                                 </value>
                               </block>
@@ -513,131 +516,242 @@
                                         </value>
                                       </block>
                                     </value>
+                                    <next>
+                                      <block type="variables_set">
+                                        <field name="VAR">sweepMs</field>
+                                        <value name="VALUE">
+                                          <block type="arduino_math_minmax">
+                                            <field name="OP">max</field>
+                                            <value name="A">
+                                              <block type="variables_get">
+                                                <field name="VAR">sweepMs</field>
+                                              </block>
+                                            </value>
+                                            <value name="B">
+                                              <block type="variables_get">
+                                                <field name="VAR">minSweepMs</field>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </next>
                                   </block>
                                 </statement>
                                 <next>
                                   <block type="variables_set">
-                                    <field name="VAR">pixelPeriodUs</field>
+                                    <field name="VAR">rowTimeUs</field>
                                     <value name="VALUE">
-                                      <block type="ll_bits_integer_math">
-                                        <field name="OP">DIV</field>
-                                        <field name="WIDTH">32</field>
+                                      <block type="math_arithmetic">
+                                        <field name="OP">MULTIPLY</field>
                                         <value name="A">
                                           <block type="variables_get">
-                                            <field name="VAR">rowTimeUs</field>
+                                            <field name="VAR">sweepMs</field>
                                           </block>
                                         </value>
                                         <value name="B">
-                                          <block type="variables_get">
-                                            <field name="VAR">imageWidth</field>
+                                          <block type="math_number">
+                                            <field name="NUM">1000</field>
                                           </block>
                                         </value>
                                       </block>
                                     </value>
                                     <next>
                                       <block type="variables_set">
-                                        <field name="VAR">samplePeriodUs</field>
+                                        <field name="VAR">maxSamples</field>
                                         <value name="VALUE">
-                                          <block type="ll_bits_integer_math">
-                                            <field name="OP">DIV</field>
-                                            <field name="WIDTH">32</field>
+                                          <block type="arduino_math_minmax">
+                                            <field name="OP">min</field>
                                             <value name="A">
-                                              <block type="variables_get">
-                                                <field name="VAR">pixelPeriodUs</field>
+                                              <block type="math_number">
+                                                <field name="NUM">65535</field>
                                               </block>
                                             </value>
                                             <value name="B">
-                                              <block type="variables_get">
-                                                <field name="VAR">multiSamples</field>
+                                              <block type="ll_bits_integer_math">
+                                                <field name="OP">DIV</field>
+                                                <field name="WIDTH">32</field>
+                                                <value name="A">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">rowTimeUs</field>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="math_arithmetic">
+                                                    <field name="OP">MULTIPLY</field>
+                                                    <value name="A">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">imageWidth</field>
+                                                      </block>
+                                                    </value>
+                                                    <value name="B">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">minimumAdcUs</field>
+                                                      </block>
+                                                    </value>
+                                                  </block>
+                                                </value>
                                               </block>
                                             </value>
                                           </block>
                                         </value>
                                         <next>
                                           <block type="variables_set">
-                                            <field name="VAR">firstSampleUs</field>
+                                            <field name="VAR">pixelPeriodUs</field>
                                             <value name="VALUE">
                                               <block type="ll_bits_integer_math">
                                                 <field name="OP">DIV</field>
                                                 <field name="WIDTH">32</field>
                                                 <value name="A">
-                                                  <block type="math_arithmetic">
-                                                    <field name="OP">MINUS</field>
-                                                    <value name="A">
-                                                      <block type="variables_get">
-                                                        <field name="VAR">pixelPeriodUs</field>
-                                                      </block>
-                                                    </value>
-                                                    <value name="B">
-                                                      <block type="math_arithmetic">
-                                                        <field name="OP">MULTIPLY</field>
-                                                        <value name="A">
-                                                          <block type="math_arithmetic">
-                                                            <field name="OP">MINUS</field>
-                                                            <value name="A">
-                                                              <block type="variables_get">
-                                                                <field name="VAR">multiSamples</field>
-                                                              </block>
-                                                            </value>
-                                                            <value name="B">
-                                                              <block type="math_number">
-                                                                <field name="NUM">1</field>
-                                                              </block>
-                                                            </value>
-                                                          </block>
-                                                        </value>
-                                                        <value name="B">
-                                                          <block type="variables_get">
-                                                            <field name="VAR">samplePeriodUs</field>
-                                                          </block>
-                                                        </value>
-                                                      </block>
-                                                    </value>
+                                                  <block type="variables_get">
+                                                    <field name="VAR">rowTimeUs</field>
                                                   </block>
                                                 </value>
                                                 <value name="B">
-                                                  <block type="math_number">
-                                                    <field name="NUM">2</field>
+                                                  <block type="variables_get">
+                                                    <field name="VAR">imageWidth</field>
                                                   </block>
                                                 </value>
                                               </block>
                                             </value>
                                             <next>
                                               <block type="variables_set">
-                                                <field name="VAR">lowMaximum</field>
+                                                <field name="VAR">samplePeriodUs</field>
                                                 <value name="VALUE">
-                                                  <block type="math_arithmetic">
-                                                    <field name="OP">MINUS</field>
+                                                  <block type="ll_bits_integer_math">
+                                                    <field name="OP">DIV</field>
+                                                    <field name="WIDTH">32</field>
                                                     <value name="A">
                                                       <block type="variables_get">
-                                                        <field name="VAR">signalHigh</field>
+                                                        <field name="VAR">pixelPeriodUs</field>
                                                       </block>
                                                     </value>
                                                     <value name="B">
-                                                      <block type="math_number">
-                                                        <field name="NUM">1</field>
+                                                      <block type="variables_get">
+                                                        <field name="VAR">multiSamples</field>
                                                       </block>
                                                     </value>
                                                   </block>
                                                 </value>
                                                 <next>
                                                   <block type="variables_set">
-                                                    <field name="VAR">highMinimum</field>
+                                                    <field name="VAR">firstSampleUs</field>
                                                     <value name="VALUE">
-                                                      <block type="math_arithmetic">
-                                                        <field name="OP">ADD</field>
+                                                      <block type="ll_bits_integer_math">
+                                                        <field name="OP">DIV</field>
+                                                        <field name="WIDTH">32</field>
                                                         <value name="A">
-                                                          <block type="variables_get">
-                                                            <field name="VAR">signalLow</field>
+                                                          <block type="math_arithmetic">
+                                                            <field name="OP">MINUS</field>
+                                                            <value name="A">
+                                                              <block type="variables_get">
+                                                                <field name="VAR">pixelPeriodUs</field>
+                                                              </block>
+                                                            </value>
+                                                            <value name="B">
+                                                              <block type="math_arithmetic">
+                                                                <field name="OP">MULTIPLY</field>
+                                                                <value name="A">
+                                                                  <block type="math_arithmetic">
+                                                                    <field name="OP">MINUS</field>
+                                                                    <value name="A">
+                                                                      <block type="variables_get">
+                                                                        <field name="VAR">multiSamples</field>
+                                                                      </block>
+                                                                    </value>
+                                                                    <value name="B">
+                                                                      <block type="math_number">
+                                                                        <field name="NUM">1</field>
+                                                                      </block>
+                                                                    </value>
+                                                                  </block>
+                                                                </value>
+                                                                <value name="B">
+                                                                  <block type="variables_get">
+                                                                    <field name="VAR">samplePeriodUs</field>
+                                                                  </block>
+                                                                </value>
+                                                              </block>
+                                                            </value>
                                                           </block>
                                                         </value>
                                                         <value name="B">
                                                           <block type="math_number">
-                                                            <field name="NUM">1</field>
+                                                            <field name="NUM">2</field>
                                                           </block>
                                                         </value>
                                                       </block>
                                                     </value>
+                                                    <next>
+                                                      <block type="variables_set">
+                                                        <field name="VAR">firstSampleUs</field>
+                                                        <value name="VALUE">
+                                                          <block type="math_arithmetic">
+                                                            <field name="OP">ADD</field>
+                                                            <value name="A">
+                                                              <block type="variables_get">
+                                                                <field name="VAR">firstSampleUs</field>
+                                                              </block>
+                                                            </value>
+                                                            <value name="B">
+                                                              <block type="math_arithmetic">
+                                                                <field name="OP">MULTIPLY</field>
+                                                                <value name="A">
+                                                                  <block type="variables_get">
+                                                                    <field name="VAR">skipPixels</field>
+                                                                  </block>
+                                                                </value>
+                                                                <value name="B">
+                                                                  <block type="variables_get">
+                                                                    <field name="VAR">pixelPeriodUs</field>
+                                                                  </block>
+                                                                </value>
+                                                              </block>
+                                                            </value>
+                                                          </block>
+                                                        </value>
+                                                        <next>
+                                                          <block type="variables_set">
+                                                            <field name="VAR">lowMaximum</field>
+                                                            <value name="VALUE">
+                                                              <block type="math_arithmetic">
+                                                                <field name="OP">MINUS</field>
+                                                                <value name="A">
+                                                                  <block type="variables_get">
+                                                                    <field name="VAR">signalHigh</field>
+                                                                  </block>
+                                                                </value>
+                                                                <value name="B">
+                                                                  <block type="math_number">
+                                                                    <field name="NUM">1</field>
+                                                                  </block>
+                                                                </value>
+                                                              </block>
+                                                            </value>
+                                                            <next>
+                                                              <block type="variables_set">
+                                                                <field name="VAR">highMinimum</field>
+                                                                <value name="VALUE">
+                                                                  <block type="math_arithmetic">
+                                                                    <field name="OP">ADD</field>
+                                                                    <value name="A">
+                                                                      <block type="variables_get">
+                                                                        <field name="VAR">signalLow</field>
+                                                                      </block>
+                                                                    </value>
+                                                                    <value name="B">
+                                                                      <block type="math_number">
+                                                                        <field name="NUM">1</field>
+                                                                      </block>
+                                                                    </value>
+                                                                  </block>
+                                                                </value>
+                                                              </block>
+                                                            </next>
+                                                          </block>
+                                                        </next>
+                                                      </block>
+                                                    </next>
                                                   </block>
                                                 </next>
                                               </block>
@@ -662,7 +776,7 @@
         </next>
       </block>
     </statement>
-    <comment pinned="false" w="390" h="170">Recalculate limits from the actual resolution, averaging, baud budget and row time. The same named bounds drive Plotter controls and command validation. The PC accepts dimensions up to 16384 and 16 megapixels total; AVR timing may allow fewer columns at the chosen speed.</comment>
+    <comment pinned="false" w="390" h="170">The PC accepts dimensions up to 16384 and 16 megapixels total without an Arduino image buffer. Width is limited by this capacity and maximum row duration, not the current speed. More columns automatically lengthen the row when ADC/UART throughput requires it. Skip adds a sampling delay while preserving pixel coordinates; skip &lt; width keeps each whole row below one unsigned micros() wrap.</comment>
   </block>
   <block type="procedures_defnoreturn" collapsed="true" x="510" y="1000">
     <field name="NAME">validateSettings</field>
@@ -721,16 +835,76 @@
                                                                           <block type="logic_operation">
                                                                             <field name="OP">AND</field>
                                                                             <value name="A">
-                                                                              <block type="logic_compare">
-                                                                                <field name="OP">GTE</field>
+                                                                              <block type="logic_operation">
+                                                                                <field name="OP">AND</field>
                                                                                 <value name="A">
-                                                                                  <block type="variables_get">
-                                                                                    <field name="VAR">imageWidth</field>
+                                                                                  <block type="logic_operation">
+                                                                                    <field name="OP">AND</field>
+                                                                                    <value name="A">
+                                                                                      <block type="logic_compare">
+                                                                                        <field name="OP">GTE</field>
+                                                                                        <value name="A">
+                                                                                          <block type="variables_get">
+                                                                                            <field name="VAR">imageWidth</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="B">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">1</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                      </block>
+                                                                                    </value>
+                                                                                    <value name="B">
+                                                                                      <block type="logic_compare">
+                                                                                        <field name="OP">LTE</field>
+                                                                                        <value name="A">
+                                                                                          <block type="variables_get">
+                                                                                            <field name="VAR">imageWidth</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="B">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">16384</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                      </block>
+                                                                                    </value>
                                                                                   </block>
                                                                                 </value>
                                                                                 <value name="B">
-                                                                                  <block type="math_number">
-                                                                                    <field name="NUM">1</field>
+                                                                                  <block type="logic_operation">
+                                                                                    <field name="OP">AND</field>
+                                                                                    <value name="A">
+                                                                                      <block type="logic_compare">
+                                                                                        <field name="OP">GTE</field>
+                                                                                        <value name="A">
+                                                                                          <block type="variables_get">
+                                                                                            <field name="VAR">imageHeight</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="B">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">1</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                      </block>
+                                                                                    </value>
+                                                                                    <value name="B">
+                                                                                      <block type="logic_compare">
+                                                                                        <field name="OP">LTE</field>
+                                                                                        <value name="A">
+                                                                                          <block type="variables_get">
+                                                                                            <field name="VAR">imageHeight</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="B">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">16384</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                      </block>
+                                                                                    </value>
                                                                                   </block>
                                                                                 </value>
                                                                               </block>
@@ -739,13 +913,23 @@
                                                                               <block type="logic_compare">
                                                                                 <field name="OP">LTE</field>
                                                                                 <value name="A">
-                                                                                  <block type="variables_get">
-                                                                                    <field name="VAR">imageWidth</field>
+                                                                                  <block type="math_arithmetic">
+                                                                                    <field name="OP">MULTIPLY</field>
+                                                                                    <value name="A">
+                                                                                      <block type="variables_get">
+                                                                                        <field name="VAR">imageWidth</field>
+                                                                                      </block>
+                                                                                    </value>
+                                                                                    <value name="B">
+                                                                                      <block type="variables_get">
+                                                                                        <field name="VAR">imageHeight</field>
+                                                                                      </block>
+                                                                                    </value>
                                                                                   </block>
                                                                                 </value>
                                                                                 <value name="B">
                                                                                   <block type="math_number">
-                                                                                    <field name="NUM">16384</field>
+                                                                                    <field name="NUM">16777216</field>
                                                                                   </block>
                                                                                 </value>
                                                                               </block>
@@ -760,7 +944,7 @@
                                                                                 <field name="OP">GTE</field>
                                                                                 <value name="A">
                                                                                   <block type="variables_get">
-                                                                                    <field name="VAR">imageHeight</field>
+                                                                                    <field name="VAR">multiSamples</field>
                                                                                   </block>
                                                                                 </value>
                                                                                 <value name="B">
@@ -775,12 +959,12 @@
                                                                                 <field name="OP">LTE</field>
                                                                                 <value name="A">
                                                                                   <block type="variables_get">
-                                                                                    <field name="VAR">imageHeight</field>
+                                                                                    <field name="VAR">multiSamples</field>
                                                                                   </block>
                                                                                 </value>
                                                                                 <value name="B">
                                                                                   <block type="math_number">
-                                                                                    <field name="NUM">16384</field>
+                                                                                    <field name="NUM">65535</field>
                                                                                   </block>
                                                                                 </value>
                                                                               </block>
@@ -790,26 +974,36 @@
                                                                       </block>
                                                                     </value>
                                                                     <value name="B">
-                                                                      <block type="logic_compare">
-                                                                        <field name="OP">LTE</field>
+                                                                      <block type="logic_operation">
+                                                                        <field name="OP">AND</field>
                                                                         <value name="A">
-                                                                          <block type="math_arithmetic">
-                                                                            <field name="OP">MULTIPLY</field>
+                                                                          <block type="logic_compare">
+                                                                            <field name="OP">GTE</field>
                                                                             <value name="A">
                                                                               <block type="variables_get">
-                                                                                <field name="VAR">imageWidth</field>
+                                                                                <field name="VAR">sweepMs</field>
                                                                               </block>
                                                                             </value>
                                                                             <value name="B">
-                                                                              <block type="variables_get">
-                                                                                <field name="VAR">imageHeight</field>
+                                                                              <block type="math_number">
+                                                                                <field name="NUM">1</field>
                                                                               </block>
                                                                             </value>
                                                                           </block>
                                                                         </value>
                                                                         <value name="B">
-                                                                          <block type="math_number">
-                                                                            <field name="NUM">16777216</field>
+                                                                          <block type="logic_compare">
+                                                                            <field name="OP">LTE</field>
+                                                                            <value name="A">
+                                                                              <block type="variables_get">
+                                                                                <field name="VAR">sweepMs</field>
+                                                                              </block>
+                                                                            </value>
+                                                                            <value name="B">
+                                                                              <block type="math_number">
+                                                                                <field name="NUM">2147483</field>
+                                                                              </block>
+                                                                            </value>
                                                                           </block>
                                                                         </value>
                                                                       </block>
@@ -824,12 +1018,12 @@
                                                                         <field name="OP">GTE</field>
                                                                         <value name="A">
                                                                           <block type="variables_get">
-                                                                            <field name="VAR">multiSamples</field>
+                                                                            <field name="VAR">transitionMs</field>
                                                                           </block>
                                                                         </value>
                                                                         <value name="B">
                                                                           <block type="math_number">
-                                                                            <field name="NUM">1</field>
+                                                                            <field name="NUM">0</field>
                                                                           </block>
                                                                         </value>
                                                                       </block>
@@ -839,12 +1033,12 @@
                                                                         <field name="OP">LTE</field>
                                                                         <value name="A">
                                                                           <block type="variables_get">
-                                                                            <field name="VAR">multiSamples</field>
+                                                                            <field name="VAR">transitionMs</field>
                                                                           </block>
                                                                         </value>
                                                                         <value name="B">
                                                                           <block type="math_number">
-                                                                            <field name="NUM">65535</field>
+                                                                            <field name="NUM">2147483</field>
                                                                           </block>
                                                                         </value>
                                                                       </block>
@@ -861,12 +1055,12 @@
                                                                     <field name="OP">GTE</field>
                                                                     <value name="A">
                                                                       <block type="variables_get">
-                                                                        <field name="VAR">sweepMs</field>
+                                                                        <field name="VAR">settleMs</field>
                                                                       </block>
                                                                     </value>
                                                                     <value name="B">
                                                                       <block type="math_number">
-                                                                        <field name="NUM">1</field>
+                                                                        <field name="NUM">0</field>
                                                                       </block>
                                                                     </value>
                                                                   </block>
@@ -876,7 +1070,7 @@
                                                                     <field name="OP">LTE</field>
                                                                     <value name="A">
                                                                       <block type="variables_get">
-                                                                        <field name="VAR">sweepMs</field>
+                                                                        <field name="VAR">settleMs</field>
                                                                       </block>
                                                                     </value>
                                                                     <value name="B">
@@ -898,7 +1092,7 @@
                                                                 <field name="OP">GTE</field>
                                                                 <value name="A">
                                                                   <block type="variables_get">
-                                                                    <field name="VAR">transitionMs</field>
+                                                                    <field name="VAR">bidirectional</field>
                                                                   </block>
                                                                 </value>
                                                                 <value name="B">
@@ -913,12 +1107,12 @@
                                                                 <field name="OP">LTE</field>
                                                                 <value name="A">
                                                                   <block type="variables_get">
-                                                                    <field name="VAR">transitionMs</field>
+                                                                    <field name="VAR">bidirectional</field>
                                                                   </block>
                                                                 </value>
                                                                 <value name="B">
                                                                   <block type="math_number">
-                                                                    <field name="NUM">2147483</field>
+                                                                    <field name="NUM">1</field>
                                                                   </block>
                                                                 </value>
                                                               </block>
@@ -935,7 +1129,7 @@
                                                             <field name="OP">GTE</field>
                                                             <value name="A">
                                                               <block type="variables_get">
-                                                                <field name="VAR">settleMs</field>
+                                                                <field name="VAR">skipPixels</field>
                                                               </block>
                                                             </value>
                                                             <value name="B">
@@ -950,12 +1144,22 @@
                                                             <field name="OP">LTE</field>
                                                             <value name="A">
                                                               <block type="variables_get">
-                                                                <field name="VAR">settleMs</field>
+                                                                <field name="VAR">skipPixels</field>
                                                               </block>
                                                             </value>
                                                             <value name="B">
-                                                              <block type="math_number">
-                                                                <field name="NUM">2147483</field>
+                                                              <block type="math_arithmetic">
+                                                                <field name="OP">MINUS</field>
+                                                                <value name="A">
+                                                                  <block type="variables_get">
+                                                                    <field name="VAR">imageWidth</field>
+                                                                  </block>
+                                                                </value>
+                                                                <value name="B">
+                                                                  <block type="math_number">
+                                                                    <field name="NUM">1</field>
+                                                                  </block>
+                                                                </value>
                                                               </block>
                                                             </value>
                                                           </block>
@@ -1351,7 +1555,7 @@
         </next>
       </block>
     </statement>
-    <comment pinned="false" w="390" h="170">Check edited defaults before any division or motion. Time phases stay below half the micros() wrap period. Runtime controls use these same cross-dependent limits and retain the previous value when rejected.</comment>
+    <comment pinned="false" w="390" h="170">Check edited defaults before division or motion. Row time is at most 2147483 ms; skip &lt; width keeps row plus delayed samples below one unsigned micros() wrap. Runtime controls use the same limits and retain rejected values.</comment>
   </block>
   <block type="procedures_defnoreturn" collapsed="true" x="980" y="1000">
     <field name="NAME">announcePlotter</field>
@@ -1365,7 +1569,7 @@
         </value>
         <statement name="DO0">
           <block type="serial_template">
-            <field name="TEXT">@plot {"version":1,"id":"photocell","title":"Photocell scanner","description":"A0 light; pan D9, tilt D10. Start scans; changes restart. Position is commanded, not measured.","fields":[{"id":"adc","min":0,"max":1023}],"widgets":[{"type":"image","image":{"id":"scan","width":{{imageWidth}},"height":{{imageHeight}},"mode":"gray","max":{{maximumValue}}}},{"type":"line","fields":["adc"]}],"controls":[{"id":"width","type":"number","label":"Image width (px)","min":1,"max":{{maxWidth}},"value":{{imageWidth}}},{"id":"height","type":"number","label":"Image height (px)","min":1,"max":{{maxHeight}},"value":{{imageHeight}}},{"id":"levels","type":"number","label":"Brightness levels","min":2,"max":65536,"value":{{brightnessLevels}}},{"id":"gain","type":"number","label":"Light gain (%)","min":0,"max":1600,"value":{{gainPercent}}},{"id":"offset","type":"number","label":"Light offset (ADC)","min":-16384,"max":16384,"value":{{offset}}},{"id":"samples","type":"number","label":"Samples per pixel","min":1,"max":{{maxSamples}},"value":{{multiSamples}}},{"id":"low","type":"number","label":"Black signal (ADC)","min":0,"max":{{lowMaximum}},"value":{{signalLow}}},{"id":"high","type":"number","label":"White signal (ADC)","min":{{highMinimum}},"max":1023,"value":{{signalHigh}}},{"id":"sweep","type":"number","label":"Time per row (ms)","min":{{minSweepMs}},"max":2147483,"value":{{sweepMs}}},{"id":"pan0","type":"number","label":"Pan start (us)","min":544,"max":2400,"value":{{panStartUs}}},{"id":"pan1","type":"number","label":"Pan end (us)","min":544,"max":2400,"value":{{panEndUs}}},{"id":"tilt0","type":"number","label":"Tilt start (us)","min":544,"max":2400,"value":{{tiltStartUs}}},{"id":"tilt1","type":"number","label":"Tilt end (us)","min":544,"max":2400,"value":{{tiltEndUs}}},{"id":"transition","type":"number","label":"Between-row move (ms)","min":0,"max":2147483,"value":{{transitionMs}}},{"id":"settle","type":"number","label":"Row settling (ms)","min":0,"max":2147483,"value":{{settleMs}}}]}</field>
+            <field name="TEXT">@plot {"version":1,"id":"photocell","title":"Photocell scanner","description":"A0 light; D9 pan, D10 tilt. Start scans; changes restart.","fields":[{"id":"adc","min":0,"max":1023}],"widgets":[{"type":"image","image":{"id":"scan","width":{{imageWidth}},"height":{{imageHeight}},"mode":"gray","max":{{maximumValue}}}},{"type":"line","fields":["adc"]}],"controls":[{"id":"width","type":"number","label":"Image width (px)","min":{{minWidth}},"max":{{maxWidth}},"value":{{imageWidth}}},{"id":"height","type":"number","label":"Image height (px)","min":1,"max":{{maxHeight}},"value":{{imageHeight}}},{"id":"levels","type":"number","label":"Brightness levels","min":2,"max":65536,"value":{{brightnessLevels}}},{"id":"gain","type":"number","label":"Light gain (%)","min":0,"max":1600,"value":{{gainPercent}}},{"id":"offset","type":"number","label":"Light offset (ADC)","min":-16384,"max":16384,"value":{{offset}}},{"id":"samples","type":"number","label":"Samples per pixel","min":1,"max":{{maxSamples}},"value":{{multiSamples}}},{"id":"low","type":"number","label":"Black signal (ADC)","min":0,"max":{{lowMaximum}},"value":{{signalLow}}},{"id":"high","type":"number","label":"White signal (ADC)","min":{{highMinimum}},"max":1023,"value":{{signalHigh}}},{"id":"sweep","type":"number","label":"Time per row (ms)","min":{{minSweepMs}},"max":2147483,"value":{{sweepMs}}},{"id":"pan0","type":"number","label":"Pan start (us)","min":544,"max":2400,"value":{{panStartUs}}},{"id":"pan1","type":"number","label":"Pan end (us)","min":544,"max":2400,"value":{{panEndUs}}},{"id":"tilt0","type":"number","label":"Tilt start (us)","min":544,"max":2400,"value":{{tiltStartUs}}},{"id":"tilt1","type":"number","label":"Tilt end (us)","min":544,"max":2400,"value":{{tiltEndUs}}},{"id":"transition","type":"number","label":"Between-row move (ms)","min":0,"max":2147483,"value":{{transitionMs}}},{"id":"settle","type":"number","label":"Row settling (ms)","min":0,"max":2147483,"value":{{settleMs}}},{"id":"both","type":"checkbox","label":"Scan both directions","value":{{bidirectional}}},{"id":"skip","type":"number","label":"Skip line start pixels","min":0,"max":{{maxSkip}},"value":{{skipPixels}}}]}</field>
             <field name="END">println</field>
             <value name="ARG_imageWidth">
               <block type="variables_get">
@@ -1390,6 +1594,11 @@
                     <field name="NUM">1</field>
                   </block>
                 </value>
+              </block>
+            </value>
+            <value name="ARG_minWidth">
+              <block type="variables_get">
+                <field name="VAR">minWidth</field>
               </block>
             </value>
             <value name="ARG_maxWidth">
@@ -1487,12 +1696,27 @@
                 <field name="VAR">settleMs</field>
               </block>
             </value>
+            <value name="ARG_bidirectional">
+              <block type="variables_get">
+                <field name="VAR">bidirectional</field>
+              </block>
+            </value>
+            <value name="ARG_skipPixels">
+              <block type="variables_get">
+                <field name="VAR">skipPixels</field>
+              </block>
+            </value>
+            <value name="ARG_maxSkip">
+              <block type="variables_get">
+                <field name="VAR">maxSkip</field>
+              </block>
+            </value>
             <comment pinned="false" w="390" h="170">Ordinary Serial template. Every {{name}} is connected to a live variable, including image dimensions, intensity maximum, control values and timing bounds. Edit the JSON in its dialog; expand the function to see the connected inputs. No JSON parser or image buffer is stored on Arduino.</comment>
           </block>
         </statement>
         <statement name="ELSE">
           <block type="serial_text">
-            <field name="TEXT">@plot {"version":1,"id":"photocell-error","description":"Invalid defaults: check Parameters and upload again.","fields":[],"widgets":[]}</field>
+            <field name="TEXT">@plot {"version":1,"id":"error","description":"Fix Parameters and upload again.","fields":[],"widgets":[]}</field>
             <field name="END">println</field>
           </block>
         </statement>
@@ -1746,7 +1970,7 @@
         </next>
       </block>
     </statement>
-    <comment pinned="false" w="390" h="170">Phase 1 interpolates from the held pose to the next row; phase 2 allows extra settling. No samples are assigned during either phase. Each new row reverses pan direction, avoiding a flyback across the whole image.</comment>
+    <comment pinned="false" w="390" h="170">Phase 1 moves to the next row; phase 2 allows extra settling. Neither assigns samples. Bidirectional scanning reverses each row; one-direction scanning returns to Pan start without measuring.</comment>
   </block>
   <block type="procedures_defnoreturn" collapsed="true" x="980" y="1095">
     <field name="NAME">restartScan</field>
@@ -1879,7 +2103,7 @@
                 <field name="NAME">announcePlotter</field>
                 <next>
                   <block type="serial_text">
-                    <field name="TEXT">@msg Rejected; previous value kept. Check limits, then Start.</field>
+                    <field name="TEXT">@msg Rejected. Check limits; press Start.</field>
                     <field name="END">println</field>
                   </block>
                 </next>
@@ -1956,7 +2180,7 @@
                                 </value>
                                 <next>
                                   <block type="serial_text">
-                                    <field name="TEXT">@msg Stopped; servos hold. Start begins a new scan.</field>
+                                    <field name="TEXT">@msg Stopped. Start scans again.</field>
                                     <field name="END">println</field>
                                   </block>
                                 </next>
@@ -1969,8 +2193,8 @@
                             <field name="COMMAND">@set width</field>
                             <field name="VAR">imageWidth</field>
                             <value name="MIN">
-                              <block type="math_number">
-                                <field name="NUM">1</field>
+                              <block type="variables_get">
+                                <field name="VAR">minWidth</field>
                               </block>
                             </value>
                             <value name="MAX">
@@ -2714,6 +2938,110 @@
                                                                                         </next>
                                                                                       </block>
                                                                                     </statement>
+                                                                                    <next>
+                                                                                      <block type="serial_set_number">
+                                                                                        <field name="COMMAND">@set both</field>
+                                                                                        <field name="VAR">bidirectional</field>
+                                                                                        <value name="MIN">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">0</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="MAX">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">1</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <value name="STEP">
+                                                                                          <block type="math_number">
+                                                                                            <field name="NUM">1</field>
+                                                                                          </block>
+                                                                                        </value>
+                                                                                        <statement name="DO">
+                                                                                          <block type="variables_set">
+                                                                                            <field name="VAR">settingsDirty</field>
+                                                                                            <value name="VALUE">
+                                                                                              <block type="logic_boolean">
+                                                                                                <field name="BOOL">TRUE</field>
+                                                                                              </block>
+                                                                                            </value>
+                                                                                          </block>
+                                                                                        </statement>
+                                                                                        <statement name="INVALID">
+                                                                                          <block type="serial_template">
+                                                                                            <field name="TEXT">@state {"both":{{actual}}}</field>
+                                                                                            <field name="END">println</field>
+                                                                                            <value name="ARG_actual">
+                                                                                              <block type="variables_get">
+                                                                                                <field name="VAR">bidirectional</field>
+                                                                                              </block>
+                                                                                            </value>
+                                                                                            <next>
+                                                                                              <block type="variables_set">
+                                                                                                <field name="VAR">settingRejected</field>
+                                                                                                <value name="VALUE">
+                                                                                                  <block type="logic_boolean">
+                                                                                                    <field name="BOOL">TRUE</field>
+                                                                                                  </block>
+                                                                                                </value>
+                                                                                              </block>
+                                                                                            </next>
+                                                                                          </block>
+                                                                                        </statement>
+                                                                                        <next>
+                                                                                          <block type="serial_set_number">
+                                                                                            <field name="COMMAND">@set skip</field>
+                                                                                            <field name="VAR">skipPixels</field>
+                                                                                            <value name="MIN">
+                                                                                              <block type="math_number">
+                                                                                                <field name="NUM">0</field>
+                                                                                              </block>
+                                                                                            </value>
+                                                                                            <value name="MAX">
+                                                                                              <block type="variables_get">
+                                                                                                <field name="VAR">maxSkip</field>
+                                                                                              </block>
+                                                                                            </value>
+                                                                                            <value name="STEP">
+                                                                                              <block type="math_number">
+                                                                                                <field name="NUM">1</field>
+                                                                                              </block>
+                                                                                            </value>
+                                                                                            <statement name="DO">
+                                                                                              <block type="variables_set">
+                                                                                                <field name="VAR">settingsDirty</field>
+                                                                                                <value name="VALUE">
+                                                                                                  <block type="logic_boolean">
+                                                                                                    <field name="BOOL">TRUE</field>
+                                                                                                  </block>
+                                                                                                </value>
+                                                                                              </block>
+                                                                                            </statement>
+                                                                                            <statement name="INVALID">
+                                                                                              <block type="serial_template">
+                                                                                                <field name="TEXT">@state {"skip":{{actual}}}</field>
+                                                                                                <field name="END">println</field>
+                                                                                                <value name="ARG_actual">
+                                                                                                  <block type="variables_get">
+                                                                                                    <field name="VAR">skipPixels</field>
+                                                                                                  </block>
+                                                                                                </value>
+                                                                                                <next>
+                                                                                                  <block type="variables_set">
+                                                                                                    <field name="VAR">settingRejected</field>
+                                                                                                    <value name="VALUE">
+                                                                                                      <block type="logic_boolean">
+                                                                                                        <field name="BOOL">TRUE</field>
+                                                                                                      </block>
+                                                                                                    </value>
+                                                                                                  </block>
+                                                                                                </next>
+                                                                                              </block>
+                                                                                            </statement>
+                                                                                          </block>
+                                                                                        </next>
+                                                                                      </block>
+                                                                                    </next>
                                                                                   </block>
                                                                                 </next>
                                                                               </block>
@@ -2917,18 +3245,14 @@
                               <block type="variables_set">
                                 <field name="VAR">fraction</field>
                                 <value name="VALUE">
-                                  <block type="math_constrain">
-                                    <value name="VALUE">
+                                  <block type="arduino_math_minmax">
+                                    <field name="OP">min</field>
+                                    <value name="A">
                                       <block type="variables_get">
                                         <field name="VAR">fraction</field>
                                       </block>
                                     </value>
-                                    <value name="LOW">
-                                      <block type="math_number">
-                                        <field name="NUM">0</field>
-                                      </block>
-                                    </value>
-                                    <value name="HIGH">
+                                    <value name="B">
                                       <block type="math_number">
                                         <field name="NUM">1</field>
                                       </block>
@@ -3061,18 +3385,14 @@
                               <block type="variables_set">
                                 <field name="VAR">fraction</field>
                                 <value name="VALUE">
-                                  <block type="math_constrain">
-                                    <value name="VALUE">
+                                  <block type="arduino_math_minmax">
+                                    <field name="OP">min</field>
+                                    <value name="A">
                                       <block type="variables_get">
                                         <field name="VAR">fraction</field>
                                       </block>
                                     </value>
-                                    <value name="LOW">
-                                      <block type="math_number">
-                                        <field name="NUM">0</field>
-                                      </block>
-                                    </value>
-                                    <value name="HIGH">
+                                    <value name="B">
                                       <block type="math_number">
                                         <field name="NUM">1</field>
                                       </block>
@@ -3426,70 +3746,48 @@
   <block type="procedures_defnoreturn" collapsed="true" x="980" y="1285">
     <field name="NAME">serviceSamples</field>
     <statement name="STACK">
-      <block type="controls_if">
-        <value name="IF0">
-          <block type="logic_operation">
-            <field name="OP">AND</field>
+      <block type="arduino_typed_variable">
+        <field name="VAR">sampleElapsedUs</field>
+        <field name="TYPE">uint32_t</field>
+        <value name="VALUE">
+          <block type="math_arithmetic">
+            <field name="OP">MINUS</field>
             <value name="A">
-              <block type="logic_compare">
-                <field name="OP">LT</field>
-                <value name="A">
-                  <block type="variables_get">
-                    <field name="VAR">pixel</field>
-                  </block>
-                </value>
-                <value name="B">
-                  <block type="variables_get">
-                    <field name="VAR">imageWidth</field>
-                  </block>
-                </value>
-              </block>
+              <block type="arduino_micros" />
             </value>
             <value name="B">
-              <block type="logic_compare">
-                <field name="OP">GTE</field>
+              <block type="variables_get">
+                <field name="VAR">phaseStartedUs</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="controls_if">
+            <value name="IF0">
+              <block type="logic_operation">
+                <field name="OP">AND</field>
                 <value name="A">
-                  <block type="math_arithmetic">
-                    <field name="OP">MINUS</field>
+                  <block type="logic_compare">
+                    <field name="OP">LT</field>
                     <value name="A">
-                      <block type="arduino_micros" />
+                      <block type="variables_get">
+                        <field name="VAR">pixel</field>
+                      </block>
                     </value>
                     <value name="B">
                       <block type="variables_get">
-                        <field name="VAR">phaseStartedUs</field>
+                        <field name="VAR">imageWidth</field>
                       </block>
                     </value>
                   </block>
                 </value>
                 <value name="B">
-                  <block type="variables_get">
-                    <field name="VAR">nextSampleUs</field>
-                  </block>
-                </value>
-              </block>
-            </value>
-          </block>
-        </value>
-        <statement name="DO0">
-          <block type="controls_if">
-            <mutation else="1" />
-            <value name="IF0">
-              <block type="logic_compare">
-                <field name="OP">GT</field>
-                <value name="A">
-                  <block type="math_arithmetic">
-                    <field name="OP">MINUS</field>
+                  <block type="logic_compare">
+                    <field name="OP">GTE</field>
                     <value name="A">
-                      <block type="math_arithmetic">
-                        <field name="OP">MINUS</field>
-                        <value name="A">
-                          <block type="arduino_micros" />
-                        </value>
-                        <value name="B">
-                          <block type="variables_get">
-                            <field name="VAR">phaseStartedUs</field>
-                          </block>
-                        </value>
+                      <block type="variables_get">
+                        <field name="VAR">sampleElapsedUs</field>
                       </block>
                     </value>
                     <value name="B">
@@ -3499,143 +3797,158 @@
                     </value>
                   </block>
                 </value>
-                <value name="B">
-                  <block type="variables_get">
-                    <field name="VAR">samplePeriodUs</field>
-                  </block>
-                </value>
               </block>
             </value>
             <statement name="DO0">
-              <block type="variables_set">
-                <field name="VAR">streaming</field>
-                <value name="VALUE">
-                  <block type="logic_boolean">
-                    <field name="BOOL">FALSE</field>
-                  </block>
-                </value>
-                <next>
-                  <block type="variables_set">
-                    <field name="VAR">phase</field>
-                    <value name="VALUE">
-                      <block type="math_number">
-                        <field name="NUM">0</field>
-                      </block>
-                    </value>
-                    <next>
-                      <block type="serial_text">
-                        <field name="TEXT">@msg Timing overrun: slow the row or reduce columns/samples, then Start.</field>
-                        <field name="END">println</field>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </statement>
-            <statement name="ELSE">
-              <block type="variables_set">
-                <field name="VAR">sampleSum</field>
-                <value name="VALUE">
-                  <block type="math_arithmetic">
-                    <field name="OP">ADD</field>
+              <block type="controls_if">
+                <mutation else="1" />
+                <value name="IF0">
+                  <block type="logic_compare">
+                    <field name="OP">GT</field>
                     <value name="A">
-                      <block type="variables_get">
-                        <field name="VAR">sampleSum</field>
+                      <block type="math_arithmetic">
+                        <field name="OP">MINUS</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">sampleElapsedUs</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="variables_get">
+                            <field name="VAR">nextSampleUs</field>
+                          </block>
+                        </value>
                       </block>
                     </value>
                     <value name="B">
-                      <block type="inout_analog_read">
-                        <field name="PIN">A0</field>
+                      <block type="variables_get">
+                        <field name="VAR">samplePeriodUs</field>
                       </block>
                     </value>
                   </block>
                 </value>
-                <next>
+                <statement name="DO0">
                   <block type="variables_set">
-                    <field name="VAR">samplesTaken</field>
+                    <field name="VAR">streaming</field>
+                    <value name="VALUE">
+                      <block type="logic_boolean">
+                        <field name="BOOL">FALSE</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="variables_set">
+                        <field name="VAR">phase</field>
+                        <value name="VALUE">
+                          <block type="math_number">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="serial_text">
+                            <field name="TEXT">@msg Timing overrun: slower row or fewer samples; Start.</field>
+                            <field name="END">println</field>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+                <statement name="ELSE">
+                  <block type="variables_set">
+                    <field name="VAR">sampleSum</field>
                     <value name="VALUE">
                       <block type="math_arithmetic">
                         <field name="OP">ADD</field>
                         <value name="A">
                           <block type="variables_get">
-                            <field name="VAR">samplesTaken</field>
+                            <field name="VAR">sampleSum</field>
                           </block>
                         </value>
                         <value name="B">
-                          <block type="math_number">
-                            <field name="NUM">1</field>
+                          <block type="inout_analog_read">
+                            <field name="PIN">A0</field>
                           </block>
                         </value>
                       </block>
                     </value>
                     <next>
                       <block type="variables_set">
-                        <field name="VAR">nextSampleUs</field>
+                        <field name="VAR">samplesTaken</field>
                         <value name="VALUE">
                           <block type="math_arithmetic">
                             <field name="OP">ADD</field>
                             <value name="A">
                               <block type="variables_get">
-                                <field name="VAR">nextSampleUs</field>
+                                <field name="VAR">samplesTaken</field>
                               </block>
                             </value>
                             <value name="B">
-                              <block type="variables_get">
-                                <field name="VAR">samplePeriodUs</field>
+                              <block type="math_number">
+                                <field name="NUM">1</field>
                               </block>
                             </value>
                           </block>
                         </value>
                         <next>
-                          <block type="controls_if">
-                            <value name="IF0">
-                              <block type="logic_compare">
-                                <field name="OP">GTE</field>
+                          <block type="variables_set">
+                            <field name="VAR">nextSampleUs</field>
+                            <value name="VALUE">
+                              <block type="math_arithmetic">
+                                <field name="OP">ADD</field>
                                 <value name="A">
                                   <block type="variables_get">
-                                    <field name="VAR">samplesTaken</field>
+                                    <field name="VAR">nextSampleUs</field>
                                   </block>
                                 </value>
                                 <value name="B">
                                   <block type="variables_get">
-                                    <field name="VAR">multiSamples</field>
+                                    <field name="VAR">samplePeriodUs</field>
                                   </block>
                                 </value>
                               </block>
                             </value>
-                            <statement name="DO0">
-                              <block type="procedures_callnoreturn">
-                                <mutation name="publishPixel" />
-                                <field name="NAME">publishPixel</field>
-                                <next>
-                                  <block type="variables_set">
-                                    <field name="VAR">pixel</field>
-                                    <value name="VALUE">
-                                      <block type="math_arithmetic">
-                                        <field name="OP">ADD</field>
-                                        <value name="A">
-                                          <block type="variables_get">
-                                            <field name="VAR">pixel</field>
-                                          </block>
-                                        </value>
-                                        <value name="B">
-                                          <block type="math_number">
-                                            <field name="NUM">1</field>
-                                          </block>
-                                        </value>
+                            <next>
+                              <block type="controls_if">
+                                <value name="IF0">
+                                  <block type="logic_compare">
+                                    <field name="OP">GTE</field>
+                                    <value name="A">
+                                      <block type="variables_get">
+                                        <field name="VAR">samplesTaken</field>
                                       </block>
                                     </value>
+                                    <value name="B">
+                                      <block type="variables_get">
+                                        <field name="VAR">multiSamples</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="procedures_callnoreturn">
+                                    <mutation name="publishPixel" />
+                                    <field name="NAME">publishPixel</field>
                                     <next>
                                       <block type="variables_set">
-                                        <field name="VAR">samplesTaken</field>
+                                        <field name="VAR">pixel</field>
                                         <value name="VALUE">
-                                          <block type="math_number">
-                                            <field name="NUM">0</field>
+                                          <block type="math_arithmetic">
+                                            <field name="OP">ADD</field>
+                                            <value name="A">
+                                              <block type="variables_get">
+                                                <field name="VAR">pixel</field>
+                                              </block>
+                                            </value>
+                                            <value name="B">
+                                              <block type="math_number">
+                                                <field name="NUM">1</field>
+                                              </block>
+                                            </value>
                                           </block>
                                         </value>
                                         <next>
                                           <block type="variables_set">
-                                            <field name="VAR">sampleSum</field>
+                                            <field name="VAR">samplesTaken</field>
                                             <value name="VALUE">
                                               <block type="math_number">
                                                 <field name="NUM">0</field>
@@ -3643,32 +3956,42 @@
                                             </value>
                                             <next>
                                               <block type="variables_set">
-                                                <field name="VAR">nextSampleUs</field>
+                                                <field name="VAR">sampleSum</field>
                                                 <value name="VALUE">
-                                                  <block type="math_arithmetic">
-                                                    <field name="OP">ADD</field>
-                                                    <value name="A">
+                                                  <block type="math_number">
+                                                    <field name="NUM">0</field>
+                                                  </block>
+                                                </value>
+                                                <next>
+                                                  <block type="variables_set">
+                                                    <field name="VAR">nextSampleUs</field>
+                                                    <value name="VALUE">
                                                       <block type="math_arithmetic">
-                                                        <field name="OP">MULTIPLY</field>
+                                                        <field name="OP">ADD</field>
                                                         <value name="A">
-                                                          <block type="variables_get">
-                                                            <field name="VAR">pixel</field>
+                                                          <block type="math_arithmetic">
+                                                            <field name="OP">MULTIPLY</field>
+                                                            <value name="A">
+                                                              <block type="variables_get">
+                                                                <field name="VAR">pixel</field>
+                                                              </block>
+                                                            </value>
+                                                            <value name="B">
+                                                              <block type="variables_get">
+                                                                <field name="VAR">pixelPeriodUs</field>
+                                                              </block>
+                                                            </value>
                                                           </block>
                                                         </value>
                                                         <value name="B">
                                                           <block type="variables_get">
-                                                            <field name="VAR">pixelPeriodUs</field>
+                                                            <field name="VAR">firstSampleUs</field>
                                                           </block>
                                                         </value>
                                                       </block>
                                                     </value>
-                                                    <value name="B">
-                                                      <block type="variables_get">
-                                                        <field name="VAR">firstSampleUs</field>
-                                                      </block>
-                                                    </value>
                                                   </block>
-                                                </value>
+                                                </next>
                                               </block>
                                             </next>
                                           </block>
@@ -3676,19 +3999,19 @@
                                       </block>
                                     </next>
                                   </block>
-                                </next>
+                                </statement>
                               </block>
-                            </statement>
+                            </next>
                           </block>
                         </next>
                       </block>
                     </next>
                   </block>
-                </next>
+                </statement>
               </block>
             </statement>
           </block>
-        </statement>
+        </next>
       </block>
     </statement>
     <comment pinned="false" w="390" h="170">At most one due analogRead per loop pass. Samples follow planned times through the continuously moving row. If service falls a complete sample interval behind, stop visibly instead of labelling a late reading as an earlier pixel. analogRead itself is one short synchronous conversion, not a per-pixel motor pause.</comment>
@@ -4023,10 +4346,20 @@
                                   <block type="variables_set">
                                     <field name="VAR">reverseRow</field>
                                     <value name="VALUE">
-                                      <block type="logic_negate">
-                                        <value name="BOOL">
+                                      <block type="logic_operation">
+                                        <field name="OP">AND</field>
+                                        <value name="A">
                                           <block type="variables_get">
-                                            <field name="VAR">reverseRow</field>
+                                            <field name="VAR">bidirectional</field>
+                                          </block>
+                                        </value>
+                                        <value name="B">
+                                          <block type="logic_negate">
+                                            <value name="BOOL">
+                                              <block type="variables_get">
+                                                <field name="VAR">reverseRow</field>
+                                              </block>
+                                            </value>
                                           </block>
                                         </value>
                                       </block>
@@ -4053,11 +4386,11 @@
         </statement>
       </block>
     </statement>
-    <comment pinned="false" w="390" h="170">Phases: 0 hold, 1 move between rows, 2 settle, 3 continuous row sweep. Start the next serpentine row only after its last pixel and sweep duration. Unsigned elapsed-time subtraction survives micros() rollover.</comment>
+    <comment pinned="false" w="390" h="170">Phases: 0 hold, 1 move between rows, 2 settle, 3 continuous sweep. Start the next row only after all delayed pixels arrive and the sweep ends. Skip delays sampling, not motion; at the endpoint the servo holds for the remaining delayed readings. Unsigned elapsed-time subtraction survives micros() rollover.</comment>
   </block>
   <block type="arduino_typed_variable" collapsed="true" x="1540" y="40">
     <field name="VAR">serialPixelBudgetUs</field>
-    <field name="TYPE">uint32_t</field>
+    <field name="TYPE">uint16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">5860</field>
@@ -4067,7 +4400,7 @@
   </block>
   <block type="arduino_typed_variable" collapsed="true" x="1880" y="40">
     <field name="VAR">minimumAdcUs</field>
-    <field name="TYPE">uint32_t</field>
+    <field name="TYPE">uint16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">250</field>
@@ -4310,8 +4643,8 @@
     </value>
   </block>
   <block type="arduino_typed_variable" collapsed="true" x="1880" y="625">
-    <field name="VAR">maxWidth</field>
-    <field name="TYPE">int32_t</field>
+    <field name="VAR">minWidth</field>
+    <field name="TYPE">int16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">0</field>
@@ -4319,8 +4652,8 @@
     </value>
   </block>
   <block type="arduino_typed_variable" collapsed="true" x="2220" y="625">
-    <field name="VAR">maxHeight</field>
-    <field name="TYPE">int32_t</field>
+    <field name="VAR">maxWidth</field>
+    <field name="TYPE">int16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">0</field>
@@ -4328,6 +4661,15 @@
     </value>
   </block>
   <block type="arduino_typed_variable" collapsed="true" x="1540" y="690">
+    <field name="VAR">maxHeight</field>
+    <field name="TYPE">int16_t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_typed_variable" collapsed="true" x="1880" y="690">
     <field name="VAR">maxSamples</field>
     <field name="TYPE">int32_t</field>
     <value name="VALUE">
@@ -4336,7 +4678,16 @@
       </block>
     </value>
   </block>
-  <block type="arduino_typed_variable" collapsed="true" x="1880" y="690">
+  <block type="arduino_typed_variable" collapsed="true" x="2220" y="690">
+    <field name="VAR">maxSkip</field>
+    <field name="TYPE">int16_t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_typed_variable" collapsed="true" x="1540" y="755">
     <field name="VAR">minSweepMs</field>
     <field name="TYPE">int32_t</field>
     <value name="VALUE">
@@ -4345,18 +4696,18 @@
       </block>
     </value>
   </block>
-  <block type="arduino_typed_variable" collapsed="true" x="2220" y="690">
+  <block type="arduino_typed_variable" collapsed="true" x="1880" y="755">
     <field name="VAR">lowMaximum</field>
-    <field name="TYPE">int32_t</field>
+    <field name="TYPE">int16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">0</field>
       </block>
     </value>
   </block>
-  <block type="arduino_typed_variable" collapsed="true" x="1540" y="755">
+  <block type="arduino_typed_variable" collapsed="true" x="2220" y="755">
     <field name="VAR">highMinimum</field>
-    <field name="TYPE">int32_t</field>
+    <field name="TYPE">int16_t</field>
     <value name="VALUE">
       <block type="math_number">
         <field name="NUM">0</field>

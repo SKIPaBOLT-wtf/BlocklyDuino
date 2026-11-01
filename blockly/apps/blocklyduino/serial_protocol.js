@@ -2,7 +2,7 @@
 (function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SerialPlotProtocol=api;})(typeof window==='object'?window:this,function(){
 'use strict';
 var own=Function.call.bind(Object.prototype.hasOwnProperty);
-var MAX_LINE=32768, MAX_FIELDS=32, MAX_WIDGETS=16, MAX_CONTROLS=16, MAX_HISTORY=10000, MAX_WINDOW=1024, MAX_IMAGE_PIXELS=16777216;
+var MAX_LINE=32768, MAX_FIELDS=32, MAX_WIDGETS=16, MAX_CONTROLS=32, MAX_HISTORY=10000, MAX_WINDOW=1024, MAX_IMAGE_PIXELS=16777216;
 function fail(message){throw new Error(message);}
 function plain(value){return value&&typeof value==='object'&&!Array.isArray(value);}
 function finite(value,name){if(typeof value!=='number'||!Number.isFinite(value))fail(name+' must be a finite number');return value;}
@@ -59,7 +59,7 @@ function controlDefinition(input){
 }
 function controlCommand(control,value){var c=controlDefinition(control);return c.type==='button'?'@do '+c.id:'@set '+c.id+' '+(c.type==='checkbox'?(controlValue(c,value)?'1':'0'):controlValue(c,value));}
 function controlState(profile,values){
- if(!plain(values))fail('@state needs a JSON object of control values');var keys=Object.keys(values);if(!keys.length||keys.length>MAX_CONTROLS)fail('@state needs 1–16 control values');
+ if(!plain(values))fail('@state needs a JSON object of control values');var keys=Object.keys(values);if(!keys.length||keys.length>MAX_CONTROLS)fail('@state needs 1–32 control values');
  var controls=Object.create(null),output=Object.create(null);(profile.controls||[]).forEach(function(c){controls[c.id]=c;});
  keys.forEach(function(key){id(key,'Control ID');if(!own(controls,key))fail('Unknown control: '+key);output[key]=controlValue(controls[key],values[key]);});return output;
 }
@@ -130,7 +130,7 @@ function validate(input){
  var output={version:1,id:id(input.id,'Profile ID'),title:text(input.title,input.id,100),history:input.history==null?500:input.history,fields:[],widgets:[]};
  if(input.description!=null)output.description=boundedText(input.description,1000,'Description');
  if(input.controls!=null){
-  if(!Array.isArray(input.controls)||input.controls.length>MAX_CONTROLS)fail('Use at most 16 controls');var controlIds=Object.create(null);
+  if(!Array.isArray(input.controls)||input.controls.length>MAX_CONTROLS)fail('Use at most 32 controls');var controlIds=Object.create(null);
   output.controls=input.controls.map(function(c){var result=controlDefinition(c);if(own(controlIds,result.id))fail('Duplicate control: '+result.id);controlIds[result.id]=true;return result;});
  }
  if(!Number.isInteger(output.history)||output.history<10||output.history>MAX_HISTORY)fail('History must be 10–10000 samples');

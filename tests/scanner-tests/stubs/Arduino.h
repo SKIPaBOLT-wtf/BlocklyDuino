@@ -19,11 +19,12 @@ class __FlashStringHelper;
 
 extern uint64_t fakeTime;
 extern int adcValue;
+extern int (*adcReader)(uint64_t);
 struct AdcEvent { uint64_t time; int pin; };
 extern std::vector<AdcEvent> adcEvents;
 inline uint32_t micros() { return uint32_t(fakeTime); }
 inline uint32_t millis() { return uint32_t(fakeTime / 1000); }
-inline int analogRead(int pin) { adcEvents.push_back({fakeTime, pin}); fakeTime += 104; return adcValue; }
+inline int analogRead(int pin) { adcEvents.push_back({fakeTime, pin}); int value=adcReader ? adcReader(fakeTime) : adcValue; fakeTime += 104; return value; }
 
 class Stream {
  public:
