@@ -41,7 +41,7 @@ function apply(next,source,parsed){
 }
 function streamControls(){
  $('stream-start').disabled=!connected||sendBusy||acquisition==='waiting';$('stream-stop').disabled=!connected||sendBusy;
- $('stream-status').textContent=!connected?'Connect, then Start':acquisition==='waiting'?'Waiting for the controller header…':acquisition==='running'?'Receiving · controller started':acquisition==='stopped'?'Stopped · connection stays open':'Ready · Start sends START';
+ $('stream-status').textContent=!connected?'Connect, then Start':acquisition==='waiting'?(parser.mode==='manual'?'Waiting for the first sample…':'Waiting for a header or numeric data…'):acquisition==='running'?'Receiving · controller started':acquisition==='stopped'?'Stopped · connection stays open':'Ready · Start sends START';
 }
 function cancelStart(){clearTimeout(startRetry);startRetry=null;startGeneration++;}
 function headerReceived(){if(acquisition==='waiting'&&(!currentEventSequence||currentEventSequence>startAfterSequence)){cancelStart();acquisition='running';streamControls();}}
@@ -56,14 +56,15 @@ async function sendStart(generation){
  startRetry=setTimeout(function(){
   if(generation!==startGeneration||acquisition!=='waiting')return;
   if(startAttempts<3)sendStart(generation);
-  else{acquisition='idle';startRetry=null;streamControls();notice('No dashboard header received. Check the sketch and baud rate, then press Start again. Existing serial data still reaches Monitor.','error');}
+  else{acquisition='idle';startRetry=null;streamControls();notice('No dashboard header or valid sample received. Check the sketch and baud rate, then press Start again. Existing serial data still reaches Monitor.','error');}
  },1800);
 }
 $('stream-start').onclick=async function(){
  if(!connected){notice('Connect a serial port in Settings first.','error');return;}
  if(demo)stopDemo();cancelStart();lines.reset();startAfterSequence=Math.max(Number(client.state.seq)||0,Number(client.cursor)||0);startAttempts=0;acquisition='waiting';
- $('mode').value='auto';parser.mode='auto';store(MODE,'auto');
- notice('START sent. Waiting for the sketch to announce its dashboard…');
+ if($('mode').value==='manual'&&profile){parser.mode='manual';apply(profile,'manual start');}
+ else{$('mode').value='auto';parser.mode='auto';store(MODE,'auto');parser.reset();}
+ notice(parser.mode==='manual'?'START sent. Keeping your manual dashboard; waiting for its data…':'START sent. Waiting for a controller header or automatic numeric data…');
  return sendStart(startGeneration);
 };
 $('stream-stop').onclick=async function(){
@@ -75,7 +76,7 @@ function reportError(message,line){errors++;log(message+(line?' | '+line.slice(0
 function data(line,ts){
  if(window.PlotterImage){
   var pixel=inlineImagesActive?PlotterImage.route(line,imageWidgets):null;
-  if(pixel){if(pixel.kind==='error')reportError(pixel.message,line);else{dirty=true;captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},pixel),true);}return;}
+  if(pixel){if(pixel.kind==='error')reportError(pixel.message,line);else{dirty=true;captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},pixel),true);headerReceived();}return;}
   if(PlotterImage.live(line)){
    var event=PlotterImage.result();
    if(event.kind==='error')reportError(event.message,line);
@@ -83,7 +84,7 @@ function data(line,ts){
     var key=JSON.stringify(event.image),changed=inlineImagesActive||legacyImageKey!==key;
     inlineImagesActive=false;legacyImageKey=key;
     if(changed){profileRevision++;captureConfiguration();}headerReceived();
-   }else captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},event),true);
+   }else{captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},event),true);headerReceived();}
    return;
   }
  }
@@ -93,6 +94,7 @@ function data(line,ts){
   if(result.generated)apply(result.generated,'automatic',true);
   var sample=result.sample;samples.push(sample);total++;if(samples.length>profile.history)samples.splice(0,samples.length-profile.history);dirty=true;
   captureRecord(Object.assign({kind:'sample',revision:profileRevision},sample),true);
+  headerReceived(); // Headerless CSV and manual profiles acknowledge Start too.
  }else if(result.kind==='error')reportError(result.message,line);
  else if(result.kind==='raw'||result.kind==='ignored'){ignored++;if(ignored<5||ignored%100===0)log(result.message||('Text: '+result.text.slice(0,140)));}
 }

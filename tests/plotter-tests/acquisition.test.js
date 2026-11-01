@@ -52,6 +52,19 @@ async function main(){
  assert.equal($('scan-panel').hidden,false);assert.equal(w.PlotterImage.model.pixels[0],99,'Legacy pixels must not get routed into an old dashboard image');
  $('save-jsonl').click();records=(await downloads.at(-1).blob.text()).trim().split('\n').map(JSON.parse);assert(records.some(r=>r.kind==='image-configuration'&&r.image.id==='legacy'));assert.equal(records.at(-1).id,'legacy');
  $('capture-stop').click();$('capture-limit').value=1;$('capture-start').click();rx('@pixel 1,0,200\n');assert($('capture-stop').disabled);$('save-jsonl').click();records=(await downloads.at(-1).blob.text()).trim().split('\n').map(JSON.parse);assert.deepEqual(records.map(r=>r.kind),['image-configuration','pixel']);
+ // A chosen manual profile stays chosen; its first sample acknowledges Start.
+ $('mode').value='manual';$('mode').dispatchEvent(new w.Event('change'));await $('stream-start').onclick();
+ assert.equal($('mode').value,'manual');rx('@plot '+JSON.stringify(header)+'\n@data [50]\n');
+ assert.equal($('dashboard-title').textContent,'dashboard-b');assert($('stream-status').textContent.includes('Receiving'));
+ assert(![...timers.values()].some(t=>t.ms===1800));await $('stream-stop').onclick();
+ await $('stream-start').onclick();rx('@pixel scan 3,0,300\n');
+ assert($('stream-status').textContent.includes('Receiving'),'A manual image can acknowledge Start with pixels alone');
+ assert(![...timers.values()].some(t=>t.ms===1800));await $('stream-stop').onclick();
+ // Example55 has no @plot header. A new Auto run must forget the previous
+ // one-column schema, discover two columns and stop retrying after real data.
+ $('mode').value='auto';$('mode').dispatchEvent(new w.Event('change'));await $('stream-start').onclick();rx('100,200\n');
+ assert($('dashboard-meta').textContent.includes('2 fields'));assert($('stream-status').textContent.includes('Receiving'));
+ assert(![...timers.values()].some(t=>t.ms===1800));await $('stream-stop').onclick();
  // No header: exactly three START writes, then an actionable status without disconnecting.
  const before=client.writes.length;await $('stream-start').onclick();await retry();await retry();await retry();assert.equal(client.writes.length-before,3);assert($('notice').textContent.includes('No dashboard header'));assert.equal($('stream-start').disabled,false);
  // Retry cancellation when disconnected or stopped prevents stale commands.

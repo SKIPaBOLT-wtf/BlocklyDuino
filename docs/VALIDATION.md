@@ -18,6 +18,8 @@
   safe formulas without dynamic evaluation, undefined results, timestamp resets
   and atomic rejection of bad data/headers. Acquisition UI tests verify bounded
   retries, header revisions, multi-series instruments and image preservation.
+  Start also preserves Manual profiles, accepts pixels or headerless samples,
+  and rediscovers changed CSV column layouts when restarted in Auto mode.
 - Browser + PTY: Start sends START, receives a header and renders six concurrent
   instruments; a live header adds a derived trace without erasing image pixels.
   A 200-record capture contains 100 numeric samples + 100 pixels across three
