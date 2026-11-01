@@ -1,16 +1,86 @@
 #!/usr/bin/env python3
 """Inventory every bundled XML lesson and attach the latest explicit AVR168 audit."""
 from pathlib import Path
-import json,re,xml.etree.ElementTree as E
+import hashlib,json,re,xml.etree.ElementTree as E
 ROOT=Path(__file__).resolve().parents[1]; APP=ROOT/'blockly/apps/blocklyduino'; OUT=APP/'examples'
 TARGET='arduino:avr:pro:cpu=16MHzatmega168'
 devices={
-'device_servo':('Servo',['Servo or BlocklyMotion']), 'device_stepper_driver':('STEP/DIR driver',['AccelStepper or FastAccelStepper']), 'device_stepper_coils':('28BYJ-48 + ULN2003',['AccelStepper']),
-'device_lcd':('HD44780 I2C LCD',['LiquidCrystal_I2C','Wire']), 'device_oled':('SSD1306 I2C OLED',['U8g2/U8x8','Wire']), 'device_oled_spi':('SSD1306 SPI OLED',['U8g2/U8x8','SPI']), 'device_tft':('ST7735 SPI TFT',['Adafruit ST7735','SPI']),
-'device_ultrasonic':('HC-SR04',[]),'device_ds18b20':('DS18B20',['DallasTemperature','OneWire']), 'device_dht':('DHT11/22',['DHT sensor library']), 'device_neopixel':('WS2812 RGB LEDs',['Adafruit NeoPixel']), 'device_ir_nec':('NEC IR receiver',['IRremote']), 'device_shift595':('74HC595',[]),'music_buzzer':('Passive buzzer',['BlocklyMusic']),
-'st_i2c_eeprom':('24LC256 EEPROM',['BlocklyStorage','Wire']), 'st_spi_eeprom':('25LC256 EEPROM',['BlocklyStorage','SPI']), 'st_spi_flash':('W25Q32 Flash',['BlocklyStorage','SPI']), 'st_sd':('SPI SD card',['BlocklyStorage','SdFat','SPI']), 'll_spi_device':('Custom SPI device',['SPI']), 'll_i2c_device':('Custom I2C device',['Wire'])}
+'device_servo':'Servo', 'device_stepper_driver':'STEP/DIR driver', 'device_stepper_coils':'28BYJ-48 + ULN2003',
+'device_lcd':'HD44780 I2C LCD', 'device_oled':'SSD1306 I2C OLED', 'device_oled_spi':'SSD1306 SPI OLED', 'device_tft':'ST7735 SPI TFT',
+'device_ultrasonic':'HC-SR04','device_ds18b20':'DS18B20', 'device_dht':'DHT11/22', 'device_neopixel':'WS2812 RGB LEDs', 'device_ir_nec':'NEC IR receiver', 'device_shift595':'74HC595','music_buzzer':'Passive buzzer',
+'st_i2c_eeprom':'24LC256 EEPROM', 'st_spi_eeprom':'25LC256 EEPROM', 'st_spi_flash':'W25Q32 Flash', 'st_sd':'SPI SD card', 'll_spi_device':'Custom SPI device', 'll_i2c_device':'Custom I2C device'}
 legacy={
-'ds18b20_temperature':'device_ds18b20','lcd_i2c_print':'device_lcd','lcd20x4_init':'device_lcd','lcd20x4_print':'device_lcd','lcd20x4_show':'device_lcd','oled091_print':'device_oled','ssd1306_spi_print':'device_oled_spi','st7735_print':'device_tft','servo_move':'device_servo','stepper_28byj_init':'device_stepper_coils','accel_4wire_init':'device_stepper_coils','accel_driver_init':'device_stepper_driver','a4988_move':'device_stepper_driver','a4988_init':'device_stepper_driver','dht_temperature':'device_dht','dht_humidity':'device_dht','ultrasonic_distance':'device_ultrasonic','neopixel_init':'device_neopixel','ir_nec_read':'device_ir_nec','shift595_write':'device_shift595'}
+'ds18b20_temperature':'device_ds18b20','lcd_i2c_print':'device_lcd','lcd1602_i2c_print':'device_lcd','lcd20x4_init':'device_lcd','lcd20x4_print':'device_lcd','lcd20x4_show':'device_lcd','oled091_print':'device_oled','oled_ssd1306_091_i2c_print':'device_oled','ssd1306_spi_print':'device_oled_spi','oled_ssd1306_spi_print':'device_oled_spi','st7735_print':'device_tft','tft_st7735_spi_print':'device_tft','servo_move':'device_servo','stepper_28byj_init':'device_stepper_coils','stepper_28byj_move':'device_stepper_coils','accel_4wire_init':'device_stepper_coils','accel_driver_init':'device_stepper_driver','a4988_move':'device_stepper_driver','a4988_init':'device_stepper_driver','stepper_step_dir':'device_stepper_driver','dht_temperature':'device_dht','dht_humidity':'device_dht','ultrasonic_distance':'device_ultrasonic','ultrasonic_cm':'device_ultrasonic','neopixel_init':'device_neopixel','ir_nec_read':'device_ir_nec','shift595_write':'device_shift595','inout_tone':'music_buzzer','inout_notone':'music_buzzer'}
+
+# Libraries are determined by the generated sketch, never by the device family:
+# a Servo may use Servo.h or hardware PWM, and a passive buzzer may use core tone,
+# the IRQ mixer, or hardware sound. The shared music-format header belongs to
+# BlocklyMotion; it does not imply that the BlocklyMusic IRQ engine is linked.
+INCLUDE_RE=re.compile(r'^\s*#\s*include\s*[<"]([^>"\n]+)',re.M)
+HEADER_LIBRARY={
+ 'Servo.h':'Servo','Stepper.h':'Stepper','AccelStepper.h':'AccelStepper',
+ 'FastAccelStepper.h':'FastAccelStepper','Adafruit_NeoPixel.h':'Adafruit NeoPixel',
+ 'Adafruit_ST7735.h':'Adafruit ST7735 and ST7789 Library',
+ 'Adafruit_GFX.h':'Adafruit GFX Library','Adafruit_I2CDevice.h':'Adafruit BusIO',
+ 'Adafruit_SPIDevice.h':'Adafruit BusIO','Adafruit_Sensor.h':'Adafruit Unified Sensor',
+ 'DHT.h':'DHT sensor library','DallasTemperature.h':'DallasTemperature',
+ 'OneWire.h':'OneWire','LiquidCrystal_I2C.h':'LiquidCrystal_I2C',
+ 'U8x8lib.h':'U8g2','IRremote.hpp':'IRremote','rgb_lcd.h':'Grove - LCD RGB Backlight',
+ 'SdFat.h':'SdFat','Wire.h':'Wire','SPI.h':'SPI'}
+# Reviewed transitive includes for this AVR target, including companion .cpp
+# files compiled by Arduino. These are build dependencies, not pin ownership.
+# Do not use a library.properties depends list: it can include optional example
+# dependencies unrelated to the selected header/engine.
+TRANSITIVE_HEADERS={
+ 'Adafruit_ST7735.h':['Adafruit_GFX.h'], # ST77xx -> Adafruit_SPITFT/GFX
+ 'Adafruit_GFX.h':['Adafruit_I2CDevice.h','Adafruit_SPIDevice.h'],
+ 'Adafruit_I2CDevice.h':['Wire.h'],'Adafruit_SPIDevice.h':['SPI.h'],
+ 'DHT.h':['Adafruit_Sensor.h'], # companion DHT_U.cpp is compiled too
+ 'DallasTemperature.h':['OneWire.h'],'LiquidCrystal_I2C.h':['Wire.h'],
+ 'U8x8lib.h':['SPI.h','Wire.h'], # U8x8lib.cpp AVR hardware-bus backends
+ 'rgb_lcd.h':['Wire.h'],'SdFat.h':['SPI.h']}
+# The three original, unaudited imports have no generated sketch in the audit.
+# These include sets were checked against the existing core/grove generators.
+LEGACY_HEADERS={'blink.xml':[], 'click_color.xml':[], 'servo_potentio.xml':['Servo.h']}
+
+def header_index():
+    """Read bundled header ownership/dependencies from repository source."""
+    owners=dict(HEADER_LIBRARY);deps={k:list(v) for k,v in TRANSITIVE_HEADERS.items()}
+    for properties in sorted((ROOT/'arduino/libraries').glob('*/library.properties')):
+        name=next(line[5:] for line in properties.read_text().splitlines() if line.startswith('name='))
+        for header in sorted((properties.parent/'src').glob('*.h')):
+            owners[header.name]=name
+            # Ignore standard/toolchain and other-architecture headers below;
+            # their names have no entry in the library-ownership map.
+            deps[header.name]=INCLUDE_RE.findall(header.read_text())
+    return owners,deps
+
+def sketch_libraries(file,row,owners,deps):
+    name=re.sub('[^A-Za-z0-9_]','_',file.name)
+    sketch=ROOT/'.test-build/sketches'/name/(name+'.ino')
+    if file.name in LEGACY_HEADERS:
+        headers=LEGACY_HEADERS[file.name];source='reviewed-legacy-generators (not compiled)'
+    else:
+        code=sketch.read_bytes()
+        if row and row.get('sketchSha256') and hashlib.sha256(code).hexdigest()!=row['sketchSha256']:
+            raise ValueError('Generated sketch differs from the compile audit: '+file.name)
+        headers=sorted(set(INCLUDE_RE.findall(code.decode())));source='audited-generated-sketch-includes'
+    for header in headers:
+        if header not in owners and not header.startswith(('avr/','util/')) and header not in {'Arduino.h','math.h','stdint.h','stdlib.h','string.h','inttypes.h','Print.h'}:
+            raise ValueError('Add a library mapping for generated header '+header+' in '+file.name)
+    seen=set();libraries=set();via={}
+    def visit(header,parent=None):
+        if header in seen:return
+        seen.add(header)
+        if header in owners:
+            libraries.add(owners[header])
+            if parent and owners.get(parent)!=owners[header]:via.setdefault(owners[header],set()).add(parent)
+        for child in deps.get(header,[]):visit(child,header)
+    for header in headers:visit(header)
+    return sorted(libraries) or ['Arduino AVR core (no extra library)'],{
+        'source':source,'headers':headers,
+        'transitive':[{ 'library':key,'viaHeaders':sorted(value)} for key,value in sorted(via.items())]
+    }
 names={
 '01':'Blink the built-in LED','02':'Serial hello','03':'Potentiometer values in Monitor','04':'Potentiometer dims a PWM LED','05':'Button controls an LED','06':'Traffic lights','07':'DS18B20 thermometer + Plotter','08':'16×2 I2C LCD hello','09':'16×2 LCD potentiometer','10':'SPI OLED uptime counter','11':'ST7735 colour TFT text','12':'Find I2C device addresses','13':'0.91-inch I2C OLED text','14':'Grove RGB LCD','15':'Single piezo beep','16':'Simple piezo melody','17':'DS18B20 temperature on LCD','18':'20×4 LCD animation (legacy helper)','19':'20×4 LCD potentiometer','20':'Servo sweep (core timer library)','21':'28BYJ stepper (blocking legacy lesson)','22':'DHT22 climate + Plotter','23':'HC-SR04 distance in Monitor','24':'NeoPixel colour cycle','25':'NEC remote commands','26':'74HC595 chasing LED','27':'STEP/DIR stepping (legacy helper)','28':'20×4 animation made from blocks','29':'STEP/DIR acceleration (legacy helper)','30':'Named 28BYJ: accelerated back and forth','31':'Setup, loop, function and variable','32':'Math operations','33':'Array animation with millis timing','34':'Local variables and 2D arrays','35a':'Named stepper: position targets','35b':'Named 20×4 I2C LCD','35c':'Servo and distance sensor sweep','36a':'I2C EEPROM: values and text','36b':'SPI EEPROM: values and text','36c':'SPI Flash: erase, write, read','36d':'SD text file','36e':'SD BMP: coordinate pixels','36f':'Radar measurements → BMP','37':'Stream monochrome BMP to SD','38a':'Buzzer: nonblocking beep','38b':'Three independent melody voices','38c':'Melody with rests','39':'SD text-note melody','40':'Polar scan → streamed BMP','41':'Multidimensional arrays and variable indices','42':'BMP grayscale levels','43':'RGB BMP gradient','44':'1024-shade grayscale PGM','45':'High-depth RGB PPM','46':'Typed function arguments and results','47':'Pack flags and bit fields','48':'AVR direct-port blink','49':'AVR input and pull-up','50':'Direct-port byte driver','51':'Read SPI Flash JEDEC ID','52':'I2C register read','53':'Interrupt counter with atomic snapshot','54':'Bidirectional Serial echo','55':'Plotter: automatic lines','56':'Plotter: potentiometer dashboard','57':'External interrupt edge counter','58':'Pin-change counters','59':'Timer1 periodic interrupt','60':'Attach and detach interrupts','61':'Photocell scanner: image + chart','62':'Continuous stepper: potentiometer ramp','63':'Servo pulse width in microseconds','64':'LCD character buffer','65':'OLED packed pixel tile','66':'NeoPixel RGB buffer','67':'TFT RGB565 tile','68':'A note read from a variable','69':'Polyphonic SD score','70':'Timer1 stepper: fine speed commands','71':'Hardware Servo + hardware sound','72':'LCD custom faces from a buffer','73':'Plotter: multiple instruments together','74':'Plotter: PC math and live configuration','75':'Plotter: RGB painting, no extra hardware'}
 recommended={'01','03','04','05','07','10','12','22','25','26','30','31','35b','36a','36b','36c','36d','37','38b','41','47','51','52','54','55','56','57','60','61','62','64','65','66','67','68','69','70','71','72','73','74','75'}
@@ -107,6 +177,7 @@ purposes={
 'servo_potentio.xml':'Original potentiometer-to-servo workspace retained as a legacy import. Prefer the named servo lessons for new work.'}
 
 def build():
+    owners,deps=header_index()
     audit_path=ROOT/'.test-build/compile-audit-atmega168.json'
     audit=json.loads(audit_path.read_text()) if audit_path.exists() else {}
     rows=audit.get('results',audit.get('examples',[]))
@@ -117,22 +188,24 @@ def build():
         byfile[file]=row;byfile[re.sub('[^A-Za-z0-9_]','_',file)]=row
     result=[]
     for file in sorted(OUT.glob('*.xml')):
-        root=E.parse(file).getroot();types={b.get('type') for b in root.iter('block')};prefix=file.name.split('-')[0]
+        root=E.parse(file).getroot()
+        # Original imports use an XHTML namespace; it must not hide their blocks.
+        for node in root.iter():node.tag=node.tag.rsplit('}',1)[-1]
+        types={b.get('type') for b in root.iter('block')};prefix=file.name.split('-')[0]
         hw={x for x in types if x in devices}|{legacy[x] for x in types if x in legacy}
-        # Older dedicated helpers retain their exact saved XML for compatibility.
-        if prefix in {'08','09','17','18','19','28'}:hw.add('device_lcd')
-        if prefix=='13':hw.add('device_oled')
-        if prefix=='11':hw.add('device_tft')
-        if prefix in {'15','16'}:hw.add('music_buzzer')
-        hardware=[{'id':x,'label':devices[x][0]} for x in sorted(hw)]
-        if any(b.get('type')=='inout_analog_read' for b in root.iter('block')):hardware.append({'id':'analog-input','label':'Analog source / potentiometer'})
-        if prefix=='14':hardware.append({'id':'grove-rgb-lcd','label':'Grove JHD1313 RGB LCD'})
-        if prefix in {'01','04','05','06','48','49','50','57','58'}:hardware.append({'id':'basic-gpio','label':'LEDs / button / GPIO'})
+        if any(t.startswith(('lcd20x4_','lcd_user_')) for t in types):hw.add('device_lcd')
+        hardware=[{'id':x,'label':devices[x]} for x in sorted(hw)]
+        if types&{'inout_analog_read','grove_rotary_angle'}:hardware.append({'id':'analog-input','label':'Analog source / potentiometer'})
+        if any(t.startswith('grove_rgb_lcd_') for t in types):hardware.append({'id':'grove-rgb-lcd','label':'Grove JHD1313 RGB LCD'})
+        if 'grove_rgb_led' in types:hardware.append({'id':'grove-chainable-rgb','label':'Grove chainable RGB LED (clock + data)'})
+        if 'i2c_scan_serial' in types:hardware.append({'id':'i2c-bus','label':'I2C device to scan (optional)'})
+        if types&{'inout_buildin_led','inout_digital_read','inout_digital_write','inout_analog_write','grove_button'} or prefix in {'48','49','50','57','58'}:hardware.append({'id':'basic-gpio','label':'LEDs / button / GPIO'})
         if any('serial' in x for x in types):hardware.append({'id':'serial','label':'USB–Serial adapter'})
         if not hardware:hardware=[{'id':'board','label':'Pro Mini only'}]
         desc=purposes[prefix]
         group=next((label for label,ids in groups if prefix in ids),'Legacy imports')
         row=byfile.get(file.name,byfile.get(re.sub('[^A-Za-z0-9_]','_',file.name)))
+        libraries,library_evidence=sketch_libraries(file,row,owners,deps)
         verification={'target':TARGET,'status':'not-compiled','physical':'not-tested-in-this-audit'}
         if row:
             verification.update({k:v for k,v in row.items() if k not in {'example','file','name'}})
@@ -146,7 +219,7 @@ def build():
         if prefix=='65':notes.append('Uses a 128-byte tile. Do not allocate a 1024-byte OLED framebuffer on a board with 1024 bytes total SRAM.')
         if prefix in {'38b','69'}:notes.append('Three-voice IRQ music shares Timer2. Each passive buzzer uses a separate output; Timer2 is unavailable for another independent engine.')
         if prefix=='75':notes.append('All pixels are held on the computer. The Arduino sends one pixel and chart sample at a time.')
-        result.append({'id':prefix,'file':file.name,'title':names.get(prefix,file.stem.replace('_',' ').replace('-',' ')),'group':group,'level':'advanced' if prefix in advanced or row and row.get('classification')=='tight' else 'beginner','recommended':prefix in recommended,'hardware':hardware,'libraries':sorted(set(y for x in hw for y in devices[x][1])),'description':desc,'notes':notes,'plotterModes':plotter.get(prefix,[]),'startCommand':'START\n' if prefix in plotter else None,'stopCommand':'STOP\n' if prefix in plotter else None,'verification':verification})
+        result.append({'id':prefix,'file':file.name,'title':names.get(prefix,file.stem.replace('_',' ').replace('-',' ')),'group':group,'level':'advanced' if prefix in advanced or row and row.get('classification')=='tight' else 'beginner','recommended':prefix in recommended,'hardware':hardware,'libraries':libraries,'libraryEvidence':library_evidence,'description':desc,'notes':notes,'plotterModes':plotter.get(prefix,[]),'startCommand':'START\n' if prefix in plotter else None,'stopCommand':'STOP\n' if prefix in plotter else None,'verification':verification})
     payload={'version':1,'auditedAt':audit.get('auditedAt'),'target':{'fqbn':TARGET,'label':'Pro Mini ATmega168 · 16 MHz','flashLimit':14336,'ramLimit':1024},'groups':[x[0] for x in groups]+['Legacy imports'],'examples':result}
     (OUT/'catalog.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n')
     print('Catalog:',len(result),'XML files;',len({d['id'] for x in result for d in x['hardware']} & set(devices)),'of',len(devices),'named device types represented')

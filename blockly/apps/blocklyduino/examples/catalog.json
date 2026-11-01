@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "auditedAt": "2026-11-01T12:59:19.402733+00:00",
+  "auditedAt": null,
   "target": {
     "fqbn": "arduino:avr:pro:cpu=16MHzatmega168",
     "label": "Pro Mini ATmega168 · 16 MHz",
@@ -32,7 +32,14 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Turn the built-in D13 LED on and off. Learn the order of statements and milliseconds.",
       "notes": [],
       "plotterModes": [],
@@ -66,7 +73,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Print a short greeting repeatedly in Serial Monitor. Match the sketch and Monitor baud rates.",
       "notes": [],
       "plotterModes": [],
@@ -104,7 +118,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Read a potentiometer on A0 and print its 0–1023 ADC value. Turn the knob to see the number change.",
       "notes": [],
       "plotterModes": [],
@@ -142,7 +163,14 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Map an A0 potentiometer reading to PWM brightness for an LED. A PWM output is required for analogWrite.",
       "notes": [],
       "plotterModes": [],
@@ -176,7 +204,14 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Read a button and change an LED. The input needs the pull-up or wiring described in the blocks.",
       "notes": [],
       "plotterModes": [],
@@ -210,7 +245,14 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Run a simple red/amber/green traffic-light sequence. Each wait makes the next visible phase last longer.",
       "notes": [],
       "plotterModes": [],
@@ -252,6 +294,21 @@
         "DallasTemperature",
         "OneWire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "DallasTemperature.h",
+          "OneWire.h"
+        ],
+        "transitive": [
+          {
+            "library": "OneWire",
+            "viaHeaders": [
+              "DallasTemperature.h"
+            ]
+          }
+        ]
+      },
       "description": "Request a DS18B20 conversion without waiting, read it after 800 ms, and show a thermometer dashboard after Plotter Start.",
       "notes": [],
       "plotterModes": [
@@ -292,6 +349,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Show a greeting on a 16×2 HD44780 LCD with PCF8574 I2C backpack. Check address and contrast first.",
       "notes": [],
       "plotterModes": [],
@@ -333,6 +405,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Read a potentiometer and print the value on a 16×2 I2C LCD. Learn how repeated prints update a text display.",
       "notes": [],
       "plotterModes": [],
@@ -368,8 +455,29 @@
       ],
       "libraries": [
         "SPI",
-        "U8g2/U8x8"
+        "U8g2",
+        "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "U8x8lib.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          }
+        ]
+      },
       "description": "Count seconds on an SSD1306 SPI OLED using a named device and no framebuffer. Update with millis timing.",
       "notes": [],
       "plotterModes": [],
@@ -408,9 +516,44 @@
         }
       ],
       "libraries": [
-        "Adafruit ST7735",
-        "SPI"
+        "Adafruit BusIO",
+        "Adafruit GFX Library",
+        "Adafruit ST7735 and ST7789 Library",
+        "SPI",
+        "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Adafruit_ST7735.h"
+        ],
+        "transitive": [
+          {
+            "library": "Adafruit BusIO",
+            "viaHeaders": [
+              "Adafruit_GFX.h"
+            ]
+          },
+          {
+            "library": "Adafruit GFX Library",
+            "viaHeaders": [
+              "Adafruit_ST7735.h"
+            ]
+          },
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "Adafruit_SPIDevice.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "Adafruit_I2CDevice.h"
+            ]
+          }
+        ]
+      },
       "description": "Print text and an analog reading on an ST7735 colour TFT over hardware SPI. Match the panel type and wiring.",
       "notes": [],
       "plotterModes": [],
@@ -440,11 +583,24 @@
       "recommended": true,
       "hardware": [
         {
+          "id": "i2c-bus",
+          "label": "I2C device to scan (optional)"
+        },
+        {
           "id": "serial",
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Wire"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Wire.h"
+        ],
+        "transitive": []
+      },
       "description": "Scan the I2C bus and print responding addresses in Monitor. Use it to discover the address of an attached module.",
       "notes": [],
       "plotterModes": [],
@@ -483,9 +639,30 @@
         }
       ],
       "libraries": [
-        "U8g2/U8x8",
+        "SPI",
+        "U8g2",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "U8x8lib.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          }
+        ]
+      },
       "description": "Print text on a 128×32 SSD1306 I2C OLED. U8x8 sends character tiles without a full pixel framebuffer.",
       "notes": [],
       "plotterModes": [],
@@ -519,7 +696,18 @@
           "label": "Grove JHD1313 RGB LCD"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Grove - LCD RGB Backlight",
+        "Wire"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Wire.h",
+          "rgb_lcd.h"
+        ],
+        "transitive": []
+      },
       "description": "Use the text and RGB backlight of a Grove JHD1313 LCD. This module uses a different library from PCF8574 backpacks.",
       "notes": [],
       "plotterModes": [],
@@ -554,8 +742,13 @@
         }
       ],
       "libraries": [
-        "BlocklyMusic"
+        "Arduino AVR core (no extra library)"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Make a passive piezo beep using the Arduino core tone function. This AVR engine uses Timer2 interrupts.",
       "notes": [],
       "plotterModes": [],
@@ -590,8 +783,13 @@
         }
       ],
       "libraries": [
-        "BlocklyMusic"
+        "Arduino AVR core (no extra library)"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Play a short tune with the basic core tone blocks. Compare this blocking lesson with the nonblocking named music examples.",
       "notes": [],
       "plotterModes": [],
@@ -635,6 +833,29 @@
         "OneWire",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "DallasTemperature.h",
+          "LiquidCrystal_I2C.h",
+          "OneWire.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "OneWire",
+            "viaHeaders": [
+              "DallasTemperature.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Read a DS18B20 temperature and show it on an I2C character LCD. Check the sensor pull-up and LCD address.",
       "notes": [],
       "plotterModes": [],
@@ -672,6 +893,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Play a preset 20×4 LCD animation with an older helper. Example 28 exposes the animation as individual blocks.",
       "notes": [],
       "plotterModes": [],
@@ -713,6 +949,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Show a potentiometer reading on a 20×4 LCD. Use the named LCD and buffer examples for reusable display logic.",
       "notes": [],
       "plotterModes": [],
@@ -747,8 +998,15 @@
         }
       ],
       "libraries": [
-        "Servo or BlocklyMotion"
+        "Servo"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Servo.h"
+        ],
+        "transitive": []
+      },
       "description": "Move a hobby servo between three angles with the core Servo library. Pulse edges are timer interrupt driven; the waits pause the main loop.",
       "notes": [],
       "plotterModes": [],
@@ -783,8 +1041,15 @@
         }
       ],
       "libraries": [
-        "AccelStepper"
+        "Stepper"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Stepper.h"
+        ],
+        "transitive": []
+      },
       "description": "Move a 28BYJ-48 through a ULN2003 using a blocking legacy helper. Example 30 provides named, accelerated, nonblocking control.",
       "notes": [
         "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
@@ -825,8 +1090,23 @@
         }
       ],
       "libraries": [
+        "Adafruit Unified Sensor",
         "DHT sensor library"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "DHT.h"
+        ],
+        "transitive": [
+          {
+            "library": "Adafruit Unified Sensor",
+            "viaHeaders": [
+              "DHT.h"
+            ]
+          }
+        ]
+      },
       "description": "Read DHT22 temperature and humidity every 2.1 seconds. Plotter Start opens separate temperature and humidity views; invalid readings are reported as text.",
       "notes": [],
       "plotterModes": [
@@ -860,11 +1140,22 @@
       "recommended": false,
       "hardware": [
         {
+          "id": "device_ultrasonic",
+          "label": "HC-SR04"
+        },
+        {
           "id": "serial",
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Measure HC-SR04 echo duration and print distance. Sensor reads can block while waiting for an echo; leave at least 60 ms between readings.",
       "notes": [],
       "plotterModes": [],
@@ -901,6 +1192,13 @@
       "libraries": [
         "Adafruit NeoPixel"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Adafruit_NeoPixel.h"
+        ],
+        "transitive": []
+      },
       "description": "Change WS2812 RGB LED colours. The strip library keeps a small colour buffer and sends it on show.",
       "notes": [],
       "plotterModes": [],
@@ -941,6 +1239,13 @@
       "libraries": [
         "IRremote"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "IRremote.hpp"
+        ],
+        "transitive": []
+      },
       "description": "Read each NEC remote command once and print only valid frames. Poll promptly while IRremote uses Timer2 for reception.",
       "notes": [],
       "plotterModes": [],
@@ -974,7 +1279,14 @@
           "label": "74HC595"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Send a shifting one-bit pattern to a 74HC595 so one LED chases across eight outputs. Wiring is declared once.",
       "notes": [],
       "plotterModes": [],
@@ -1004,11 +1316,18 @@
       "recommended": false,
       "hardware": [
         {
-          "id": "board",
-          "label": "Pro Mini only"
+          "id": "device_stepper_driver",
+          "label": "STEP/DIR driver"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Generate a simple STEP/DIR movement with a legacy helper. Use example 70 for fast hardware-timed continuous motion.",
       "notes": [
         "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
@@ -1048,6 +1367,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Build a 20×4 moving-text animation from editable blocks rather than a preset animation helper.",
       "notes": [],
       "plotterModes": [],
@@ -1082,8 +1416,15 @@
         }
       ],
       "libraries": [
-        "AccelStepper or FastAccelStepper"
+        "AccelStepper"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "AccelStepper.h"
+        ],
+        "transitive": []
+      },
       "description": "Request STEP/DIR positions and repeatedly call AccelStepper run to accelerate and decelerate. Older helper format retained for comparison.",
       "notes": [
         "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
@@ -1122,6 +1463,13 @@
       "libraries": [
         "AccelStepper"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "AccelStepper.h"
+        ],
+        "transitive": []
+      },
       "description": "Use one named 28BYJ-48 motor to travel between two positions with acceleration. Call run continuously; no delay interrupts the coil sequence.",
       "notes": [],
       "plotterModes": [],
@@ -1151,11 +1499,22 @@
       "recommended": true,
       "hardware": [
         {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
+        },
+        {
           "id": "serial",
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Separate one-time setup from repeated loop work, create a variable, and call a reusable function.",
       "notes": [],
       "plotterModes": [],
@@ -1189,7 +1548,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Try arithmetic, ranges and mathematical operations. Observe how connected value blocks form expressions.",
       "notes": [],
       "plotterModes": [],
@@ -1223,7 +1589,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Update array data on a millis schedule so loop can continue between animation steps.",
       "notes": [],
       "plotterModes": [],
@@ -1257,7 +1630,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Compare global and local declarations and address a two-dimensional array with zero-based indices.",
       "notes": [],
       "plotterModes": [],
@@ -1292,8 +1672,15 @@
         }
       ],
       "libraries": [
-        "AccelStepper or FastAccelStepper"
+        "AccelStepper"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "AccelStepper.h"
+        ],
+        "transitive": []
+      },
       "description": "Declare a STEP/DIR device once, request target positions and keep servicing the loop engine until each target is reached.",
       "notes": [],
       "plotterModes": [],
@@ -1331,6 +1718,21 @@
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Declare a 20×4 I2C LCD once and print through its named actions without repeating address or dimensions.",
       "notes": [],
       "plotterModes": [],
@@ -1373,8 +1775,15 @@
         }
       ],
       "libraries": [
-        "Servo or BlocklyMotion"
+        "Servo"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Servo.h"
+        ],
+        "transitive": []
+      },
       "description": "Sweep a servo and take HC-SR04 distance readings. Allow settling time and remember that an echo read briefly blocks.",
       "notes": [],
       "plotterModes": [],
@@ -1414,8 +1823,29 @@
       ],
       "libraries": [
         "BlocklyStorage",
+        "SPI",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMemory.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          }
+        ]
+      },
       "description": "Write and read typed values and text in a 24LC256 I2C EEPROM. Addresses are byte offsets, separate from its I2C bus address.",
       "notes": [
         "Writes a small EEPROM test area. Use a chip with no data you need to retain."
@@ -1457,8 +1887,29 @@
       ],
       "libraries": [
         "BlocklyStorage",
-        "SPI"
+        "SPI",
+        "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMemory.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          }
+        ]
+      },
       "description": "Write and read typed values and text in a 25LC256 SPI EEPROM using one named chip-select configuration.",
       "notes": [
         "Writes a small EEPROM test area. Use a chip with no data you need to retain."
@@ -1500,8 +1951,29 @@
       ],
       "libraries": [
         "BlocklyStorage",
-        "SPI"
+        "SPI",
+        "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMemory.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "BlocklyMemory.h"
+            ]
+          }
+        ]
+      },
       "description": "Erase a W25Q32 Flash sector, write a value/text, then read it back. Flash cannot overwrite programmed bits without erase.",
       "notes": [
         "Erases a whole 4 KB Flash sector before writing. Use a chip with no data you need to retain."
@@ -1542,6 +2014,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklySD.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Create or append a text file on an SPI SD card, then flush and close it. A FAT filesystem remains readable on a computer.",
       "notes": [],
       "plotterModes": [],
@@ -1580,6 +2072,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklySD.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Create a small BMP file on SD and write pixels by coordinates. File storage replaces a full image array in RAM.",
       "notes": [],
       "plotterModes": [],
@@ -1625,8 +2137,29 @@
         "BlocklyStorage",
         "SPI",
         "SdFat",
-        "Servo or BlocklyMotion"
+        "Servo"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklySD.h",
+          "Servo.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Sweep a servo, measure distance, and draw results into an SD BMP. This combined sketch has little memory margin on ATmega168.",
       "notes": [
         "Small remaining memory margin: 240 bytes Flash and 284 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
@@ -1668,6 +2201,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklySD.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Write a monochrome BMP in raster order, one pixel at a time, then finish the file. No full image buffer is allocated.",
       "notes": [],
       "plotterModes": [],
@@ -1699,11 +2252,30 @@
         {
           "id": "music_buzzer",
           "label": "Passive buzzer"
+        },
+        {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          }
+        ]
+      },
       "description": "Start a nonblocking note on a named passive buzzer while the main loop remains available for other tasks.",
       "notes": [],
       "plotterModes": [],
@@ -1738,8 +2310,24 @@
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h",
+          "BlocklyMusicTypes.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          }
+        ]
+      },
       "description": "Play three independent melody voices on three passive buzzers. The optional IRQ mixer shares one Timer2 and consumes periodic CPU time.",
       "notes": [
         "Three-voice IRQ music shares Timer2. Each passive buzzer uses a separate output; Timer2 is unavailable for another independent engine."
@@ -1776,8 +2364,24 @@
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h",
+          "BlocklyMusicTypes.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          }
+        ]
+      },
       "description": "Define a reusable flash melody with rests and play it through a named buzzer.",
       "notes": [],
       "plotterModes": [],
@@ -1816,11 +2420,40 @@
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic",
         "BlocklyStorage",
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h",
+          "BlocklySD.h",
+          "BlocklyTextIO.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          },
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Read text notes from a known SD file and pass each note record to the buzzer. The line parser avoids loading the whole tune.",
       "notes": [
         "Small remaining memory margin: 820 bytes Flash and 276 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation."
@@ -1868,8 +2501,29 @@
         "BlocklyStorage",
         "SPI",
         "SdFat",
-        "Servo or BlocklyMotion"
+        "Servo"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklySD.h",
+          "Servo.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Convert a polar servo/distance scan into row-ordered BMP output on SD. Advanced example with tight AVR memory margins.",
       "notes": [
         "Small remaining memory margin: 804 bytes Flash and 276 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
@@ -1906,7 +2560,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Use variables for every index of a multidimensional array. Fixed dimensions reserve RAM; indices choose an element at runtime.",
       "notes": [],
       "plotterModes": [],
@@ -1945,6 +2606,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyGrayBMP.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Create a grayscale BMP with selected palette levels and append calculated shades. Values must fit the chosen output range.",
       "notes": [],
       "plotterModes": [],
@@ -1976,6 +2657,10 @@
         {
           "id": "st_sd",
           "label": "SPI SD card"
+        },
+        {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
       "libraries": [
@@ -1983,6 +2668,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyImage.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Stream an RGB gradient into a BMP file without keeping the picture in AVR RAM.",
       "notes": [],
       "plotterModes": [],
@@ -2014,6 +2719,10 @@
         {
           "id": "st_sd",
           "label": "SPI SD card"
+        },
+        {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
       "libraries": [
@@ -2021,6 +2730,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyImage.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Write a 1024-level grayscale PGM, preserving more than 8 bits per sample. Use a computer image viewer that supports PGM.",
       "notes": [],
       "plotterModes": [],
@@ -2052,6 +2781,10 @@
         {
           "id": "st_sd",
           "label": "SPI SD card"
+        },
+        {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
       "libraries": [
@@ -2059,6 +2792,26 @@
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyImage.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Write a high-depth RGB PPM with selected per-channel range. This format preserves precision beyond an 8-bit BMP channel.",
       "notes": [],
       "plotterModes": [],
@@ -2092,7 +2845,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Define a function with typed float and uint32_t arguments and an explicit result type.",
       "notes": [],
       "plotterModes": [],
@@ -2126,7 +2886,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Pack several flags and small fields into integers with masks, shifts and extraction blocks.",
       "notes": [],
       "plotterModes": [],
@@ -2160,7 +2927,16 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/io.h"
+        ],
+        "transitive": []
+      },
       "description": "Blink D13 through AVR port registers. Compare the generated code and Flash use with ordinary digitalWrite.",
       "notes": [],
       "plotterModes": [],
@@ -2194,7 +2970,16 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/io.h"
+        ],
+        "transitive": []
+      },
       "description": "Configure an AVR port input and pull-up with masks, then read its bit without changing neighbouring pins.",
       "notes": [],
       "plotterModes": [],
@@ -2228,7 +3013,16 @@
           "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/io.h"
+        ],
+        "transitive": []
+      },
       "description": "Drive a byte pattern through direct port operations. This advanced lesson exposes register ownership and bit masks.",
       "notes": [],
       "plotterModes": [],
@@ -2269,6 +3063,13 @@
       "libraries": [
         "SPI"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "SPI.h"
+        ],
+        "transitive": []
+      },
       "description": "Send the JEDEC-ID command to an SPI Flash chip and read its identification bytes using generic SPI blocks.",
       "notes": [],
       "plotterModes": [],
@@ -2309,6 +3110,13 @@
       "libraries": [
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Wire.h"
+        ],
+        "transitive": []
+      },
       "description": "Write a register pointer and read data from an I2C device using generic transactions. Match the address/register to the attached chip.",
       "notes": [],
       "plotterModes": [],
@@ -2342,7 +3150,18 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/interrupt.h",
+          "avr/io.h",
+          "util/atomic.h"
+        ],
+        "transitive": []
+      },
       "description": "Increment a volatile counter in an interrupt and copy it atomically before using it in loop.",
       "notes": [],
       "plotterModes": [],
@@ -2376,7 +3195,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Echo incoming Serial bytes back to Monitor. Test sending text and different line endings without a blocking String read.",
       "notes": [],
       "plotterModes": [],
@@ -2414,7 +3240,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "After Plotter Start, send two numeric CSV columns from A0. Automatic mode discovers two line traces without a JSON header.",
       "notes": [],
       "plotterModes": [
@@ -2454,7 +3287,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "After Plotter Start, send one A0 value. A Flash-resident header asks the PC to calculate voltage and show lines, a gauge, a bar and raw values.",
       "notes": [],
       "plotterModes": [
@@ -2497,7 +3337,18 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/interrupt.h",
+          "avr/io.h",
+          "util/atomic.h"
+        ],
+        "transitive": []
+      },
       "description": "Count edges on external interrupt D2. A physical button may bounce and create several electrical edges per press.",
       "notes": [],
       "plotterModes": [],
@@ -2535,7 +3386,18 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/interrupt.h",
+          "avr/io.h",
+          "util/atomic.h"
+        ],
+        "transitive": []
+      },
       "description": "Use pin-change interrupts on D4 and D5 to keep separate counters, then copy the values safely in loop.",
       "notes": [],
       "plotterModes": [],
@@ -2569,7 +3431,18 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/interrupt.h",
+          "avr/io.h",
+          "util/atomic.h"
+        ],
+        "transitive": []
+      },
       "description": "Use Timer1 for a periodic interrupt and keep the handler short. The timer is then unavailable to Servo, fast stepper and its PWM channels.",
       "notes": [],
       "plotterModes": [],
@@ -2603,7 +3476,18 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "avr/interrupt.h",
+          "avr/io.h",
+          "util/atomic.h"
+        ],
+        "transitive": []
+      },
       "description": "Attach or detach a configured interrupt using Monitor commands while preserving the accumulated counter.",
       "notes": [],
       "plotterModes": [],
@@ -2646,8 +3530,15 @@
         }
       ],
       "libraries": [
-        "Servo or BlocklyMotion"
+        "BlocklyMotion"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyHardwareServo.h"
+        ],
+        "transitive": []
+      },
       "description": "After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.",
       "notes": [],
       "plotterModes": [
@@ -2690,8 +3581,17 @@
         }
       ],
       "libraries": [
-        "AccelStepper or FastAccelStepper"
+        "AccelStepper",
+        "BlocklyMotion"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "AccelStepper.h",
+          "BlocklyMotion.h"
+        ],
+        "transitive": []
+      },
       "description": "Use a potentiometer to set signed continuous stepper speed with acceleration. The software loop engine must still be serviced every pass.",
       "notes": [],
       "plotterModes": [],
@@ -2730,8 +3630,15 @@
         }
       ],
       "libraries": [
-        "Servo or BlocklyMotion"
+        "Servo"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Servo.h"
+        ],
+        "transitive": []
+      },
       "description": "Map a potentiometer to servo pulse microseconds for finer command increments than whole degree values.",
       "notes": [],
       "plotterModes": [],
@@ -2766,9 +3673,26 @@
         }
       ],
       "libraries": [
+        "BlocklyBuffers",
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyBuffers.h",
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Prepare an 80-byte LCD character grid in RAM, then send the finished 20×4 frame once. Legacy text mode treats zero as a space.",
       "notes": [],
       "plotterModes": [],
@@ -2803,9 +3727,32 @@
         }
       ],
       "libraries": [
-        "U8g2/U8x8",
+        "BlocklyBuffers",
+        "SPI",
+        "U8g2",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyBuffers.h",
+          "U8x8lib.h"
+        ],
+        "transitive": [
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "U8x8lib.h"
+            ]
+          }
+        ]
+      },
       "description": "Build a 128-byte packed OLED tile: each byte stores eight vertical pixels. Send the tile without allocating a full-screen buffer.",
       "notes": [
         "Uses a 128-byte tile. Do not allocate a 1024-byte OLED framebuffer on a board with 1024 bytes total SRAM."
@@ -2842,8 +3789,17 @@
         }
       ],
       "libraries": [
-        "Adafruit NeoPixel"
+        "Adafruit NeoPixel",
+        "BlocklyBuffers"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Adafruit_NeoPixel.h",
+          "BlocklyBuffers.h"
+        ],
+        "transitive": []
+      },
       "description": "Prepare RGB values in an array, copy them to the NeoPixel library buffer and call show once for the finished frame.",
       "notes": [],
       "plotterModes": [],
@@ -2878,9 +3834,46 @@
         }
       ],
       "libraries": [
-        "Adafruit ST7735",
-        "SPI"
+        "Adafruit BusIO",
+        "Adafruit GFX Library",
+        "Adafruit ST7735 and ST7789 Library",
+        "BlocklyBuffers",
+        "SPI",
+        "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "Adafruit_ST7735.h",
+          "BlocklyBuffers.h"
+        ],
+        "transitive": [
+          {
+            "library": "Adafruit BusIO",
+            "viaHeaders": [
+              "Adafruit_GFX.h"
+            ]
+          },
+          {
+            "library": "Adafruit GFX Library",
+            "viaHeaders": [
+              "Adafruit_ST7735.h"
+            ]
+          },
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "Adafruit_SPIDevice.h"
+            ]
+          },
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "Adafruit_I2CDevice.h"
+            ]
+          }
+        ]
+      },
       "description": "Prepare a small RGB565 colour tile and send it to an ST7735 TFT in one SPI transaction.",
       "notes": [],
       "plotterModes": [],
@@ -2915,8 +3908,23 @@
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          }
+        ]
+      },
       "description": "Pass a note record through a variable to the music parser. The same format can come from EEPROM, Serial or an SD line.",
       "notes": [],
       "plotterModes": [],
@@ -2955,11 +3963,41 @@
         }
       ],
       "libraries": [
+        "BlocklyMotion",
         "BlocklyMusic",
+        "BlocklySDMusic",
         "BlocklyStorage",
         "SPI",
         "SdFat"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyMusic.h",
+          "BlocklySD.h",
+          "BlocklySDMusic.h"
+        ],
+        "transitive": [
+          {
+            "library": "BlocklyMotion",
+            "viaHeaders": [
+              "BlocklyMusic.h"
+            ]
+          },
+          {
+            "library": "SPI",
+            "viaHeaders": [
+              "SdFat.h"
+            ]
+          },
+          {
+            "library": "SdFat",
+            "viaHeaders": [
+              "BlocklySD.h"
+            ]
+          }
+        ]
+      },
       "description": "Play a timed, polyphonic score from SD without loading it all into RAM. Three IRQ voices and the SD cache leave a small stack margin.",
       "notes": [
         "Small remaining memory margin: 842 bytes Flash and 196 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
@@ -3001,8 +4039,23 @@
         }
       ],
       "libraries": [
-        "AccelStepper or FastAccelStepper"
+        "BlocklyMotion",
+        "FastAccelStepper"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyFastStepper.h"
+        ],
+        "transitive": [
+          {
+            "library": "FastAccelStepper",
+            "viaHeaders": [
+              "BlocklyFastStepper.h"
+            ]
+          }
+        ]
+      },
       "description": "Start a Timer1 STEP/DIR motor stopped, then change signed target speed in small or large increments through Monitor. Hardware pulses and acceleration continue independently of loop.",
       "notes": [
         "Small remaining memory margin: 832 bytes Flash and 388 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation."
@@ -3047,9 +4100,17 @@
         }
       ],
       "libraries": [
-        "BlocklyMusic",
-        "Servo or BlocklyMotion"
+        "BlocklyMotion"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyHardwareBuzzer.h",
+          "BlocklyHardwareServo.h",
+          "BlocklyMusicTypes.h"
+        ],
+        "transitive": []
+      },
       "description": "Use a potentiometer to control hardware Servo pulses on D9 while a hardware buzzer on D11 plays a melody. Timer1 and Timer2 have separate owners.",
       "notes": [],
       "plotterModes": [],
@@ -3084,9 +4145,26 @@
         }
       ],
       "libraries": [
+        "BlocklyBuffers",
         "LiquidCrystal_I2C",
         "Wire"
       ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [
+          "BlocklyBuffers.h",
+          "LiquidCrystal_I2C.h",
+          "Wire.h"
+        ],
+        "transitive": [
+          {
+            "library": "Wire",
+            "viaHeaders": [
+              "LiquidCrystal_I2C.h"
+            ]
+          }
+        ]
+      },
       "description": "Define a 5×8 face in LCD glyph slot 0, then animate two faces through an 80-byte raw-code buffer. Eight slots and variable indices are supported.",
       "notes": [],
       "plotterModes": [],
@@ -3097,14 +4175,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "471b27246a5c2db61d69a1af3fda5009b626763df90bc3176ff5384f0a73e5a4",
         "flash": 3736,
         "flashLimit": 14336,
         "staticRam": 354,
         "staticRamLimit": 1024,
-        "ramRemaining": 670,
         "flashRemaining": 10600,
-        "classification": "fits",
-        "sketchSha256": "471b27246a5c2db61d69a1af3fda5009b626763df90bc3176ff5384f0a73e5a4"
+        "ramRemaining": 670,
+        "classification": "fits"
       }
     },
     {
@@ -3124,7 +4202,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Compare A0 with a generated triangle in overlaid lines, a multi-needle gauge, grouped bars, two XY traces and a raw table. Start/Stop controls one shared stream.",
       "notes": [],
       "plotterModes": [
@@ -3168,7 +4253,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Send one voltage plus device time and let the PC calculate mean, RMS, limits, sum, derivative and integral. After five seconds, a live header changes the averaging window.",
       "notes": [],
       "plotterModes": [
@@ -3208,7 +4300,14 @@
           "label": "USB–Serial adapter"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "audited-generated-sketch-includes",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Paint an RGB gradient one pixel at a time while charts and bars show the colours. No external hardware or AVR image buffer is needed.",
       "notes": [
         "All pixels are held on the computer. The Arduino sends one pixel and chart sample at a time."
@@ -3244,11 +4343,18 @@
       "recommended": false,
       "hardware": [
         {
-          "id": "board",
-          "label": "Pro Mini only"
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "reviewed-legacy-generators (not compiled)",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Original BlocklyDuino blink workspace retained for importing older projects.",
       "notes": [],
       "plotterModes": [],
@@ -3269,11 +4375,22 @@
       "recommended": false,
       "hardware": [
         {
-          "id": "board",
-          "label": "Pro Mini only"
+          "id": "grove-chainable-rgb",
+          "label": "Grove chainable RGB LED (clock + data)"
+        },
+        {
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Arduino AVR core (no extra library)"
+      ],
+      "libraryEvidence": {
+        "source": "reviewed-legacy-generators (not compiled)",
+        "headers": [],
+        "transitive": []
+      },
       "description": "Original BlocklyDuino demonstration workspace retained as a legacy import, outside the current AVR168 compile audit.",
       "notes": [],
       "plotterModes": [],
@@ -3294,11 +4411,24 @@
       "recommended": false,
       "hardware": [
         {
-          "id": "board",
-          "label": "Pro Mini only"
+          "id": "device_servo",
+          "label": "Servo"
+        },
+        {
+          "id": "analog-input",
+          "label": "Analog source / potentiometer"
         }
       ],
-      "libraries": [],
+      "libraries": [
+        "Servo"
+      ],
+      "libraryEvidence": {
+        "source": "reviewed-legacy-generators (not compiled)",
+        "headers": [
+          "Servo.h"
+        ],
+        "transitive": []
+      },
       "description": "Original potentiometer-to-servo workspace retained as a legacy import. Prefer the named servo lessons for new work.",
       "notes": [],
       "plotterModes": [],

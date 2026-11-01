@@ -87,3 +87,11 @@ time-based derivatives/integrals; acquisition tests use a mocked shared Serial
 client. A PTY browser check sends START and STOP, replaces headers during a capture,
 exports CSV/JSONL/PNG, and verifies multiple instruments and preserved pixels.
 No physical board is required and no firmware is uploaded.
+
+After a complete ATmega168 build, run `python3 tools/build-example-catalog.py`
+to refresh catalogue metadata. The compiler writes
+`.test-build/compile-audit-atmega168.json` with Flash/SRAM limits and generated
+sketch hashes. A subset build preserves only earlier entries whose generated
+source still matches. Catalogue libraries come from the audited sketch includes
+and reviewed header dependencies, so hardware waveforms are not mislabeled as
+software music. A mismatched sketch requires a new compile before publication.

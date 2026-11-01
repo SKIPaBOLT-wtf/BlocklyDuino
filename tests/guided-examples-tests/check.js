@@ -9,6 +9,12 @@ assert.deepStrictEqual(catalog.examples.map(e=>e.file).sort(),files,'Every examp
 const covered=new Set(catalog.examples.flatMap(e=>e.hardware.map(d=>d.id)));
 win.BlocklyDeviceCatalog.forEach(d=>assert(covered.has(d.type),'Hardware coverage: '+d.type));
 assert(catalog.examples.filter(e=>/^\d/.test(e.file)).every(e=>e.verification.ok===true),'Numbered examples carry explicit target compile results');
+function lesson(prefix){return catalog.examples.find(e=>e.file.startsWith(prefix));}
+assert.deepStrictEqual(lesson('71-').libraries,['BlocklyMotion'],'Hardware-only sound/servo must not claim IRQ music or core Servo');
+assert.deepStrictEqual(lesson('21-').libraries,['Stepper'],'Legacy blocking coils use Stepper, not AccelStepper');
+assert(lesson('15-').libraries.every(n=>!n.includes('BlocklyMusic')),'Core tone has no named music dependency');
+assert(lesson('23-').hardware.some(h=>h.id==='device_ultrasonic'));
+assert(lesson('27-').hardware.some(h=>h.id==='device_stepper_driver'));
 const plotFiles=catalog.examples.filter(e=>e.plotterModes.length);
 for(const e of plotFiles){
  const xml=fs.readFileSync(path.join(out,'examples',e.file),'utf8'),ws=load(xml),code=generate(ws);
