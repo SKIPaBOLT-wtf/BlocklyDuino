@@ -1,13 +1,12 @@
 {
   "version": 1,
   "id": "pot-dashboard",
-  "title": "Potentiometer dashboard",
-  "history": 500,
+  "title": "Turn the potentiometer",
+  "history": 200,
   "fields": [
     {
       "id": "adc",
       "label": "ADC",
-      "type": "number",
       "min": 0,
       "max": 1023
     },
@@ -15,10 +14,12 @@
       "id": "volts",
       "label": "Voltage",
       "unit": "V",
-      "type": "number",
       "min": 0,
       "max": 5,
-      "scale": 0.004887585532746823
+      "derive": {
+        "op": "formula",
+        "expr": "adc * 5 / 1023"
+      }
     }
   ],
   "widgets": [
@@ -35,11 +36,6 @@
       "fields": [
         "adc"
       ]
-    },
-    {
-      "type": "xy",
-      "x": "adc",
-      "y": "volts"
     },
     {
       "type": "raw",

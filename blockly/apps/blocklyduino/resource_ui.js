@@ -4,7 +4,14 @@
  function records(ws){var blocks=(ws||Blockly.mainWorkspace).getAllBlocks();return blocks.map(function(b){var f={};b.inputList.forEach(function(i){i.fieldRow.forEach(function(v){if(v.name)f[v.name]=b.getFieldValue(v.name);});});if(/^lcd_user_/.test(b.type)){var init=blocks.find(function(c){return c.type==='lcd_user_init'&&!c.disabled;});f.ADDR=init?init.getFieldValue('ADDR'):'0x27';}var mask=b.getInputTargetBlock&&b.getInputTargetBlock('MASK');if(mask&&mask.type==='math_number')f._MASK=Number(mask.getFieldValue('NUM'));return{id:b.id,type:b.type,name:f.NAME||b.type,fields:f,disabled:b.disabled||(b.getInheritedDisabled&&b.getInheritedDisabled())};});}
  function analysis(ws){return R.analyze(records(ws),p||R.profile(''));}
  function options(b,key){if(!p)return null;var rs=records(b.workspace.isFlyout?Blockly.mainWorkspace:b.workspace);if(!rs.some(function(r){return r.id===b.id;}))rs=rs.concat(records(b.workspace).filter(function(r){return r.id===b.id;}));return R.choices(rs,b.id,key,p).map(function(v){return[R.label(p,v),v];});}
+ function engineOptions(b){return p&&R.engines(records(b.workspace.isFlyout?Blockly.mainWorkspace:b.workspace),b.id,p);}
+ function changeEngine(b,value){var opts=engineOptions(b),plan=opts&&opts.find(function(e){return e.value===value&&e.available;});if(!plan)return null;
+  var changed=[];Object.keys(R.spec({type:b.type,fields:plan.fields}).pins||{}).forEach(function(k){if(b.getFieldValue(k)!==plan.fields[k])changed.push(k+' → '+R.label(p,plan.fields[k]));});
+  b.setFieldValue(value,'ENGINE');if(b.type==='device_stepper_driver'&&value==='TIMER'&&b.getFieldValue('DRIVE_MODE')==='CONTINUOUS'){b.setFieldValue('RAMPED','DRIVE_MODE');changed.push('motion → continuous with acceleration');}Object.keys(R.spec({type:b.type,fields:plan.fields}).pins||{}).forEach(function(k){b.setFieldValue(plan.fields[k],k);});
+  if(window.editorStatus)editorStatus(changed.length?'Engine changed. Wiring changed: '+changed.join(', ')+'. Check Connections before connecting hardware.':'Engine changed. Wiring is unchanged.',false);setTimeout(update,0);return value;
+ }
  function wire(b){var s=R.specs[b.type];if(!s)return;
+  var engine=b.getField('ENGINE');if(engine&&!engine.resourceWired_){engine.resourceWired_=true;var originalEngine=engine.menuGenerator_;engine.menuGenerator_=function(){var opts=engineOptions(b);if(!opts)return typeof originalEngine==='function'?originalEngine.call(this):originalEngine;var available=opts.filter(function(e){return e.available;}).map(function(e){return[e.label,e.value];});return available.length?available:[['No compatible engine — see Connections','']];};engine.changeHandler_=function(value){var opts=engineOptions(b);return opts?changeEngine(b,value):value;};}
   Object.keys(s.pins||{}).forEach(function(key){var field=b.getField(key);if(!field&&s.fixed&&s.fixed[key]){field=new Blockly.FieldDropdown([[R.label(p||R.profile('arduino:avr:uno'),s.fixed[key]),s.fixed[key]]]);b.appendDummyInput().appendField(key).appendField(field,key);}if(!field||field.resourceWired_)return;field.resourceWired_=true;if(s.fixed&&s.fixed[key]){field.EDITABLE=false;if(field.updateEditable)field.updateEditable();return;}var original=field.menuGenerator_;
    field.menuGenerator_=function(){var list=options(b,key);if(list===null)return typeof original==='function'?original.call(this):original;return list.length?list:[['No compatible free pin','']];};
    field.changeHandler_=function(value){var list=options(b,key);return !list||list.some(function(x){return x[1]===value;})?value:null;};
@@ -21,7 +28,9 @@
   if(window.selected==='connections'&&window.renderConnections)renderConnections();
  }
  function setTarget(fqbn){p=R.profile(fqbn);update();}
- function allocate(b){if(!p||!p.known)throw Error('Select a board with a verified pin profile before adding hardware.');var s=R.specs[b.type];if(!s)return;
+ function allocate(b){if(!p||!p.known)throw Error('Select a board with a verified pin profile before adding hardware.');
+  var engines=engineOptions(b);if(engines){var engine=engines.find(function(e){return e.available;});if(!engine)throw Error(engines.map(function(e){return e.label+': '+e.reason;}).join('\n'));b.setFieldValue(engine.value,'ENGINE');Object.keys(R.spec({type:b.type,fields:engine.fields}).pins||{}).forEach(function(k){b.setFieldValue(engine.fields[k],k);});b.allocationNote_=engine.description;}
+  var s=R.spec({type:b.type,fields:records(b.workspace).find(function(r){return r.id===b.id;}).fields});if(!s)return;
   var fields=Object.keys(s.pins||{}),defaults={};fields.forEach(function(k){defaults[k]=b.getFieldValue(k);b.setFieldValue('',k);});
   // Reserve bus lines before assigning CS/DC/RESET or general-purpose pins.
   fields.forEach(function(k){var opts=R.choices(records(b.workspace),b.id,k,p);if(!opts.length)throw Error('No free '+s.pins[k]+' pin for '+k+'. Required pins are occupied.');var preferred=opts.filter(function(v){return !p.serial.includes(v);});var available=preferred.length?preferred:opts;b.setFieldValue(available.indexOf(defaults[k])>=0?defaults[k]:available[0],k);});
@@ -39,5 +48,5 @@
  Blockly.Arduino.inout_buildin_led=function(){var pin=p&&p.known?p.led:'LED_BUILTIN';Blockly.Arduino.setups_['setup_output_'+pin]='pinMode('+pin+', OUTPUT);';return 'digitalWrite('+pin+', '+this.getFieldValue('STAT')+');\n';};
  var generate=Blockly.Arduino.workspaceToCode;
  Blockly.Arduino.workspaceToCode=function(ws){if(p){var a=analysis(ws||Blockly.mainWorkspace);if(a.errors.length){var e=Error(a.errors.map(function(x){return x.message;}).join('\n'));e.blockId=a.errors[0].id;throw e;}}return generate.apply(this,arguments);};
- window.BlocklyResources={records:records,analysis:analysis,profile:function(){return p;},setTarget:setTarget,allocate:allocate,install:install,update:update};
+ window.BlocklyResources={records:records,analysis:analysis,profile:function(){return p;},setTarget:setTarget,allocate:allocate,engineOptions:engineOptions,changeEngine:changeEngine,install:install,update:update};
 })();

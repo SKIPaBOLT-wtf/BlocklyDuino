@@ -1,3 +1,20 @@
+## Pro Mini guided workflow update
+
+The Pro Mini ATmega168 reference now has a versioned capability description,
+engine-aware allocation and explicit wiring-change notices. Connections explains
+hardware versus interrupt/loop engines and their resource limits.
+
+The grouped example catalogue covers all 20 named device types, includes target
+build sizes and beginner comments, and distinguishes legacy/advanced lessons.
+LCD users can define eight 5×8 glyphs and display codes 0–7 from a prepared buffer;
+legacy zero-as-space buffers keep their previous behavior.
+
+Plotter Start/Stop sends ordinary serial commands. Controller headers describe
+multiple charts, overlaid traces, gauge needles, bars, raw tables and scan images.
+Bounded host formulas/statistics/integration keep the computation off the MCU.
+Capture retains configuration revisions and raw/calculated samples across live
+header changes. See the in-app Plotter guide for complete wire-format examples.
+
 # Classic editor extension: changes and integration map
 
 This is a contribution proposal for the classic `v1-gh-pages` application,

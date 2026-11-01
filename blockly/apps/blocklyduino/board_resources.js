@@ -2,10 +2,11 @@
  * Pin and peripheral contracts for the supported board/core combinations.
  * Pure model: no DOM, serial access or guesses about unlisted boards.
  */
-(function(root,factory){var api=factory();if(typeof module==='object')module.exports=api;else root.BoardResources=api;})(this,function(){
+(function(root,factory){var api=factory(typeof module==='object'?require('./board_capabilities.js'):root.BoardCapabilities);if(typeof module==='object')module.exports=api;else root.BoardResources=api;})(this,function(C){
  'use strict';
  function range(a,b,prefix){var r=[];for(var i=a;i<=b;i++)r.push((prefix||'')+i);return r;}
  function profile(fqbn){
+  var described=C&&C.profile(fqbn);if(described)return described;
   var p={fqbn:fqbn||'',known:true,aliases:{},pwm:[],irq:[],pcint:[],servo:12,buzzer:0,buses:{},serial:[],reserved:[]};
   if(/^arduino:avr:(uno|nano|pro|diecimila)(:|$)/.test(fqbn)){
    p.led='13';p.id='avr328';p.name='ATmega168/328';p.digital=range(0,13).concat(range(0,5,'A'));p.analog=range(0,/:(pro|nano)(:|$)/.test(fqbn)?7:5,'A');
@@ -91,6 +92,14 @@
   live.forEach(function(r){var s=spec(r);if(!s){if(/^(lcd|grove_|oled_|dht_|ds18b20_|neopixel_|stepper_|accel_|ultrasonic_|ir_nec_)/.test(r.type))notes.push('Legacy hardware blocks do not declare reusable devices. Replace them with Add device definitions for complete pin tracking.');if(/^(user_|arduino_raw)/.test(r.type))notes.push('Custom C++ may use resources beyond these declarations.');return;}
    if(!p.known){error(r,'choose a board with a verified pin profile.');return;}
    if(s.avr&&p.id!=='avr328')error(r,'this block requires ATmega168/328.');
+   var engineDefs=p.capabilities&&p.capabilities.engines[r.type],engine=engineDefs&&engineDefs.find(function(e){return e.value===(r.fields.ENGINE||(r.type==='device_servo'?'CORE':r.type==='music_buzzer'?'IRQ':'LOOP'));});
+   if(engineDefs&&!engine)error(r,'unknown pulse engine. Select a supported engine.');
+   if(engine&&r.type==='device_servo'){
+    var lo=Number(r.fields.MIN_US||544),hi=Number(r.fields.MAX_US||2400),hz=Number(r.fields.FRAME_HZ||50),range=engine.pulseUs;
+    if(!Number.isInteger(lo)||!Number.isInteger(hi)||lo<range.min||hi>range.max||lo>=hi)error(r,'pulse endpoints must be whole microseconds within '+range.min+'–'+range.max+', minimum < maximum.');
+    if(engine.calibration){var cal=C.servoCalibration(lo,hi);if(!cal.valid)error(r,cal.message);else if(cal.min!==lo||cal.max!==hi)notes.push(r.name+': AVR Servo calibration is '+cal.min+'–'+cal.max+' µs after 4 µs endpoint quantization.');}
+    if(engine.refreshHz&&(!Number.isInteger(hz)||hz<engine.refreshHz.min||hz>engine.refreshHz.max||hi*hz>=1000000))error(r,'refresh must be '+engine.refreshHz.min+'–'+engine.refreshHz.max+' Hz with the maximum pulse shorter than the period.');
+   }
    if(s.resource&&!counted[r.owner]){counted[r.owner]=true;if(!s.legacyServo||!servoPins[pin(p,r.fields.PIN)])counts[s.resource]=(counts[s.resource]||0)+1;if(s.legacyServo)servoPins[pin(p,r.fields.PIN)]=true;}
    var row={id:r.id,name:r.name||r.type,type:r.type,fields:r.fields,wires:[]};rows.push(row);
    if(s.fixedLED){claim(r,p.led,'LED','gpio:'+p.led);row.wires.push('LED → '+label(p,p.led));}
@@ -121,7 +130,7 @@
    if(cs[i].id===cs[j].id&&cs[i].role===cs[j].role)continue;
    error({id:cs[i].id,name:cs[i].name},label(p,v)+' is occupied by '+cs[j].name+' ('+cs[j].role+').');
   }});
-  var limits={hardwareServo:p.id==='avr328'?2:(p.servopwm||[]).length,hardwareBuzzer:p.id==='avr328'?2:p.id==='bluepill'?4:8,fastStepper:p.fastStepper||0,sd:1,servo:p.servo,buzzer:p.buzzer,ir:1,timer1:p.id==='avr328'?1:0};
+  var limits=p.limits||{hardwareServo:p.id==='avr328'?2:(p.servopwm||[]).length,hardwareBuzzer:p.id==='avr328'?2:p.id==='bluepill'?4:8,fastStepper:p.fastStepper||0,sd:1,servo:p.servo,buzzer:p.buzzer,ir:1,timer1:p.id==='avr328'?1:0};
   Object.keys(limits).forEach(function(k){if((counts[k]||0)>limits[k])error({id:'limits',name:p.name},'maximum '+limits[k]+' '+k+' device(s).');});
   if(counts.servo&&p.id!=='pico')timers[p.servoTimer]=['Servo'];
   if(p.id==='pico'){var tones=new Set(live.filter(function(r){return r.type==='inout_tone'||r.type==='music_buzzer'&&r.fields.ENGINE==='HARDWARE';}).map(function(r){return pin(p,r.fields.PIN);})),pixels=new Set(live.filter(function(r){return r.type==='device_neopixel'||r.type==='neopixel_init';}).map(function(r){return r.owner;})),pio=(counts.servo||0)+pixels.size+tones.size;if(pio>8)error({id:'limits',name:'PIO'},'Servo, NeoPixel and tone together need '+pio+' state machines; Pico has 8.');if(tones.size)notes.push('Pico tone reserves one PIO state machine per used pin; noTone releases it. Static validation assumes these outputs can overlap.');}
@@ -146,7 +155,7 @@
   if(counts.rawTimer0)notes.push('Changing Timer0 can change millis, micros, delay and polled stepper timing.');
   return {errors:errors,claims:claims,counts:counts,timers:timers,rows:rows,notes:Array.from(new Set(notes))};
  }
- function choices(records,id,field,p){var r=records.filter(function(r){return r.id===id;})[0];if(!r||!specs[r.type])return [];var s=spec(r),kind=(s.pins||{})[field];if(!kind)return [];
+ function choices(records,id,field,p){records=records.map(function(r){return r.id===id?Object.assign({},r,{disabled:false}):r;});var r=records.filter(function(r){return r.id===id;})[0];if(!r||!specs[r.type])return [];var s=spec(r),kind=(s.pins||{})[field];if(!kind)return [];
   return (p[kind]||[]).filter(function(v){var copy=records.map(function(x){if(x.id!==id)return x;var f=Object.assign({},x.fields);f[field]=v;return Object.assign({},x,{fields:f});});
    var a=analyze(copy,p),physical=pin(p,v),own=normalized(copy).filter(function(x){return x.id===id;})[0];
    if(s.avr&&p.id!=='avr328')return false;
@@ -157,5 +166,20 @@
    return !a.errors.some(function(e){return e.id===id&&(e.message.indexOf(field+' needs')>=0||e.message.indexOf('PWM timer')>=0||e.message.indexOf('PWM channel')>=0||e.message.indexOf('PWM remap')>=0||candidates.some(function(c){return e.message.indexOf(label(p,c)+' is occupied')>=0;}));})&&!candidates.some(function(c){return (a.claims[c]||[]).some(function(cl){return cl.id!==id&&!(s.read&&cl.irq)&&!(s.irq&&cl.observer)&&!(s.gpio&&cl.share==='gpio:'+c)&&!(s.legacyServo&&cl.share==='servo:'+c)&&!(s.legacy&&cl.share.indexOf(own.owner+':')===0);});});
   });
  }
- return {profile:profile,specs:specs,spec:spec,pin:pin,label:label,analyze:analyze,choices:choices,nextPin:nextPin};
+ // Plan a new device or an explicit engine change without mutating the project.
+ // Existing invalid XML stays visible; only newly introduced conflicts reject a plan.
+ function assignment(records,record,p,engine){
+  var other=records.filter(function(r){return r.id!==record.id;}),copy=Object.assign({},record,{disabled:false,fields:Object.assign({},record.fields)});if(engine!==undefined)copy.fields.ENGINE=engine;
+  var s=spec(copy),keys=Object.keys(s&&s.pins||{}),defaults=Object.assign({},copy.fields),baseline=analyze(other,p).errors.map(function(e){return e.id+':'+e.message;}),reason='No compatible free pins for this engine.';
+  keys.forEach(function(k){copy.fields[k]='';});
+  function visit(index){
+   if(index===keys.length){var a=analyze(other.concat([copy]),p),err=a.errors.find(function(e){return e.id===copy.id||baseline.indexOf(e.id+':'+e.message)<0;});if(err){reason=err.message;return null;}return Object.assign({},copy.fields);}
+   var k=keys[index],opts=choices(other.concat([copy]),copy.id,k,p);opts.sort(function(a,b){return Number(b===defaults[k])-Number(a===defaults[k])||Number(p.serial.indexOf(a)>=0)-Number(p.serial.indexOf(b)>=0);});
+   for(var i=0;i<opts.length;i++){copy.fields[k]=opts[i];var found=visit(index+1);if(found)return found;}
+   copy.fields[k]='';if(!opts.length){var probe=Object.assign({},copy,{fields:Object.assign({},copy.fields)});probe.fields[k]=(p[s.pins[k]]||[])[0]||'';var conflict=analyze(other.concat([probe]),p).errors.sort(function(a,b){return Number(b.id==='timers'||b.id==='limits')-Number(a.id==='timers'||a.id==='limits');}).find(function(e){return baseline.indexOf(e.id+':'+e.message)<0&&(e.id==='limits'||e.id==='timers'||e.id===copy.id&&/occupied|pulse endpoints|refresh/.test(e.message));});reason=conflict?conflict.message:'No free '+s.pins[k]+' pin for '+k+'. Check occupied pins and timer owners in Connections.';}return null;
+  }
+  var fields=visit(0);return {available:!!fields,fields:fields,reason:fields?'':reason};
+ }
+ function engines(records,id,p){var record=records.find(function(r){return r.id===id;}),defs=record&&p.capabilities&&p.capabilities.engines[record.type];return defs?defs.map(function(d){var candidate=Object.assign({},record,{fields:Object.assign({},record.fields)});Object.keys(d.defaults||{}).forEach(function(k){if((p[d.pins[k]]||[]).indexOf(pin(p,candidate.fields[k]))<0)candidate.fields[k]=d.defaults[k];});return Object.assign({},d,assignment(records,candidate,p,d.value));}):null;}
+ return {profile:profile,specs:specs,spec:spec,pin:pin,label:label,analyze:analyze,choices:choices,nextPin:nextPin,assignment:assignment,engines:engines};
 });

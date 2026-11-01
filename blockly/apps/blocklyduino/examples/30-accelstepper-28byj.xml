@@ -1,49 +1,51 @@
 <xml>
-  <block type="arduino_setup_section" x="30" y="30">
+  <block type="device_stepper_coils" x="30" y="30">
+    <mutation uid="coils30" />
+    <field name="NAME">motor</field>
+    <field name="IN1">8</field>
+    <field name="IN2">9</field>
+    <field name="IN3">10</field>
+    <field name="IN4">11</field>
+    <field name="SPEED">500</field>
+    <field name="ACCEL">100</field>
+    <comment pinned="false" w="390" h="170">28BYJ-48 through ULN2003: IN1 D8, IN2 D9, IN3 D10, IN4 D11. Separate appropriate motor supply, common GND. AccelStepper uses half steps and switches these four GPIOs in software; PWM pins are not required.</comment>
+  </block>
+  <block type="arduino_typed_variable" x="510" y="30">
+    <field name="VAR">target</field>
+    <field name="TYPE">int32_t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">512</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_setup_section" x="990" y="30">
     <statement name="DO">
-      <block type="accel_4wire_init">
-        <field name="MOTOR">1</field>
-        <field name="IN1">8</field>
-        <field name="IN2">9</field>
-        <field name="IN3">10</field>
-        <field name="IN4">11</field>
-        <value name="SPEED">
-          <block type="math_number">
-            <field name="NUM">500</field>
+      <block type="device_stepper_move">
+        <field name="DEVICE">coils30</field>
+        <field name="MODE">TO</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">target</field>
           </block>
         </value>
-        <value name="ACCEL">
-          <block type="math_number">
-            <field name="NUM">100</field>
-          </block>
-        </value>
-        <next>
-          <block type="accel_move_to">
-            <field name="MOTOR">1</field>
-            <value name="TARGET">
-              <block type="math_number">
-                <field name="NUM">2048</field>
-              </block>
-            </value>
-          </block>
-        </next>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Purpose: Use AccelStepper acceleration with a 28BYJ-48 and ULN2003.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="390" h="170">Set the first absolute target. This only requests movement; loop must service it.</comment>
   </block>
-  <block type="arduino_loop_section" x="30" y="280">
+  <block type="arduino_loop_section" x="30" y="290">
     <statement name="DO">
-      <block type="accel_run">
-        <field name="MOTOR">1</field>
+      <block type="device_stepper_run">
+        <field name="DEVICE">coils30</field>
         <next>
           <block type="controls_if">
             <value name="IF0">
               <block type="logic_compare">
                 <field name="OP">EQ</field>
                 <value name="A">
-                  <block type="accel_distance_to_go">
-                    <field name="MOTOR">1</field>
+                  <block type="device_stepper_position">
+                    <field name="DEVICE">coils30</field>
+                    <field name="READ">DISTANCE</field>
                   </block>
                 </value>
                 <value name="B">
@@ -54,9 +56,9 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
               </block>
             </value>
             <statement name="DO0">
-              <block type="accel_move_to">
-                <field name="MOTOR">1</field>
-                <value name="TARGET">
+              <block type="variables_set">
+                <field name="VAR">target</field>
+                <value name="VALUE">
                   <block type="math_arithmetic">
                     <field name="OP">MINUS</field>
                     <value name="A">
@@ -65,20 +67,29 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
                       </block>
                     </value>
                     <value name="B">
-                      <block type="accel_current_position">
-                        <field name="MOTOR">1</field>
+                      <block type="variables_get">
+                        <field name="VAR">target</field>
                       </block>
                     </value>
                   </block>
                 </value>
+                <next>
+                  <block type="device_stepper_move">
+                    <field name="DEVICE">coils30</field>
+                    <field name="MODE">TO</field>
+                    <value name="VALUE">
+                      <block type="variables_get">
+                        <field name="VAR">target</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
               </block>
             </statement>
-            <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
           </block>
         </next>
-        <comment pinned="false" w="340" h="170">Service the motor on every loop pass. This emits a step only when due and returns quickly. Long delays would interrupt smooth movement.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
+    <comment pinned="false" w="390" h="170">Call run on every pass. At each target, reverse to the other position with acceleration and deceleration. No delay or slow display writes here; those would interrupt software pulse generation.</comment>
   </block>
 </xml>

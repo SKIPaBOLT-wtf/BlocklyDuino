@@ -10,6 +10,7 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
     <mutation uid="pan40" />
     <field name="NAME">pan</field>
     <field name="PIN">9</field>
+    <field name="ENGINE">CORE</field>
   </block>
   <block type="device_ultrasonic" x="540" y="20">
     <mutation uid="range40" />

@@ -1,21 +1,54 @@
 <xml>
-  <block type="serial_print" x="30" y="30">
-    <value name="CONTENT">
-      <block type="ir_nec_read">
-        <field name="PIN">2</field>
-      </block>
-    </value>
-    <next>
-      <block type="base_delay">
-        <value name="DELAY_TIME">
-          <block type="math_number">
-            <field name="NUM">100</field>
+  <block type="device_ir_nec" x="30" y="30">
+    <mutation uid="ir25" />
+    <field name="NAME">remote</field>
+    <field name="PIN">2</field>
+    <comment pinned="false" w="390" h="170">NEC-compatible receiver output D2, correct module supply and common ground. This is a demodulating IR receiver, not a bare photodiode. Library sampling uses Timer2 on ATmega168; do not also allocate that timer to audio or timer interrupts.</comment>
+  </block>
+  <block type="serial_config" x="510" y="30">
+    <field name="BAUD">115200</field>
+  </block>
+  <block type="arduino_loop_section" x="990" y="30">
+    <statement name="DO">
+      <block type="arduino_typed_variable">
+        <field name="VAR">command</field>
+        <field name="TYPE">int32_t</field>
+        <value name="VALUE">
+          <block type="device_ir_command">
+            <field name="DEVICE">ir25</field>
           </block>
         </value>
-        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
+        <next>
+          <block type="controls_if">
+            <value name="IF0">
+              <block type="logic_compare">
+                <field name="OP">GTE</field>
+                <value name="A">
+                  <block type="variables_get">
+                    <field name="VAR">command</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="serial_send">
+                <field name="END">println</field>
+                <value name="VALUE">
+                  <block type="variables_get">
+                    <field name="VAR">command</field>
+                  </block>
+                </value>
+              </block>
+            </statement>
+          </block>
+        </next>
       </block>
-    </next>
-    <comment pinned="false" w="340" h="170">Purpose: Decode NEC infrared remote commands and print them to Serial.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    </statement>
+    <comment pinned="false" w="390" h="170">Read the next received command once into a variable. Print only valid frames; -1 means no frame. Open Monitor at 115200 and press buttons on an NEC remote. Avoid delay so new frames are handled promptly.</comment>
   </block>
 </xml>

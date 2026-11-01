@@ -1,3 +1,47 @@
+# Pro Mini capability, examples and Plotter audit — 2026-11-01
+
+- All 28 JavaScript suites, 20 Python backend tests and host C++ simulations pass.
+  All **84 numbered examples** generate C++, pass declared pin/timer validation,
+  and compile for `arduino:avr:pro:cpu=16MHzatmega168` with pinned dependencies.
+- Reference-board regressions cover disabled imported devices and AVR Servo
+  signed-byte calibration offsets, including rejection of wrapping values and
+  explicit 4 µs quantization. A generated 501–2501 µs core calibration request
+  compiles as the effective 504–2500 µs range (1,410 Flash / 50 static RAM bytes).
+- New examples: 72 LCD glyph/buffer (3,736 Flash / 354 static RAM bytes),
+  73 mixed Plotter instruments (4,430 / 215), 74 host math/live headers
+  (5,756 / 216), 75 RGB painting (2,892 / 203). Scanner 61 now uses hardware
+  Servo pulses and an image-plus-chart header (4,438 / 221).
+- Software tests execute generated START/STOP parsing, including split commands,
+  invalid/overflowing input, CRLF, restart and millis rollover. LCD tests cover
+  slot0, eight-row shape validation, row masking and unchanged legacy buffers.
+- Protocol tests cover 5,142 additional schema/math cases: bounded windows,
+  safe formulas without dynamic evaluation, undefined results, timestamp resets
+  and atomic rejection of bad data/headers. Acquisition UI tests verify bounded
+  retries, header revisions, multi-series instruments and image preservation.
+- Browser + PTY: Start sends START, receives a header and renders six concurrent
+  instruments; a live header adds a derived trace without erasing image pixels.
+  A 200-record capture contains 100 numeric samples + 100 pixels across three
+  configuration revisions. Both downloaded CSV and JSONL were parsed and checked.
+  PNG export preserves the 32×16 original raster. Stop leaves the connection open.
+- Browser editor: grouped catalogue loads 87 XML entries (84 numbered + 3 legacy),
+  a new Servo selects compatible hardware PWM with only D9/D10 available, and
+  Connections renders shared I2C claims from the same board model. Compile from
+  the browser succeeds for LCD glyph 72 plus the added hardware Servo: 4,204 Flash /
+  365 static RAM bytes. The installed HTTP service also compiles LCD glyph 72 (3,736 / 354) with the
+  updated sketchbook library while retaining its existing serial session.
+  No upload or physical motion/audio test was performed.
+
+Memory limits remain real: SD polyphonic example 69 leaves 196 SRAM bytes after
+static allocation, before stack and heap; radar 36f leaves 240 sketch bytes. The
+catalogue marks tight examples as advanced. Compilation and host simulations do
+not prove worst-case runtime memory, electrical wiring or peripheral timing.
+Other MCU families were not expanded in this iteration. The concrete extension
+plan is in [board-capabilities.md](board-capabilities.md).
+
+Earlier dated runs below describe their then-current versions.
+
+---
+
 # Pulse engines and timing audit — 2026-11-01
 
 - All 24 JavaScript suites and 20 Python backend tests pass. All 80 numbered XML

@@ -2,12 +2,12 @@
 
 This branch extends the classic BlocklyDuino editor with named devices, typed
 programming blocks, interrupts, streamed storage/images, music, workspace tools,
-and a shared Serial Monitor/Plotter. It includes 78 commented numbered examples and a
+and a shared Serial Monitor/Plotter. It includes 84 commented numbered examples and a
 Python 3 / Arduino CLI backend. The existing v2 subtree is unchanged.
 
 **Start here: [installation and usage](docs/GETTING-STARTED.md).**
 See [changes and architecture](docs/CLASSIC-EXTENSIONS.md),
-[testing and limits](docs/TESTING.md), and the in-app **Guide**.
+[testing and limits](docs/TESTING.md), the [Pro Mini reference capability model](docs/board-capabilities.md), and the in-app **Guide**.
 
 The following is the original upstream project documentation.
 

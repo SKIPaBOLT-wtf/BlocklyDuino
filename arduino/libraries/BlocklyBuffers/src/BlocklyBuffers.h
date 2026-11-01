@@ -3,10 +3,24 @@
 #include <Arduino.h>
 // Rows first by default, or xFirst for [column][row]. No whole-buffer copy.
 template<class D, class T, size_t N, size_t M>
-void bxLcdBuffer(D &d, const T (&b)[N][M], bool xFirst, uint16_t columns, uint16_t rows) {
+void bxLcdBuffer(D &d, const T (&b)[N][M], bool xFirst, uint16_t columns, uint16_t rows, bool zeroIsSpace=true) {
   const size_t width=xFirst?N:M, height=xFirst?M:N;
   for(size_t y=0;y<height && y<rows;++y){d.setCursor(0,y);
-    for(size_t x=0;x<width && x<columns;++x){uint8_t c=xFirst?b[x][y]:b[y][x];d.write(c?c:uint8_t(' '));}}
+    for(size_t x=0;x<width && x<columns;++x){uint8_t c=xFirst?b[x][y]:b[y][x];d.write(zeroIsSpace&&!c?uint8_t(' '):c);}}
+}
+// HD44780 CGRAM: eight 5x8 glyphs; bit 4 is the leftmost dot in each row.
+// Copy just eight bytes, since common LCD libraries require a mutable array.
+template<class D, class T, size_t N>
+bool bxLcdCreateGlyph(D &d, long slot, const T (&rows)[N]) {
+  static_assert(N==8,"LCD glyph needs exactly eight rows");
+  if(slot<0 || slot>7)return false;
+  uint8_t glyph[8];for(uint8_t i=0;i<8;++i)glyph[i]=uint8_t(rows[i])&31;
+  d.createChar(uint8_t(slot),glyph);return true;
+}
+template<class D>
+bool bxLcdShowGlyph(D &d,long slot,long column,long row,uint16_t columns,uint16_t rows) {
+  if(slot<0 || slot>7 || column<0 || row<0 || column>=columns || row>=rows)return false;
+  d.setCursor(uint8_t(column),uint8_t(row));d.write(uint8_t(slot));return true;
 }
 // Packed format: each byte is a vertical column of eight pixels, bit 0 at top.
 // Only one 8-byte tile is temporary; U8x8 sends it directly to display RAM.

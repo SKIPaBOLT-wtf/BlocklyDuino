@@ -6,7 +6,7 @@ From the repository root, install the dependencies in GETTING-STARTED.md, then:
 npm ci --ignore-scripts
 npm test
 .venv/bin/python -m unittest discover -s tests/serial-backend-tests -p 'test_*.py' -v
-python3 tools/compile-examples.py
+python3 tools/compile-examples.py --fqbn arduino:avr:pro:cpu=16MHzatmega168
 ```
 
 The Node suites use the actual bundled Blockly and jsdom. They test all numbered
@@ -72,3 +72,18 @@ hardware-only programs must retain weak default Timer1/Timer2 vectors, without
 linking the software audio ISR. These checks run in CI for AVR. Compiler commands
 explicitly select the bundled libraries so an older sketchbook copy cannot
 silently override them.
+
+## Pro Mini beginner workflow
+
+CI compiles all numbered examples for ATmega168 / 16 MHz. The grouped catalogue
+records measured Flash/static RAM and warns about small stack/heap margins.
+`guided-examples-tests` executes the generated START/STOP reader as C++ (including
+partial commands, overflow, CRLF and millis wrap), validates every example header
+and checks all named-device categories have examples. `capabilities.js` tests the
+reference board description and engine-aware selection.
+
+The Plotter advanced suite checks safe host formulas, windowed statistics and
+time-based derivatives/integrals; acquisition tests use a mocked shared Serial
+client. A PTY browser check sends START and STOP, replaces headers during a capture,
+exports CSV/JSONL/PNG, and verifies multiple instruments and preserved pixels.
+No physical board is required and no firmware is uploaded.

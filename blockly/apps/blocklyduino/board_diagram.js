@@ -3,6 +3,7 @@
  */
 (function(){'use strict';
  function layout(p){
+  if(p.capabilities&&p.capabilities.layout)return p.capabilities.layout;
   if(p.id==='pico')return{name:'Raspberry Pi Pico · USB at top',left:['0','1','GND','2','3','4','5','GND','6','7','8','9','GND','10','11','12','13','GND','14','15'],right:['VBUS','VSYS','GND','3V3_EN','3V3','ADC_VREF','28','AGND','27','26','RUN','22','GND','21','20','19','18','GND','17','16'],extra:['25'],physical:true};
   if(p.id==='bluepill')return{name:'Blue Pill F103 · USB at top',left:['VBAT','PC13','PC14','PC15','PA0','PA1','PA2','PA3','PA4','PA5','PA6','PA7','PB0','PB1','PB10','PB11','RESET','3V3','GND','GND'],right:['PB12','PB13','PB14','PB15','PA8','PA9','PA10','PA11','PA12','PA15','PB3','PB4','PB5','PB6','PB7','PB8','PB9','5V','GND','3V3'],extra:['PA13','PA14'],physical:false};
   if(p.id==='avr328'){

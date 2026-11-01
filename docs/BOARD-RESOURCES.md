@@ -16,6 +16,12 @@ move-to-top icon; press the gear again to save the order. Device types already
 used in the project remain highlighted and ahead of unused types. Each device
 has a colour setting behind the gear beside its name in Project devices. Its configuration, actions, toolbox accent and Connections card follow that colour. No colour field is displayed on a block or in Connections.
 
+The current Pro Mini ATmega168 reference is described by one versioned capability
+model; see [schema, allocation rules and development plan](board-capabilities.md).
+New Pro Mini devices prefer a free hardware engine. Explicit engine changes
+reassign only that device to compatible pins and report wiring changes. Imported
+XML retains its original engine and pins. Connections explains unavailable engines.
+
 ## Supported profiles
 
 | Board/core family | Analog pins | Default I²C | Default SPI (MOSI / MISO / SCK) | Servo resource |

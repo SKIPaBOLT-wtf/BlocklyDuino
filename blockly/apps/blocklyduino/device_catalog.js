@@ -67,7 +67,9 @@
       "device_lcd_print",
       "device_lcd_clear_row",
       "device_lcd_clear",
-      "device_lcd_backlight"
+      "device_lcd_backlight",
+      "device_lcd_create_glyph",
+      "device_lcd_show_glyph"
     ]
   },
   {

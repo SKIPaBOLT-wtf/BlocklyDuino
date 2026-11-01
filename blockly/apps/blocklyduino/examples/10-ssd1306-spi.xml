@@ -1,33 +1,130 @@
 <xml>
-  <block type="oled_ssd1306_spi_print" x="30" y="30">
-    <field name="ROW">0</field>
-    <value name="CONTENT">
-      <block type="text">
-        <field name="TEXT">Hello!</field>
+  <block type="device_oled_spi" x="30" y="30">
+    <mutation uid="oled10" />
+    <field name="NAME">screen</field>
+    <field name="CS">10</field>
+    <field name="DC">9</field>
+    <field name="RESET">8</field>
+    <comment pinned="false" w="390" h="170">SSD1306 128×64 SPI OLED: CS D10, DC D9, RESET D8, MOSI D11, SCK D13. Match the supply and input levels of your module. U8x8 sends text directly, so no full framebuffer consumes the 1 KB RAM.</comment>
+  </block>
+  <block type="arduino_typed_variable" x="510" y="30">
+    <field name="VAR">lastSample</field>
+    <field name="TYPE">uint32_t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
       </block>
     </value>
-    <next>
-      <block type="oled_ssd1306_spi_print">
-        <field name="ROW">2</field>
-        <value name="CONTENT">
-          <block type="inout_analog_read">
-            <field name="PIN">A0</field>
-            <comment pinned="false" w="340" h="160">Measure the voltage on this analog input. On ATmega168/328, the ADC returns 0–1023; other boards may use a different ADC range. A potentiometer wiper or analog sensor connects here.</comment>
+  </block>
+  <block type="arduino_typed_variable" x="990" y="30">
+    <field name="VAR">seconds</field>
+    <field name="TYPE">uint32_t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+  </block>
+  <block type="arduino_setup_section" x="30" y="290">
+    <statement name="DO">
+      <block type="device_oled_print">
+        <field name="DEVICE">oled10</field>
+        <value name="TEXT">
+          <block type="text">
+            <field name="TEXT">Tiny RAM, big fun</field>
           </block>
         </value>
-        <next>
-          <block type="base_delay">
-            <value name="DELAY_TIME">
-              <block type="math_number">
-                <field name="NUM">500</field>
+        <value name="COL">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="ROW">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <comment pinned="false" w="390" h="170">Initialize the named SPI OLED once and write a heading. Text coordinates are character cells: columns 0–15, rows 0–7.</comment>
+  </block>
+  <block type="arduino_loop_section" x="510" y="290">
+    <statement name="DO">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="logic_compare">
+            <field name="OP">GTE</field>
+            <value name="A">
+              <block type="math_arithmetic">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <block type="arduino_millis" />
+                </value>
+                <value name="B">
+                  <block type="variables_get">
+                    <field name="VAR">lastSample</field>
+                  </block>
+                </value>
               </block>
             </value>
-            <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
+            <value name="B">
+              <block type="math_number">
+                <field name="NUM">1000</field>
+              </block>
+            </value>
           </block>
-        </next>
+        </value>
+        <statement name="DO0">
+          <block type="variables_set">
+            <field name="VAR">lastSample</field>
+            <value name="VALUE">
+              <block type="arduino_millis" />
+            </value>
+            <next>
+              <block type="device_oled_print">
+                <field name="DEVICE">oled10</field>
+                <value name="TEXT">
+                  <block type="variables_get">
+                    <field name="VAR">seconds</field>
+                  </block>
+                </value>
+                <value name="COL">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="ROW">
+                  <block type="math_number">
+                    <field name="NUM">3</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="variables_set">
+                    <field name="VAR">seconds</field>
+                    <value name="VALUE">
+                      <block type="math_arithmetic">
+                        <field name="OP">ADD</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">seconds</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">1</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <comment pinned="false" w="390" h="170">Use elapsed milliseconds instead of delay. The command reader remains responsive between updates; unsigned subtraction also works when millis wraps.</comment>
       </block>
-    </next>
-    <comment pinned="false" w="340" h="170">Purpose: Show text on an SSD1306 display over hardware SPI.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    </statement>
+    <comment pinned="false" w="390" h="170">Update the seconds counter once per second. For pixel patterns see the packed-buffer lesson; small tiles work on ATmega168.</comment>
   </block>
 </xml>

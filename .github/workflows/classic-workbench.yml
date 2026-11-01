@@ -49,5 +49,5 @@ jobs:
           version: '1.5.1'
       - run: npm ci --ignore-scripts
       - run: python3 tools/install-arduino.py
-      - run: python3 tools/compile-examples.py
+      - run: python3 tools/compile-examples.py --fqbn arduino:avr:pro:cpu=16MHzatmega168
       - run: python3 tools/compile-pulse-probes.py
