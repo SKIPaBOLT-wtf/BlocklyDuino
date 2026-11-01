@@ -1569,7 +1569,7 @@
         </value>
         <statement name="DO0">
           <block type="serial_template">
-            <field name="TEXT">@plot {"version":1,"id":"photocell","title":"Photocell scanner","description":"A0 light; D9 pan, D10 tilt. Start scans; changes restart.","fields":[{"id":"adc","min":0,"max":1023}],"widgets":[{"type":"image","image":{"id":"scan","width":{{imageWidth}},"height":{{imageHeight}},"mode":"gray","max":{{maximumValue}}}},{"type":"line","fields":["adc"]}],"controls":[{"id":"width","type":"number","label":"Image width (px)","min":{{minWidth}},"max":{{maxWidth}},"value":{{imageWidth}}},{"id":"height","type":"number","label":"Image height (px)","min":1,"max":{{maxHeight}},"value":{{imageHeight}}},{"id":"levels","type":"number","label":"Brightness levels","min":2,"max":65536,"value":{{brightnessLevels}}},{"id":"gain","type":"number","label":"Light gain (%)","min":0,"max":1600,"value":{{gainPercent}}},{"id":"offset","type":"number","label":"Light offset (ADC)","min":-16384,"max":16384,"value":{{offset}}},{"id":"samples","type":"number","label":"Samples per pixel","min":1,"max":{{maxSamples}},"value":{{multiSamples}}},{"id":"low","type":"number","label":"Black signal (ADC)","min":0,"max":{{lowMaximum}},"value":{{signalLow}}},{"id":"high","type":"number","label":"White signal (ADC)","min":{{highMinimum}},"max":1023,"value":{{signalHigh}}},{"id":"sweep","type":"number","label":"Time per row (ms)","min":{{minSweepMs}},"max":2147483,"value":{{sweepMs}}},{"id":"pan0","type":"number","label":"Pan start (us)","min":544,"max":2400,"value":{{panStartUs}}},{"id":"pan1","type":"number","label":"Pan end (us)","min":544,"max":2400,"value":{{panEndUs}}},{"id":"tilt0","type":"number","label":"Tilt start (us)","min":544,"max":2400,"value":{{tiltStartUs}}},{"id":"tilt1","type":"number","label":"Tilt end (us)","min":544,"max":2400,"value":{{tiltEndUs}}},{"id":"transition","type":"number","label":"Between-row move (ms)","min":0,"max":2147483,"value":{{transitionMs}}},{"id":"settle","type":"number","label":"Row settling (ms)","min":0,"max":2147483,"value":{{settleMs}}},{"id":"both","type":"checkbox","label":"Scan both directions","value":{{bidirectional}}},{"id":"skip","type":"number","label":"Skip line start pixels","min":0,"max":{{maxSkip}},"value":{{skipPixels}}}]}</field>
+            <field name="TEXT">@plot {"version":1,"id":"photocell","title":"Photocell scanner","description":"A0 light; D9 pan; D10 tilt.","fields":[{"id":"adc","min":0,"max":1023}],"widgets":[{"type":"image","image":{"id":"scan","width":{{imageWidth}},"height":{{imageHeight}},"mode":"gray","max":{{maximumValue}}}},{"type":"line","fields":["adc"]}],"controls":[{"id":"width","type":"number","label":"Width (px)","min":{{minWidth}},"max":{{maxWidth}},"value":{{imageWidth}}},{"id":"height","type":"number","label":"Height (px)","min":1,"max":{{maxHeight}},"value":{{imageHeight}}},{"id":"levels","type":"number","label":"Levels","min":2,"max":65536,"value":{{brightnessLevels}}},{"id":"gain","type":"number","label":"Gain (%)","min":0,"max":1600,"value":{{gainPercent}}},{"id":"offset","type":"number","label":"Offset (ADC)","min":-16384,"max":16384,"value":{{offset}}},{"id":"samples","type":"number","label":"Samples/pixel","min":1,"max":{{maxSamples}},"value":{{multiSamples}}},{"id":"low","type":"number","label":"Black (ADC)","min":0,"max":{{lowMaximum}},"value":{{signalLow}}},{"id":"high","type":"number","label":"White (ADC)","min":{{highMinimum}},"max":1023,"value":{{signalHigh}}},{"id":"sweep","type":"number","label":"Row time (ms)","min":{{minSweepMs}},"max":2147483,"value":{{sweepMs}}},{"id":"pan0","type":"number","label":"Pan start (us)","min":544,"max":2400,"value":{{panStartUs}}},{"id":"pan1","type":"number","label":"Pan end (us)","min":544,"max":2400,"value":{{panEndUs}}},{"id":"tilt0","type":"number","label":"Tilt start (us)","min":544,"max":2400,"value":{{tiltStartUs}}},{"id":"tilt1","type":"number","label":"Tilt end (us)","min":544,"max":2400,"value":{{tiltEndUs}}},{"id":"transition","type":"number","label":"Row move (ms)","min":0,"max":2147483,"value":{{transitionMs}}},{"id":"settle","type":"number","label":"Settle (ms)","min":0,"max":2147483,"value":{{settleMs}}},{"id":"both","type":"checkbox","label":"Scan both directions","value":{{bidirectional}}},{"id":"skip","type":"number","label":"Skip line start pixels","min":0,"max":{{maxSkip}},"value":{{skipPixels}}}]}</field>
             <field name="END">println</field>
             <value name="ARG_imageWidth">
               <block type="variables_get">
@@ -1716,7 +1716,7 @@
         </statement>
         <statement name="ELSE">
           <block type="serial_text">
-            <field name="TEXT">@plot {"version":1,"id":"error","description":"Fix Parameters and upload again.","fields":[],"widgets":[]}</field>
+            <field name="TEXT">@plot {"version":1,"id":"error","description":"Fix Parameters; upload.","fields":[],"widgets":[]}</field>
             <field name="END">println</field>
           </block>
         </statement>
@@ -2103,7 +2103,7 @@
                 <field name="NAME">announcePlotter</field>
                 <next>
                   <block type="serial_text">
-                    <field name="TEXT">@msg Rejected. Check limits; press Start.</field>
+                    <field name="TEXT">@msg Rejected; check limits. Start.</field>
                     <field name="END">println</field>
                   </block>
                 </next>
@@ -2180,7 +2180,7 @@
                                 </value>
                                 <next>
                                   <block type="serial_text">
-                                    <field name="TEXT">@msg Stopped. Start scans again.</field>
+                                    <field name="TEXT">@msg Stopped. Start to scan.</field>
                                     <field name="END">println</field>
                                   </block>
                                 </next>
@@ -3845,7 +3845,7 @@
                         </value>
                         <next>
                           <block type="serial_text">
-                            <field name="TEXT">@msg Timing overrun: slower row or fewer samples; Start.</field>
+                            <field name="TEXT">@msg Timing overrun: slow down; Start.</field>
                             <field name="END">println</field>
                           </block>
                         </next>

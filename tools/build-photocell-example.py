@@ -40,23 +40,23 @@ def micros_servo(uid, value):
 # One definition supplies the initial parameter block, control and receive rule.
 # Dynamic bounds use derived variables recalculated whenever a setting changes.
 PARAMETERS = [
-    ('width', 'imageWidth', 'int32_t', 32, 'Image width', 'px', 'minWidth', 'maxWidth', 1,
+    ('width', 'imageWidth', 'int32_t', 32, 'Width', 'px', 'minWidth', 'maxWidth', 1,
      'Columns in the computer image. Higher resolution automatically lengthens Time per row if ADC or Serial throughput requires it. Width must exceed Skip line start pixels.'),
-    ('height', 'imageHeight', 'int32_t', 24, 'Image height', 'px', 1, 'maxHeight', 1,
+    ('height', 'imageHeight', 'int32_t', 24, 'Height', 'px', 1, 'maxHeight', 1,
      'Rows in the computer image. Its size does not allocate an image buffer on Arduino.'),
-    ('levels', 'brightnessLevels', 'int32_t', 1024, 'Brightness levels', '', 2, 65536, 1,
+    ('levels', 'brightnessLevels', 'int32_t', 1024, 'Levels', '', 2, 65536, 1,
      'Output values are 0 through levels-1. The ADC is still 10-bit; rescaling does not add sensor information.'),
-    ('gain', 'gainPercent', 'int32_t', 100, 'Light gain', '%', 0, 1600, 1,
+    ('gain', 'gainPercent', 'int32_t', 100, 'Gain', '%', 0, 1600, 1,
      '100% means 1x gain; 125% means 1.25x. Multiply the averaged ADC reading, then add offset. Whole percent steps avoid a floating-point command parser on the small ATmega168.'),
-    ('offset', 'offset', 'int32_t', 0, 'Light offset', 'ADC', -16384, 16384, 1,
+    ('offset', 'offset', 'int32_t', 0, 'Offset', 'ADC', -16384, 16384, 1,
      'Add this signed ADC-count offset after gain, before mapping the black/white signal range.'),
-    ('samples', 'multiSamples', 'int32_t', 4, 'Samples per pixel', '', 1, 'maxSamples', 1,
+    ('samples', 'multiSamples', 'int32_t', 4, 'Samples/pixel', '', 1, 'maxSamples', 1,
      'Average this many readings spread through each pixel cell while the servo keeps moving.'),
-    ('low', 'signalLow', 'int32_t', 0, 'Black signal', 'ADC', 0, 'lowMaximum', 1,
+    ('low', 'signalLow', 'int32_t', 0, 'Black', 'ADC', 0, 'lowMaximum', 1,
      'Corrected readings at or below this become black. Must be lower than White signal.'),
-    ('high', 'signalHigh', 'int32_t', 1023, 'White signal', 'ADC', 'highMinimum', 1023, 1,
+    ('high', 'signalHigh', 'int32_t', 1023, 'White', 'ADC', 'highMinimum', 1023, 1,
      'Corrected readings at or above this become white. Must be higher than Black signal.'),
-    ('sweep', 'sweepMs', 'int32_t', 3000, 'Time per row', 'ms', 'minSweepMs', 2147483, 1,
+    ('sweep', 'sweepMs', 'int32_t', 3000, 'Row time', 'ms', 'minSweepMs', 2147483, 1,
      'Pan moves from one endpoint to the other in this time. Larger means slower. A higher resolution automatically increases this time only if ADC/Serial throughput requires it.'),
     ('pan0', 'panStartUs', 'int32_t', 1100, 'Pan start', 'us', PULSE_MIN, PULSE_MAX, 1,
      'Servo pulse for the left edge. It may be greater than Pan end to reverse the physical axis.'),
@@ -66,9 +66,9 @@ PARAMETERS = [
      'Servo pulse for the top row. Reversed endpoints are allowed.'),
     ('tilt1', 'tiltEndUs', 'int32_t', 1800, 'Tilt end', 'us', PULSE_MIN, PULSE_MAX, 1,
      'Servo pulse for the bottom row. A one-row image samples midway between the endpoints.'),
-    ('transition', 'transitionMs', 'int32_t', 250, 'Between-row move', 'ms', 0, 2147483, 1,
+    ('transition', 'transitionMs', 'int32_t', 250, 'Row move', 'ms', 0, 2147483, 1,
      'Time to interpolate from the held pose to the next row. This also handles return from the last row to the first.'),
-    ('settle', 'settleMs', 'int32_t', 100, 'Row settling', 'ms', 0, 2147483, 1,
+    ('settle', 'settleMs', 'int32_t', 100, 'Settle', 'ms', 0, 2147483, 1,
      'Extra wait after a row transition. There is no stop or settling delay between pixels.'),
     ('both', 'bidirectional', 'int32_t', 1, 'Scan both directions', '', 0, 1, 1,
      '1: alternate forward/reverse rows. 0: scan every row from Pan start to Pan end; return without taking measurements.'),
@@ -99,7 +99,7 @@ def header_block():
             if isinstance(bound, str): bindings[bound] = var(bound)
     profile = {
         'version': 1, 'id': 'photocell', 'title': 'Photocell scanner',
-        'description': 'A0 light; D9 pan, D10 tilt. Start scans; changes restart.',
+        'description': 'A0 light; D9 pan; D10 tilt.',
         'fields': [{'id': 'adc', 'min': 0, 'max': 1023}],
         'widgets': [{'type': 'image', 'image': {'id': 'scan', 'width': '{{imageWidth}}', 'height': '{{imageHeight}}', 'mode': 'gray', 'max': '{{maximumValue}}'}},
                     {'type': 'line', 'fields': ['adc']}],
@@ -171,7 +171,7 @@ def build():
     ), 'Check edited defaults before division or motion. Row time is at most 2147483 ms; skip < width keeps row plus delayed samples below one unsigned micros() wrap. Runtime controls use the same limits and retain rejected values.')
 
     announce = collapsed('announcePlotter', iff(var('settingsValid'), header_block(),
-        message('@plot {"version":1,"id":"error","description":"Fix Parameters and upload again.","fields":[],"widgets":[]}')),
+        message('@plot {"version":1,"id":"error","description":"Fix Parameters; upload.","fields":[],"widgets":[]}')),
         'Send the current header from setup, Start and every accepted setting change. No stale copied defaults: the template inputs are the actual parameters. Motion is held while this long header is transmitted.')
 
     write_servos = collapsed('writeServoTargets', chain(micros_servo('scanpan', var('currentPanUs')), micros_servo('scantilt', var('currentTiltUs'))),
@@ -193,14 +193,14 @@ def build():
         iff(both(var('streaming'), var('settingsValid')), call('restartScan'), assign('streaming', flag(False)))) ,
         'An accepted change holds the current servo pulses, regenerates the header from the new parameters, then restarts coherently. The explicit image-clear message starts a clean image; a completed unchanged raster simply overwrites pixels.')
     rejected = collapsed('rejectSetting', chain(assign('phase', n(0)), assign('streaming', flag(False)), call('announcePlotter'),
-        message('@msg Rejected. Check limits; press Start.')),
+        message('@msg Rejected; check limits. Start.')),
         'A bad input never replaces its parameter. Pause, resend canonical values to restore the controls, and tell the user what to do next.')
 
     # The generic reader is bounded and consumes only available bytes. All scanner
     # logic below remains ordinary named functions, variables and math blocks.
     receive_cases = [block('serial_when_command', {'COMMAND': 'START'}, statements={'DO': chain(assign('streaming', flag(True)), assign('settingsDirty', flag(True)))}),
         block('serial_when_command', {'COMMAND': 'STOP'}, statements={'DO': chain(
-            assign('streaming', flag(False)), assign('phase', n(0)), message('@msg Stopped. Start scans again.'))})]
+            assign('streaming', flag(False)), assign('phase', n(0)), message('@msg Stopped. Start to scan.'))})]
     for id_, name, kind, initial, label, unit, lo, hi, step, note in PARAMETERS:
         receive_cases.append(block('serial_set_number', {'COMMAND': '@set ' + id_, 'VAR': name},
             {'MIN': limit(lo), 'MAX': limit(hi), 'STEP': n(step)},
@@ -240,7 +240,7 @@ def build():
             assign('pixel', op('ADD', var('pixel'), n(1))), assign('samplesTaken', n(0)), assign('sampleSum', n(0)),
             assign('nextSampleUs', op('ADD', op('MULTIPLY', var('pixel'), var('pixelPeriodUs')), var('firstSampleUs'))))))
     late = chain(assign('streaming', flag(False)), assign('phase', n(0)),
-        message('@msg Timing overrun: slower row or fewer samples; Start.'))
+        message('@msg Timing overrun: slow down; Start.'))
     sample_service = collapsed('serviceSamples', chain(declare('sampleElapsedUs', 'uint32_t', elapsed('phaseStartedUs')),
         iff(both(compare('LT', var('pixel'), var('imageWidth')), compare('GTE', var('sampleElapsedUs'), var('nextSampleUs'))),
         iff(compare('GT', op('MINUS', var('sampleElapsedUs'), var('nextSampleUs')), var('samplePeriodUs')), late, sample))),
