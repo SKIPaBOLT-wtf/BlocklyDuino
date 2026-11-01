@@ -22,7 +22,11 @@
  function validate(ws){var bs=ws.getAllBlocks().filter(active),ss=bs.filter(function(b){return types[b.type];}),names=Object.create(null),usedPins=Object.create(null),groups=Object.create(null);ss.forEach(function(b){var n=b.getFieldValue('NAME'),pin=b.getFieldValue('PIN');if(b.getParent())throw Error('Place interrupt handlers outside setup, loop and functions.');if(!/^[A-Za-z][A-Za-z0-9_]*$/.test(n))throw Error('Interrupt name must start with a letter and use letters, digits or underscores.');if(names[n])throw Error('Give every interrupt source a unique name: '+n);names[n]=true;if(usedPins[pin])throw Error('Only one named interrupt handler may use pin '+pin+'.');usedPins[pin]=true;if(b.type==='irq_external'&&['2','3'].indexOf(pin)<0)throw Error('External interrupts on this Pro Mini use D2 or D3.');if(b.type==='irq_pin_change'){var m=mapping(pin);groups['PCINT'+m.group+'_vect']=true;}validateBody(b);});
  bs.filter(function(b){return b.type==='irq_timer1';}).forEach(validateBody);
  var external=ss.some(function(b){return b.type==='irq_external';});bs.forEach(function(b){if(b.type==='avr_isr'){var v=b.getFieldValue('VECTOR');if(groups[v]||(external&&(v==='INT0_vect'||v==='INT1_vect')))throw Error('Interrupt vector '+v+' is already owned by the named pin interrupt blocks.');}});return ss;}
- var oldInit=A.init;A.init=function(ws){oldInit.call(this,ws);A.irqSources_=validate(ws);};
+ var oldInit=A.init;A.init=function(ws){oldInit.call(this,ws);A.irqSources_=validate(ws);
+  // User procedures can attach/detach sources. Reserve declarations before
+  // procedure generation; finish() inserts their bodies later.
+  if(A.irqSources_.length)A.definitions_.irq_prototypes=A.irqSources_.map(function(b){return 'static void '+symbol(b)+'_callback();\nstatic void '+symbol(b)+'_setEnabled(bool enabled);';}).join('\n');
+ };
  var oldFinish=A.finish;A.finish=function(code){var ss=A.irqSources_||[];if(ss.length){
  A.definitions_.irq_guard='#if !defined(__AVR_ATmega168__) && !defined(__AVR_ATmega168A__) && !defined(__AVR_ATmega168P__) && !defined(__AVR_ATmega168PA__) && !defined(__AVR_ATmega328__) && !defined(__AVR_ATmega328P__)\n#error "Named pin interrupt blocks target ATmega168/328(P) Pro Mini / Uno pin mapping"\n#endif';
  A.definitions_.irq_includes='#include <avr/interrupt.h>\n#include <util/atomic.h>';

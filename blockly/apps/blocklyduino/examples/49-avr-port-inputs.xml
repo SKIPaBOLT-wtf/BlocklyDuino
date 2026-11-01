@@ -46,8 +46,9 @@
         <comment pinned="false" w="340" h="160">Choose input/output direction for the selected AVR port bits. Other bits are preserved. This is hardware-specific; use the board diagram to identify the affected pins.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Purpose: Read an AVR input and configure its pull-up through port registers.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Configure an AVR port input and pull-up with masks, then read its bit without changing neighbouring pins.
+Wiring: Button between D2 and GND; observe the built-in D13 LED.
+Try: Press and release the D2 button and watch D13 follow the port input.</comment>
   </block>
   <block type="arduino_loop_section" x="25" y="345">
     <statement name="DO">
@@ -65,6 +66,5 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
         <comment pinned="false" w="340" h="160">Change a single AVR output bit directly. Set its direction to output first. Direct register operations bypass the usual digitalWrite overhead.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

@@ -28,7 +28,8 @@
         <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
       </block>
     </next>
-    <comment pinned="false" w="340" h="170">Purpose: Read a button using a pull-up and control the LED. Pressed means LOW.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Read a button and change an LED. The input needs the pull-up or wiring described in the blocks.
+Wiring: Button between D2 and GND; internal pull-up is enabled. The output is the built-in D13 LED.
+Try: Swap the HIGH/LOW actions to make the LED light when the button is released.</comment>
   </block>
 </xml>

@@ -5,7 +5,9 @@
     <field name="DATA">8</field>
     <field name="CLOCK">9</field>
     <field name="LATCH">10</field>
-    <comment pinned="false" w="390" h="170">74HC595 SER→D8, SRCLK→D9, RCLK→D10; OE→GND, MR→VCC, VCC/GND as appropriate. Use a resistor per LED on Q0–Q7. The named action reuses these three wires.</comment>
+    <comment pinned="false" w="390" h="170">Purpose: Send a shifting one-bit pattern to a 74HC595 so one LED chases across eight outputs. Wiring is declared once.
+Wiring: 74HC595: DATA D8, CLOCK D9, LATCH D10. Common GND; use each module’s required supply.
+Try: Reverse the shift direction or increase the 150 ms interval.</comment>
   </block>
   <block type="arduino_typed_variable" x="510" y="30">
     <field name="VAR">position</field>

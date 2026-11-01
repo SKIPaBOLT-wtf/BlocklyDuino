@@ -5,7 +5,9 @@
     <field name="CS">10</field>
     <field name="DC">9</field>
     <field name="RESET">8</field>
-    <comment pinned="false" w="390" h="170">SSD1306 128×64 SPI OLED: CS D10, DC D9, RESET D8, MOSI D11, SCK D13. Match the supply and input levels of your module. U8x8 sends text directly, so no full framebuffer consumes the 1 KB RAM.</comment>
+    <comment pinned="false" w="390" h="170">Purpose: Count seconds on an SSD1306 SPI OLED using a named device and no framebuffer. Update with millis timing.
+Wiring: SSD1306 SPI OLED: CS D10, DC D9, RESET D8; SPI MOSI D11, SCK D13; MISO is unused; CS/DC/RESET as listed. Common GND; use each module’s required supply.
+Try: Edit the heading or move the counter to another text row.</comment>
   </block>
   <block type="arduino_typed_variable" x="510" y="30">
     <field name="VAR">lastSample</field>

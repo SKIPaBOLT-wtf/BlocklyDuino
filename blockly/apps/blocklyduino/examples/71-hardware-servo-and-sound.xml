@@ -7,7 +7,9 @@
     <field name="MIN_US">1000</field>
     <field name="MAX_US">2000</field>
     <field name="FRAME_HZ">50</field>
-    <comment pinned="false" w="370" h="185">Purpose: A hardware PWM servo and a hardware buzzer run with no per-edge software ISR. AVR: servo D9/Timer1, buzzer D11/Timer2. Servo uses calibrated 1000–2000 µs endpoints at 50 Hz. Other supported boards require selecting compatible pins in Connections. Confirm the servo supports these pulse limits before connecting it.</comment>
+    <comment pinned="false" w="370" h="185">Purpose: Use a potentiometer to control hardware Servo pulses on D9 while a hardware buzzer on D11 plays a melody. Timer1 and Timer2 have separate owners.
+Wiring: Servo: PIN D9; Passive buzzer: PIN D11; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.
+Try: Turn A0 and edit the melody. Servo and sound use separate hardware timers.</comment>
   </block>
   <block type="music_buzzer" x="25" y="290">
     <mutation uid="hwbuzzer71" />

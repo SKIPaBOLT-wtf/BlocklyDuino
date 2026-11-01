@@ -3,8 +3,9 @@
     <mutation uid="card36" />
     <field name="NAME">card</field>
     <field name="CS">10</field>
-    <comment pinned="false" w="340" h="170">Purpose: Combine a servo scan and range readings with a BMP stored on SD. Memory is tight on ATmega168.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Sweep a servo, measure distance, and draw results into an SD BMP. This combined sketch has little memory margin on ATmega168.
+Wiring: SPI SD card: CS D10; Servo: PIN D9; HC-SR04: TRIG D5, ECHO D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.
+Try: Move an object in the scan arc. Inspect the completed BMP; keep this small-memory combined project advanced.</comment>
   </block>
   <block type="device_servo" x="340" y="25">
     <mutation uid="pan36" />
@@ -204,7 +205,6 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
                                         <comment pinned="false" w="340" h="160">Ask the filesystem to write buffered file data to the card. Flushing every sample can be slow; use it at a useful checkpoint and close the file when finished.</comment>
                                       </block>
                                     </next>
-                                    <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
                                   </block>
                                 </next>
                                 <comment pinned="false" w="340" h="170">Create distance as float. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
@@ -224,14 +224,11 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
                     <comment pinned="false" w="340" h="170">Repeat the body with angle taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
                   </block>
                 </statement>
-                <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
               </block>
             </next>
           </block>
         </statement>
-        <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
 </xml>

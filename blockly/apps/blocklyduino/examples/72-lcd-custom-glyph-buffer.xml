@@ -5,7 +5,9 @@
     <field name="ADDR">0x27</field>
     <field name="COLS">20</field>
     <field name="ROWS">4</field>
-    <comment pinned="false" w="390" h="170">Two faces chase each other on a 20×4 HD44780 LCD with PCF8574 I2C backpack. Pro Mini SDA=A4, SCL=A5. Adjust 0x27 if your module differs. Eight row bytes draw a reusable 5×8 glyph; an 80-byte frame holds character codes.</comment>
+    <comment pinned="false" w="390" h="170">Purpose: Define a 5×8 face in LCD glyph slot 0, then animate two faces through an 80-byte raw-code buffer. Eight slots and variable indices are supported.
+Wiring: HD44780 I2C LCD: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.
+Try: Edit the eight faceRows values (0–31), or define a second face in slot 1.</comment>
   </block>
   <block type="arduino_array_declare" x="510" y="30">
     <field name="VAR">faceRows</field>

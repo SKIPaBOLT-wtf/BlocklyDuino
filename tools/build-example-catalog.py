@@ -82,11 +82,11 @@ def sketch_libraries(file,row,owners,deps):
         'transitive':[{ 'library':key,'viaHeaders':sorted(value)} for key,value in sorted(via.items())]
     }
 names={
-'01':'Blink the built-in LED','02':'Serial hello','03':'Potentiometer values in Monitor','04':'Potentiometer dims a PWM LED','05':'Button controls an LED','06':'Traffic lights','07':'DS18B20 thermometer + Plotter','08':'16×2 I2C LCD hello','09':'16×2 LCD potentiometer','10':'SPI OLED uptime counter','11':'ST7735 colour TFT text','12':'Find I2C device addresses','13':'0.91-inch I2C OLED text','14':'Grove RGB LCD','15':'Single piezo beep','16':'Simple piezo melody','17':'DS18B20 temperature on LCD','18':'20×4 LCD animation (legacy helper)','19':'20×4 LCD potentiometer','20':'Servo sweep (core timer library)','21':'28BYJ stepper (blocking legacy lesson)','22':'DHT22 climate + Plotter','23':'HC-SR04 distance in Monitor','24':'NeoPixel colour cycle','25':'NEC remote commands','26':'74HC595 chasing LED','27':'STEP/DIR stepping (legacy helper)','28':'20×4 animation made from blocks','29':'STEP/DIR acceleration (legacy helper)','30':'Named 28BYJ: accelerated back and forth','31':'Setup, loop, function and variable','32':'Math operations','33':'Array animation with millis timing','34':'Local variables and 2D arrays','35a':'Named stepper: position targets','35b':'Named 20×4 I2C LCD','35c':'Servo and distance sensor sweep','36a':'I2C EEPROM: values and text','36b':'SPI EEPROM: values and text','36c':'SPI Flash: erase, write, read','36d':'SD text file','36e':'SD BMP: coordinate pixels','36f':'Radar measurements → BMP','37':'Stream monochrome BMP to SD','38a':'Buzzer: nonblocking beep','38b':'Three independent melody voices','38c':'Melody with rests','39':'SD text-note melody','40':'Polar scan → streamed BMP','41':'Multidimensional arrays and variable indices','42':'BMP grayscale levels','43':'RGB BMP gradient','44':'1024-shade grayscale PGM','45':'High-depth RGB PPM','46':'Typed function arguments and results','47':'Pack flags and bit fields','48':'AVR direct-port blink','49':'AVR input and pull-up','50':'Direct-port byte driver','51':'Read SPI Flash JEDEC ID','52':'I2C register read','53':'Interrupt counter with atomic snapshot','54':'Bidirectional Serial echo','55':'Plotter: automatic lines','56':'Plotter: potentiometer dashboard','57':'External interrupt edge counter','58':'Pin-change counters','59':'Timer1 periodic interrupt','60':'Attach and detach interrupts','61':'Photocell scanner: image + chart','62':'Continuous stepper: potentiometer ramp','63':'Servo pulse width in microseconds','64':'LCD character buffer','65':'OLED packed pixel tile','66':'NeoPixel RGB buffer','67':'TFT RGB565 tile','68':'A note read from a variable','69':'Polyphonic SD score','70':'Timer1 stepper: fine speed commands','71':'Hardware Servo + hardware sound','72':'LCD custom faces from a buffer','73':'Plotter: multiple instruments together','74':'Plotter: PC math and live configuration','75':'Plotter: RGB painting, no extra hardware'}
+'01':'Blink the built-in LED','02':'Serial hello','03':'Potentiometer values in Monitor','04':'Potentiometer dims a PWM LED','05':'Button controls an LED','06':'Traffic lights','07':'DS18B20 thermometer + Plotter','08':'16×2 I2C LCD hello','09':'16×2 LCD potentiometer','10':'SPI OLED uptime counter','11':'ST7735 colour TFT text','12':'Find I2C device addresses','13':'0.91-inch I2C OLED text','14':'Grove RGB LCD','15':'Single piezo beep','16':'Simple piezo melody','17':'DS18B20 temperature on LCD','18':'20×4 LCD animation (legacy helper)','19':'20×4 LCD potentiometer','20':'Servo sweep (core timer library)','21':'28BYJ stepper (blocking legacy lesson)','22':'DHT22 climate + Plotter','23':'HC-SR04 distance gauge','24':'NeoPixel colour cycle','25':'Read NEC remote buttons','26':'74HC595 chasing LED','27':'STEP/DIR stepping (legacy helper)','28':'20×4 animation made from blocks','29':'STEP/DIR acceleration (legacy helper)','30':'Named 28BYJ: accelerated back and forth','31':'Setup, loop, function and variable','32':'Math operations','33':'Array animation with millis timing','34':'Local variables and 2D arrays','35a':'Named stepper: position targets','35b':'Named 20×4 I2C LCD','35c':'Servo and distance sensor sweep','36a':'I2C EEPROM: values and text','36b':'SPI EEPROM: values and text','36c':'SPI Flash: erase, write, read','36d':'SD text file','36e':'SD BMP: coordinate pixels','36f':'Radar measurements → BMP','37':'Stream monochrome BMP to SD','38a':'Buzzer: nonblocking beep','38b':'Three independent melody voices','38c':'Melody with rests','39':'SD text-note melody','40':'Polar scan → streamed BMP','41':'Multidimensional arrays and variable indices','42':'BMP grayscale levels','43':'RGB BMP gradient','44':'1024-shade grayscale PGM','45':'High-depth RGB PPM','46':'Typed function arguments and results','47':'Pack flags and bit fields','48':'AVR direct-port blink','49':'AVR input and pull-up','50':'Direct-port byte driver','51':'Read SPI Flash JEDEC ID','52':'I2C register read','53':'Interrupt counter with atomic snapshot','54':'Send text and receive the board’s reply','55':'Interactive LED lab: your first controls','56':'Plotter: potentiometer dashboard','57':'External interrupt edge counter','58':'Pin-change counters','59':'Timer1 periodic interrupt','60':'Attach and detach interrupts','61':'Photocell scanner: image + chart','62':'Continuous stepper: potentiometer ramp','63':'Servo pulse width in microseconds','64':'LCD character buffer','65':'OLED packed pixel tile','66':'NeoPixel RGB buffer','67':'TFT RGB565 tile','68':'A note read from a variable','69':'Polyphonic SD score','70':'Timer1 stepper: fine speed commands','71':'Hardware Servo + hardware sound','72':'LCD custom faces from a buffer','73':'Plotter: multiple instruments together','74':'Plotter: PC math and live configuration','75':'Plotter: RGB painting, no extra hardware'}
 recommended={'01','03','04','05','07','10','12','22','25','26','30','31','35b','36a','36b','36c','36d','37','38b','41','47','51','52','54','55','56','57','60','61','62','64','65','66','67','68','69','70','71','72','73','74','75'}
 advanced={'34','36c','36e','36f','37','38b','39','40','42','43','44','45','46','47','48','49','50','51','52','53','58','59','60','61','65','67','69','70','71','73','74'}
 groups=[('Start here',{'01','02','03','04','05','06','12','31','32','33','34','41','46'}),('Sensors and input',{'07','17','22','23','25'}),('Displays and LED outputs',{'08','09','10','11','13','14','18','19','24','26','28','35b','64','65','66','67','72'}),('Motors and motion',{'20','21','27','29','30','35a','35c','62','63','70','71'}),('Sound and music',{'15','16','38a','38b','38c','39','68','69'}),('Memory, files and images',{'36a','36b','36c','36d','36e','36f','37','40','42','43','44','45'}),('Ports, bits and interrupts',{'47','48','49','50','51','52','53','57','58','59','60'}),('Serial Monitor and Plotter',{'54','55','56','61','73','74','75'})]
-plotter={'07':['line','gauge'],'22':['line','gauge','raw'],'55':['auto-line'],'56':['line','gauge','bar','raw'],'61':['image-gray','line','gauge'],'73':['line-multiple','gauge-multiple','bar-multiple','xy-multiple','raw'],'74':['line-multiple','gauge-multiple','raw','math','live-header'],'75':['image-rgb','line-multiple','bar-multiple']}
+plotter={'12':['messages'],'23':['gauge','line'],'25':['raw'],'31':['line','raw'],'32':['messages'],'33':['messages'],'34':['messages'],'35c':['xy','gauge'],'36a':['messages'],'36b':['messages'],'36c':['messages'],'41':['messages'],'46':['messages'],'47':['messages'],'51':['messages'],'52':['messages'],'53':['line','raw'],'54':['messages','controls'],'57':['line','raw'],'58':['line-multiple','raw'],'59':['line','controls'],'60':['line','controls'],'70':['line','controls'],'07':['line','gauge'],'22':['line','gauge','raw'],'55':['line','controls','messages'],'56':['line','gauge','bar','raw'],'61':['image-gray','line','gauge'],'73':['line-multiple','gauge-multiple','bar-multiple','xy-multiple','raw'],'74':['line-multiple','gauge-multiple','raw','math','live-header'],'75':['image-rgb','line-multiple','bar-multiple']}
 purposes={
 '01':'Turn the built-in D13 LED on and off. Learn the order of statements and milliseconds.',
 '02':'Print a short greeting repeatedly in Serial Monitor. Match the sketch and Monitor baud rates.',
@@ -150,13 +150,13 @@ purposes={
 '51':'Send the JEDEC-ID command to an SPI Flash chip and read its identification bytes using generic SPI blocks.',
 '52':'Write a register pointer and read data from an I2C device using generic transactions. Match the address/register to the attached chip.',
 '53':'Increment a volatile counter in an interrupt and copy it atomically before using it in loop.',
-'54':'Echo incoming Serial bytes back to Monitor. Test sending text and different line endings without a blocking String read.',
-'55':'After Plotter Start, send two numeric CSV columns from A0. Automatic mode discovers two line traces without a JSON header.',
+'54':'Type a short message in Plotter. The board receives the text and sends it back to the visible message box.',
+'55':'The built-in LED blinks immediately after upload. Plotter creates controls for interval, on-time, enable, pattern and a text reply from the board.',
 '56':'After Plotter Start, send one A0 value. A Flash-resident header asks the PC to calculate voltage and show lines, a gauge, a bar and raw values.',
 '57':'Count edges on external interrupt D2. A physical button may bounce and create several electrical edges per press.',
 '58':'Use pin-change interrupts on D4 and D5 to keep separate counters, then copy the values safely in loop.',
-'59':'Use Timer1 for a periodic interrupt and keep the handler short. The timer is then unavailable to Servo, fast stepper and its PWM channels.',
-'60':'Attach or detach a configured interrupt using Monitor commands while preserving the accumulated counter.',
+'59':'The counter rises ten times per second. Plotter shows it five times per second; Running pauses/resumes Timer1, Clear resets the count, and Restart begins a fresh timer period.',
+'60':'Starts detached. Check Attached, then press the D2 button. Detach pauses counting while preserving the count; Clear resets it.',
 '61':'After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.',
 '62':'Use a potentiometer to set signed continuous stepper speed with acceleration. The software loop engine must still be serviced every pass.',
 '63':'Map a potentiometer to servo pulse microseconds for finer command increments than whole degree values.',
@@ -166,7 +166,7 @@ purposes={
 '67':'Prepare a small RGB565 colour tile and send it to an ST7735 TFT in one SPI transaction.',
 '68':'Pass a note record through a variable to the music parser. The same format can come from EEPROM, Serial or an SD line.',
 '69':'Play a timed, polyphonic score from SD without loading it all into RAM. Three IRQ voices and the SD cache leave a small stack margin.',
-'70':'Start a Timer1 STEP/DIR motor stopped, then change signed target speed in small or large increments through Monitor. Hardware pulses and acceleration continue independently of loop.',
+'70':'Starts stationary. Enter a signed target pulse rate in Plotter; Timer1 ramps toward it with acceleration 5000 steps/s². The chart shows the requested rate, not measured motor speed.',
 '71':'Use a potentiometer to control hardware Servo pulses on D9 while a hardware buzzer on D11 plays a melody. Timer1 and Timer2 have separate owners.',
 '72':'Define a 5×8 face in LCD glyph slot 0, then animate two faces through an 80-byte raw-code buffer. Eight slots and variable indices are supported.',
 '73':'Compare A0 with a generated triangle in overlaid lines, a multi-needle gauge, grouped bars, two XY traces and a raw table. Start/Stop controls one shared stream.',
@@ -175,6 +175,133 @@ purposes={
 'blink.xml':'Original BlocklyDuino blink workspace retained for importing older projects.',
 'click_color.xml':'Original BlocklyDuino demonstration workspace retained as a legacy import, outside the current AVR168 compile audit.',
 'servo_potentio.xml':'Original potentiometer-to-servo workspace retained as a legacy import. Prefer the named servo lessons for new work.'}
+
+# Small, practical lesson notes are shown before opening the blocks and in the
+# editor. Wiring is generated from the same XML pin selections where possible.
+changes={
+'01':'Change both wait values from 1000 to 200 ms and compare the blink rate.',
+'04':'Change the map output maximum from 255 to 80 to limit LED brightness.',
+'05':'Swap the HIGH/LOW actions to make the LED light when the button is released.',
+'06':'Change the red, amber and green wait times separately.',
+'07':'Warm the sensor with your fingers. Change the graph gauge bounds, keeping the 800 ms sensor interval.',
+'08':'Edit the two text values. Row 0 is the first line; row 1 is the second.',
+'09':'Turn the potentiometer. Edit the label and move its output column.',
+'10':'Edit the heading or move the counter to another text row.',
+'11':'Change the foreground colour, text row or the potentiometer label.',
+'12':'Disconnect one I2C module and scan again; its address disappears.',
+'13':'Edit the heading. Keep text rows within the 128×32 display height.',
+'14':'Change red, green and blue backlight values and edit the greeting.',
+'15':'Change the frequency from 440 Hz to 880 Hz; compare one octave.',
+'16':'Change the note frequencies and note durations independently.',
+'17':'Warm the DS18B20, then change the temperature label or LCD row.',
+'19':'Turn A0 and change which LCD row shows the ADC reading.',
+'20':'Change the three angle targets, keeping them within your servo mechanism’s clear travel.',
+'22':'Breathe gently near the sensor and watch humidity. Change gauge bounds without making sampling faster than 2.1 s.',
+'23':'Move a flat object toward the sensor. Change the gauge maximum from 200 to 50 cm.',
+'24':'Change the RGB values or the LED count to match your strip.',
+'25':'Press different remote buttons and note their command values.',
+'26':'Reverse the shift direction or increase the 150 ms interval.',
+'28':'Edit the message and the update interval to change its movement.',
+'30':'Change target 512 to 256 half-steps or reduce maximum speed and acceleration.',
+'31':'Edit the blink function once; every function call uses the new timing.',
+'32':'Change one input and compare the labelled mathematical results.',
+'33':'Change an array element and the update interval; compare the sequence printed below.',
+'34':'Change one 2D array index and compare the selected element; local variables exist only inside their function.',
+'35a':'Change the two position targets or the acceleration; call run on every loop pass.',
+'35b':'Change the message or the LCD columns/rows once in the device definition.',
+'35c':'Move an object into the sweep and narrow the servo angle range.',
+'36a':'Change the stored number/text, using separate byte addresses for each record.',
+'36b':'Change the stored number/text without changing the SPI bus pins.',
+'36c':'Change the test value inside the erased sector; Flash must be erased before bits can return to 1.',
+'36d':'Change the filename and text, upload, then inspect the file on a computer.',
+'36e':'Change the coordinates and pixel values, then open the resulting BMP on a computer.',
+'36f':'Move an object in the scan arc. Inspect the completed BMP; keep this small-memory combined project advanced.',
+'37':'Change the pixel formula to make stripes or a checkerboard; finish the image before reading it on the computer.',
+'38a':'Change the beep duration while the LED continues its separate task.',
+'38b':'Change one voice’s notes while the other two voices keep their own melodies.',
+'38c':'Edit one note or rest in the melody definition; play it again.',
+'39':'Edit the note file on the SD card, using the note syntax from the SD music guide.',
+'40':'Change the pixel/intensity mapping after understanding the polar-to-raster conversion.',
+'41':'Change row and column variables to select another cell; keep indices inside the declared shape.',
+'42':'Change the number of palette shades and the pixel formula together.',
+'43':'Change the red, green or blue formula to produce another colour gradient.',
+'44':'Change a 0–1023 pixel value and open the PGM in a viewer that supports that precision.',
+'45':'Change one colour-channel formula while keeping values within the configured range.',
+'46':'Change the arguments to the function and compare its returned value.',
+'47':'Change one bit index or packed field, then compare the printed number.',
+'48':'Change the wait times; PB5 is the built-in D13 LED.',
+'49':'Press and release the D2 button and watch D13 follow the port input.',
+'50':'Change the byte pattern sent to the 74HC595 and watch Q0–Q7.',
+'51':'Read the three JEDEC bytes and compare with the Flash chip’s datasheet.',
+'52':'Set the actual I2C address and register for your chip before interpreting its bytes.',
+'53':'Pulse D2 and watch the counter. Keep Serial output outside the interrupt handler.',
+'54':'Type a short message in Plotter and send it; the board returns the same characters.',
+'55':'Try a slower interval, a different on-time, Steady light, and a text message. Each control changes the running board.',
+'56':'Turn A0. Edit the header’s voltage formula only if your measured ADC reference differs from 5 V.',
+'57':'Press the D2 button; electrical contact bounce may count several edges per press.',
+'58':'Press each button independently and compare its own counter trace.',
+'59':'Pause/resume the timer with its checkbox and clear the counter with the button.',
+'60':'Attach the interrupt, press the button, detach it, then compare the counter.',
+'61':'Move light across the sensor and change scan bounds or settle time to match the mechanism.',
+'62':'Turn A0 slowly through the centre to stop and reverse. Narrow the speed range for finer ADC control.',
+'63':'Turn A0 and adjust the minimum/maximum pulse widths to your servo’s usable travel.',
+'64':'Change characters in the frame array, then send the complete frame.',
+'65':'Change bits in the 128-byte tile; each byte represents eight vertical pixels.',
+'66':'Change one RGB triplet in the array, then call show once for the finished frame.',
+'67':'Change RGB565 tile values or its target position without allocating a full-screen buffer.',
+'68':'Replace the note text with another note or a rest, using the same parser.',
+'69':'Edit one voice’s events in the SD score. This example has little free RAM; keep the buffer sizes unchanged.',
+'70':'Enter -30000..30000 steps/s; Stop ramps to zero. Change acceleration in the device block. Adjacent high-speed requests can map to the same timer period. This sketch has almost no spare Flash.',
+'71':'Turn A0 and edit the melody. Servo and sound use separate hardware timers.',
+'72':'Edit the eight faceRows values (0–31), or define a second face in slot 1.',
+'73':'Turn A0 and compare the same value in lines, gauge, bars and XY plots.',
+'74':'Keep A0 steady, then turn it. After five seconds the header changes the averaging window while streaming.',
+'75':'Change the RGB formulas or image dimensions, upload, and watch the computer build the new picture.'}
+wire_overrides={
+'01':'Only the Pro Mini and USB–Serial adapter; use the built-in L / D13 LED.',
+'05':'Button between D2 and GND; internal pull-up is enabled. The output is the built-in D13 LED.',
+'06':'Red LED D2, amber D3, green D4; each LED needs its own series resistor to GND.',
+'11':'ST7735 TFT: MOSI D11, SCK D13, CS D10, DC D9, RESET D8; MISO is unused. Potentiometer wiper A0, outer legs VCC/GND. Match the display’s supply and logic levels.',
+'12':'I2C module SDA→A4 and SCL→A5, with matching supply and common GND. Several modules can share the bus.',
+'14':'Grove JHD1313 RGB LCD: SDA→A4, SCL→A5, supply and GND.',
+'31':'Only the Pro Mini and USB–Serial adapter; observe the built-in D13 LED.',
+'48':'Only the Pro Mini; PB5 is the built-in L / D13 LED.',
+'49':'Button between D2 and GND; observe the built-in D13 LED.',
+'50':'74HC595 SER→D8, SRCLK→D9, RCLK→D10, OE→GND, MR→VCC. Add a resistor to each output LED.',
+'53':'Pulse input or button D2→GND with the configured pull-up. D13 gives a visible indication.',
+'70':'TB6600 STEP signal D9, DIR D4 and common signal GND. Follow the module’s input-voltage wiring; power the motor through the driver.',
+'54':'Only the Pro Mini and USB–Serial adapter.',
+'55':'Only the Pro Mini and USB–Serial adapter; L / D13 is built in.',
+'57':'Button between D2 and GND; internal pull-up is enabled.',
+'58':'Two buttons: D4→GND and D5→GND; both inputs use internal pull-ups.',
+'59':'Only the Pro Mini and USB–Serial adapter. Timer1 supplies periodic interrupts.',
+'60':'Button between D2 and GND; internal pull-up is enabled.',
+'75':'Only the Pro Mini and USB–Serial adapter; the image is generated mathematically.'}
+
+def lesson_notes(root,prefix,hardware,desc,types):
+    parts=[]
+    for b in root.iter('block'):
+        if b.get('type') in {'inout_digital_read','inout_digital_write','inout_analog_write','inout_analog_read'} or b.get('type') in devices or b.get('type') in legacy or b.get('type') in {'lcd_user_init','irq_external','irq_pin_change'}:
+            pins=[]
+            for f in b.findall('field'):
+                k=f.get('name');v=f.text or ''
+                if k in {'PIN','STEP','DIR','TRIG','ECHO','CS','DC','RESET','IN1','IN2','IN3','IN4','DATA','CLOCK','LATCH'}:
+                    if v.isdigit():v='D'+v
+                    pins.append(k+' '+v)
+                elif k=='ADDR':pins.append('address '+v)
+            if pins:
+                label=devices.get(b.get('type'),devices.get(legacy.get(b.get('type')),b.get('type').replace('inout_','').replace('_',' ')))
+                part=label+': '+', '.join(pins)
+                if part not in parts:parts.append(part)
+    if types&{'device_lcd','device_oled','st_i2c_eeprom','ll_i2c_device','lcd_user_init','lcd1602_i2c_print','oled_ssd1306_091_i2c_print','grove_rgb_lcd_print'}:parts.append('I2C SDA A4, SCL A5')
+    if types&{'st_spi_eeprom','st_spi_flash','st_sd','ll_spi_device'}:parts.append('SPI MOSI D11, MISO D12, SCK D13; CS as listed')
+    elif types&{'device_oled_spi','device_tft','tft_st7735_spi_print','oled_ssd1306_spi_print'}:parts.append('SPI MOSI D11, SCK D13; MISO is unused; CS/DC/RESET as listed')
+    if any(t=='inout_analog_read' for t in types):parts.append('Potentiometer outer legs VCC/GND; wiper on the listed analog input')
+    if 'device_ds18b20' in types or 'ds18b20_temperature' in types:parts.append('Powered DS18B20: data needs a 4.7 kΩ pull-up to VCC')
+    if 'device_dht' in types:parts.append('Bare DHT sensor data needs a pull-up; select its exact model')
+    wiring=wire_overrides.get(prefix,'; '.join(parts)+'. Common GND; use each module’s required supply.' if parts else 'Only the Pro Mini and USB–Serial adapter.')
+    baud=next((int(f.text) for b in root.iter('block') if b.get('type')=='serial_config' for f in b.findall('field') if f.get('name')=='BAUD'),None)
+    return {'wiring':wiring,'observe':desc,'change':changes[prefix],'serial':'plotter' if baud else 'none','baud':baud}
 
 def build():
     owners,deps=header_index()
@@ -215,12 +342,12 @@ def build():
         if prefix in {'36f','40'}:notes.append('Combined SD, sensing and motion: advanced, little stack/heap headroom on ATmega168. Compile size is not a runtime stack test.')
         if prefix in {'36a','36b'}:notes.append('Writes a small EEPROM test area. Use a chip with no data you need to retain.')
         if prefix=='36c':notes.append('Erases a whole 4 KB Flash sector before writing. Use a chip with no data you need to retain.')
-        if prefix in {'21','27','29'}:notes.append('Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work.')
+        if prefix=='70':notes.append('Very tight Flash budget on ATmega168. Compile after any edit; a larger header or extra library may not fit.')
         if prefix=='65':notes.append('Uses a 128-byte tile. Do not allocate a 1024-byte OLED framebuffer on a board with 1024 bytes total SRAM.')
         if prefix in {'38b','69'}:notes.append('Three-voice IRQ music shares Timer2. Each passive buzzer uses a separate output; Timer2 is unavailable for another independent engine.')
         if prefix=='75':notes.append('All pixels are held on the computer. The Arduino sends one pixel and chart sample at a time.')
-        result.append({'id':prefix,'file':file.name,'title':names.get(prefix,file.stem.replace('_',' ').replace('-',' ')),'group':group,'level':'advanced' if prefix in advanced or row and row.get('classification')=='tight' else 'beginner','recommended':prefix in recommended,'hardware':hardware,'libraries':libraries,'libraryEvidence':library_evidence,'description':desc,'notes':notes,'plotterModes':plotter.get(prefix,[]),'startCommand':'START\n' if prefix in plotter else None,'stopCommand':'STOP\n' if prefix in plotter else None,'verification':verification})
-    payload={'version':1,'auditedAt':audit.get('auditedAt'),'target':{'fqbn':TARGET,'label':'Pro Mini ATmega168 · 16 MHz','flashLimit':14336,'ramLimit':1024},'groups':[x[0] for x in groups]+['Legacy imports'],'examples':result}
+        result.append({'id':prefix,'file':file.name,'title':names.get(prefix,file.stem.replace('_',' ').replace('-',' ')),'group':group,'level':'advanced' if prefix in advanced or row and row.get('classification')=='tight' else 'beginner','recommended':prefix in recommended,'hardware':hardware,'libraries':libraries,'libraryEvidence':library_evidence,'description':desc,'lesson':lesson_notes(root,prefix,hardware,desc,types),'notes':notes,'plotterModes':plotter.get(prefix,[]),'startCommand':'START\n' if prefix in plotter else None,'stopCommand':'STOP\n' if prefix in plotter else None,'verification':verification})
+    payload={'version':1,'auditedAt':audit.get('auditedAt'),'target':{'fqbn':TARGET,'label':'Pro Mini ATmega168 · 16 MHz','flashLimit':14336,'ramLimit':1024},'groups':[x[0] for x in groups],'examples':result}
     (OUT/'catalog.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n')
     print('Catalog:',len(result),'XML files;',len({d['id'] for x in result for d in x['hardware']} & set(devices)),'of',len(devices),'named device types represented')
 if __name__=='__main__':build()

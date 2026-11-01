@@ -95,3 +95,12 @@ sketch hashes. A subset build preserves only earlier entries whose generated
 source still matches. Catalogue libraries come from the audited sketch includes
 and reviewed header dependencies, so hardware waveforms are not mislabeled as
 software music. A mismatched sketch requires a new compile before publication.
+
+The interactive workflow suites execute the generated MCU command helper as host
+C++, including button-only dashboards and invalid/range/step inputs. UI regressions
+cover unsent drafts, state acknowledgements, explicit Reset of image buffers and
+header-first acquisition. The layout suite tests 1–16 instruments across six
+viewport shapes; browser checks must also verify actual canvas/card bounds at
+1280×720 and 960×600, remembered Fit/Scroll choice, and message-only dashboards.
+A PTY can connect a host-compiled generated example to the real backend without
+opening a physical USB serial port.

@@ -29,7 +29,8 @@
         </next>
       </block>
     </next>
-    <comment pinned="false" w="340" h="170">Purpose: Print text on a 128×32 SSD1306 I2C OLED, without a full framebuffer.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Print text on a 128×32 SSD1306 I2C OLED. U8x8 sends character tiles without a full pixel framebuffer.
+Wiring: SSD1306 I2C OLED: address 0x3C; analog read: PIN A0; I2C SDA A4, SCL A5; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.
+Try: Edit the heading. Keep text rows within the 128×32 display height.</comment>
   </block>
 </xml>

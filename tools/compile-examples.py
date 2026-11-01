@@ -10,7 +10,9 @@ a=p.parse_args(); root=Path(__file__).resolve().parents[1]; os.chdir(root)
 subprocess.run(['node','tests/variables-validation/integration.js'],check=True,env={**os.environ,'GENERATE_SKETCHES':'1'})
 results=[]
 bundled=[arg for folder in sorted((root/'arduino/libraries').iterdir()) if (folder/'library.properties').is_file() for arg in ('--library',str(folder))]
+active={re.sub(r'[^a-zA-Z0-9_]', '_', p.name) for p in (root/'blockly/apps/blocklyduino/examples').glob('[0-9]*.xml')}
 for sketch in sorted((root/'.test-build/sketches').iterdir()):
+ if sketch.name not in active: continue
  if a.examples and not any(sketch.name.startswith(x) for x in a.examples): continue
  cmd=[a.cli,'compile','--fqbn',a.fqbn,*bundled,str(sketch)]
  r=subprocess.run(cmd,capture_output=True,text=True,timeout=180)
@@ -32,7 +34,7 @@ if a.fqbn=='arduino:avr:pro:cpu=16MHzatmega168':
  if a.examples and audit.exists():
   for row in json.loads(audit.read_text()).get('results',[]):
    source=root/'.test-build/sketches'/row['example']/(row['example']+'.ino')
-   if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()==row.get('sketchSha256'):previous[row['example']]=row
+   if row['example'] in active and source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()==row.get('sketchSha256'):previous[row['example']]=row
  previous.update({row['example']:row for row in results})
  audit.write_text(json.dumps({'fqbn':a.fqbn,'results':sorted(previous.values(),key=lambda row:row['example'])},indent=2))
 if not results: raise SystemExit('No matching examples')

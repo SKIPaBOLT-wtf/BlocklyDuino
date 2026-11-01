@@ -3,8 +3,9 @@
     <mutation uid="card37" />
     <field name="NAME">card</field>
     <field name="CS">10</field>
-    <comment pinned="false" w="340" h="170">Purpose: Stream BMP pixels in row order directly to SD; the library handles bit packing and padding.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Write a monochrome BMP in raster order, one pixel at a time, then finish the file. No full image buffer is allocated.
+Wiring: SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.
+Try: Change the pixel formula to make stripes or a checkerboard; finish the image before reading it on the computer.</comment>
   </block>
   <block type="arduino_typed_variable" x="310" y="20">
     <field name="TYPE">uint16_t</field>
@@ -170,15 +171,12 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
                     <comment pinned="false" w="340" h="170">Repeat the body with y taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
                   </block>
                 </statement>
-                <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
               </block>
             </next>
             <field name="RESERVE">true</field>
           </block>
         </statement>
-        <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
 </xml>

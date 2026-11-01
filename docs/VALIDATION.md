@@ -1,4 +1,49 @@
-# Pro Mini capability, examples and Plotter audit — 2026-11-01
+# Interactive lessons and automatic Plotter layout — 2026-11-01
+
+- All **33 JavaScript suites**, **20 Python backend tests** and host C++
+  simulations pass. All **78
+  retained numbered examples** generate C++, pass declared pin/resource checks,
+  and compile for `arduino:avr:pro:cpu=16MHzatmega168`. Catalogue sizes match the
+  current generated sketch hashes. Nine superseded XML files were removed.
+- All 31 Serial lessons announce a configuration on boot and START. The new
+  interactive LED lesson (55) uses 7,686 Flash / 318 static SRAM bytes; the smaller
+  text-reply lesson (54) uses 2,614 / 242. Every lesson has practical Connect,
+  Watch and Try changing instructions in the editor and grouped catalogue.
+- Fresh/reset automatic Plotter views wait for an explicit header. Tests cover
+  all six control types, command validation, UTF-8 byte limits, board messages,
+  state confirmations, incomplete commands and unsent draft preservation.
+  Message-only headers accept ordinary Serial text. Button-only generated helpers
+  do not emit empty state packets; explicit Manual Reset clears image pixels.
+- Browser + PTY testing ran the actual generated lesson 55 as host C++ with GPIO
+  and Serial stubs. Connect and Start produced its dashboard; slider, number,
+  checkbox, select, text and button commands reached the sketch, whose state and
+  text replies appeared in the UI. This verifies program/transport/UI behavior,
+  not physical LED timing or electrical hardware.
+- The installed HTTP service also compiles lesson 55 at 7,686 Flash / 318 static
+  SRAM bytes; the existing physical serial session and baud were preserved.
+- Six concurrent instruments (line, multi-needle gauge, grouped bars, XY, raw
+  values and retained image) fit inside 1280×720 and 960×600 browser viewports.
+  Both page dimensions stayed within the viewport. Layout tests cover 1–16
+  instruments across six window shapes. Fit is the default; an explicitly
+  selected Scroll layout persists after reload. Message-only dashboards use the
+  available space without an empty graph. Browser checks also created a manual
+  dashboard from the One sensor starter and verified headerless data remains
+  ignored after Reset.
+- Generated Timer1/interrupt lessons 59, 60 and 70 execute bounded START/STOP and
+  control-command tests. Function declarations now precede generated user
+  functions that call IRQ helpers. Hardware stepper lesson 70 fits at
+  **14,312 Flash / 665 static SRAM bytes**, leaving just **24 Flash bytes**;
+  it is explicitly marked advanced and very tight.
+
+No physical board was reflashed in this iteration. Compilation and host/browser
+tests do not establish worst-case stack space, sensor accuracy or electrical
+timing. SD polyphony 69 still leaves only 196 bytes after static SRAM allocation.
+Other board families were not expanded. Earlier runs below describe their
+then-current behavior and counts, including superseded CSV auto-detection.
+
+---
+
+# Earlier Pro Mini capability, examples and Plotter audit — 2026-11-01
 
 - All 28 JavaScript suites, 20 Python backend tests and host C++ simulations pass.
   All **84 numbered examples** generate C++, pass declared pin/timer validation,

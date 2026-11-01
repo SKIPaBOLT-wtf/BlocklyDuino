@@ -5,6 +5,7 @@ var colors=['#1679aa','#dd6841','#23856d','#9a61b0','#c18c11','#447dc2','#aa536b
 var KEY='blocklyduino.plotter.profiles.v1',MODE='blocklyduino.plotter.mode.v1',AXIS='blocklyduino.plotter.axis.v1',CAP='blocklyduino.plotter.capture.v1',LAST='blocklyduino.plotter.last.v1';
 var profiles=Object.create(null),profile=null,samples=[],total=0,ignored=0,errors=0,paused=false,dirty=true,lastRender=0;
 var capture=null,captured=[],captureRecords=[],captureBytes=0,profileRevision=0,captureName='serial',demo=null,priorDemo=null,connected=false,diagnostic=[];
+var messageHistory=[],controlNodes=Object.create(null),controlGeneration=0,waitingNotice=false,resetBeforeSequence=0;
 var widgetNodes=[],imageWidgets=[],inlineImagesActive=true,legacyImageKey='',acquisition='idle',startRetry=null,startAttempts=0,sendBusy=false,startGeneration=0,startAfterSequence=0,currentEventSequence=0;
 function load(key,fallback){try{var v=localStorage.getItem(key);return v==null?fallback:JSON.parse(v);}catch(e){return fallback;}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){notice('Browser storage is full. Export your profile to a file.','error');return false;}}
@@ -17,14 +18,14 @@ $('mode').value=load(MODE,'auto');if(!$('mode').value)$('mode').value='auto';$('
 var parser=new P.Parser({mode:$('mode').value,getProfile:function(id){return profiles[id];}});
 function refreshProfiles(){var old=$('profiles').value;$('profiles').replaceChildren(new Option('Choose a saved dashboard…',''));Object.keys(profiles).sort().forEach(function(k){$('profiles').add(new Option(profiles[k].title+' · '+k,k));});$('profiles').value=old;}
 refreshProfiles();
-function stopCapture(reason){if(!capture)return;capture=null;$('capture-start').disabled=false;$('capture-stop').disabled=true;$('capture-count').textContent=captured.length+' samples · stopped';if(reason)notice(reason);}
+function stopCapture(reason){if(!capture)return;capture=null;$('capture-start').disabled=false;$('capture-stop').disabled=true;$('capture-count').textContent=captured.length+' records · stopped';if(reason)notice(reason);}
 function updateCaptureButtons(){$('save-csv').disabled=!captured.length;$('save-jsonl').disabled=!captured.length;}
 function captureRecord(record,isSample){
  if(!capture)return;
  var size=JSON.stringify(record).length*2;
  if(captureBytes+size>20*1024*1024){stopCapture('Capture reached the 20 MiB memory limit. Save it before starting another.');return;}
  captureRecords.push(record);captureBytes+=size;
- if(isSample){captured.push(record);$('capture-count').textContent=captured.length+' / '+capture.limit+' samples';updateCaptureButtons();if(captured.length>=capture.limit)stopCapture('Capture complete: '+captured.length+' samples.');}
+ if(isSample){captured.push(record);$('capture-count').textContent=captured.length+' / '+capture.limit+' records';updateCaptureButtons();if(captured.length>=capture.limit)stopCapture('Capture complete: '+captured.length+' records.');}
 }
 function captureConfiguration(){
  if(!inlineImagesActive&&window.PlotterImage&&PlotterImage.model.config)captureRecord({kind:'image-configuration',revision:profileRevision,ts:Date.now(),id:PlotterImage.model.config.id,image:PlotterImage.model.config},false);
@@ -34,17 +35,19 @@ function apply(next,source,parsed){
  var p=P.validate(next),fromImage=!inlineImagesActive;if(!parsed)parser.setProfile(p);inlineImagesActive=true;
  if(profile&&JSON.stringify(profile)===JSON.stringify(p)&&!fromImage)return;
  if(window.PlotterImage)PlotterImage.show(false);
- profile=p;profileRevision++;samples=[];total=0;dirty=true;buildWidgets();captureConfiguration();
+ profile=p;profileRevision++;samples=[];total=0;messageHistory=[];$('board-message').hidden=true;dirty=true;waitingNotice=false;buildWidgets();buildControls();captureConfiguration();
  $('dashboard-title').textContent=p.title;$('dashboard-meta').textContent=p.id+' · '+p.fields.length+' fields · '+p.history+' history samples · '+source;
  $('profiles').value=Object.prototype.hasOwnProperty.call(profiles,p.id)?p.id:'';
- notice('Dashboard ready: '+p.title+'. Send one complete sample per line.');
+ $('dashboard-description').textContent=p.description||'';$('dashboard-description').hidden=!p.description;
+ notice('Dashboard received. Follow the board message or press Start.');streamControls();
 }
 function streamControls(){
- $('stream-start').disabled=!connected||sendBusy||acquisition==='waiting';$('stream-stop').disabled=!connected||sendBusy;
- $('stream-status').textContent=!connected?'Connect, then Start':acquisition==='waiting'?(parser.mode==='manual'?'Waiting for the first sample…':'Waiting for a header or numeric data…'):acquisition==='running'?'Receiving · controller started':acquisition==='stopped'?'Stopped · connection stays open':'Ready · Start sends START';
+ $('stream-start').disabled=!connected||sendBusy||acquisition==='waiting';$('stream-stop').disabled=!connected||sendBusy;refreshControlAvailability();
+ $('stream-status').textContent=!connected?'Connect, then Start':acquisition==='waiting'?(parser.mode==='manual'?'Waiting for the first sample…':profile?'Waiting for the board…':'Waiting for the board’s dashboard…'):acquisition==='running'?'Receiving · controller started':acquisition==='stopped'?'Stopped · connection stays open':profile?'Dashboard ready':'Waiting for dashboard · press Start';
 }
 function cancelStart(){clearTimeout(startRetry);startRetry=null;startGeneration++;}
-function headerReceived(){if(acquisition==='waiting'&&(!currentEventSequence||currentEventSequence>startAfterSequence)){cancelStart();acquisition='running';streamControls();}}
+function headerReceived(){if(acquisition==='waiting'&&(!currentEventSequence||currentEventSequence>startAfterSequence)){cancelStart();acquisition='running';streamControls();}else if(acquisition==='idle'&&profile){streamControls();}}
+function sampleReceived(){headerReceived();if(acquisition==='idle'){acquisition='running';streamControls();}if(!demo&&$('notice').className!=='error')notice('');}
 async function sendStart(generation){
  if(generation!==startGeneration||acquisition!=='waiting'||!connected)return;
  startAttempts++;sendBusy=true;streamControls();
@@ -60,11 +63,11 @@ async function sendStart(generation){
  },1800);
 }
 $('stream-start').onclick=async function(){
- if(!connected){notice('Connect a serial port in Settings first.','error');return;}
+ if(!connected){notice('Choose a serial port above and connect first.','error');return;}
  if(demo)stopDemo();cancelStart();lines.reset();startAfterSequence=Math.max(Number(client.state.seq)||0,Number(client.cursor)||0);startAttempts=0;acquisition='waiting';
  if($('mode').value==='manual'&&profile){parser.mode='manual';apply(profile,'manual start');}
- else{$('mode').value='auto';parser.mode='auto';store(MODE,'auto');parser.reset();}
- notice(parser.mode==='manual'?'START sent. Keeping your manual dashboard; waiting for its data…':'START sent. Waiting for a controller header or automatic numeric data…');
+ else{$('mode').value='auto';parser.mode='auto';store(MODE,'auto');}
+ notice(parser.mode==='manual'?'START sent. Keeping your manual dashboard; waiting for its data…':'START sent. Waiting for the board to send its dashboard and readings…');
  return sendStart(startGeneration);
 };
 $('stream-stop').onclick=async function(){
@@ -74,9 +77,10 @@ $('stream-stop').onclick=async function(){
 };
 function reportError(message,line){errors++;log(message+(line?' | '+line.slice(0,140):''));notice(message,'error');}
 function data(line,ts){
+ if(/^@(pixel|image-clear)(?:\s|$)/.test(line)&&!imageWidgets.length&&!(window.PlotterImage&&PlotterImage.model.config)){if(!waitingNotice){notice('Receiving pixels, waiting for the sketch’s image/dashboard header. Press Start to request it.');waitingNotice=true;}return;}
  if(window.PlotterImage){
   var pixel=inlineImagesActive?PlotterImage.route(line,imageWidgets):null;
-  if(pixel){if(pixel.kind==='error')reportError(pixel.message,line);else{dirty=true;captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},pixel),true);headerReceived();}return;}
+  if(pixel){if(pixel.kind==='error')reportError(pixel.message,line);else{dirty=true;captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},pixel),true);sampleReceived();}return;}
   if(PlotterImage.live(line)){
    var event=PlotterImage.result();
    if(event.kind==='error')reportError(event.message,line);
@@ -84,29 +88,75 @@ function data(line,ts){
     var key=JSON.stringify(event.image),changed=inlineImagesActive||legacyImageKey!==key;
     inlineImagesActive=false;legacyImageKey=key;
     if(changed){profileRevision++;captureConfiguration();}headerReceived();
-   }else{captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},event),true);headerReceived();}
+   }else{captureRecord(Object.assign({revision:profileRevision,ts:ts==null?Date.now():ts},event),true);sampleReceived();}
    return;
   }
  }
  var result=parser.parse(line,ts);
  if(result.kind==='config'){apply(result.profile,result.source,true);headerReceived();return;}
+ if(result.kind==='message'){showBoardMessage(result.text,result.level);if(profile)headerReceived();captureRecord({kind:'message',revision:profileRevision,ts:ts==null?Date.now():ts,id:profile&&profile.id,text:result.text,level:result.level},true);return;}
+ if(result.kind==='state'){updateControlState(result.values);captureRecord({kind:'state',revision:profileRevision,ts:ts==null?Date.now():ts,id:profile&&profile.id,values:result.values},false);return;}
  if(result.kind==='sample'){
   if(result.generated)apply(result.generated,'automatic',true);
   var sample=result.sample;samples.push(sample);total++;if(samples.length>profile.history)samples.splice(0,samples.length-profile.history);dirty=true;
   captureRecord(Object.assign({kind:'sample',revision:profileRevision},sample),true);
-  headerReceived(); // Headerless CSV and manual profiles acknowledge Start too.
+  sampleReceived();
  }else if(result.kind==='error')reportError(result.message,line);
- else if(result.kind==='raw'||result.kind==='ignored'){ignored++;if(ignored<5||ignored%100===0)log(result.message||('Text: '+result.text.slice(0,140)));}
+ else if(result.kind==='raw'||result.kind==='ignored'){ignored++;if(!profile&&!waitingNotice){notice('Serial data is arriving. Waiting for the program’s dashboard header; press Start to request it.');waitingNotice=true;}if(ignored<5||ignored%100===0)log(result.message||('Text: '+String(result.text||'').slice(0,140)));}
 }
 var lines=new P.Lines(data,function(message){reportError(message);});
 var client=new window.SerialClient({
- onReset:function(){lines.reset();},
+ onReset:function(){lines.reset();resetBeforeSequence=0;if(parser.mode!=='manual')resetView(false);},
  onGap:function(count){lines.reset();log('Serial history gap: '+count+' events lost; partial sample discarded.');notice('Some serial data was lost before this view received it.','error');},
- onEvents:function(events){if(demo)return;events.forEach(function(e){currentEventSequence=e.seq||0;if(e.direction==='rx')lines.push(e.text,e.ts);else if(e.direction==='system'){lines.reset();log(e.text);}});},
+ onEvents:function(events){if(demo)return;events.forEach(function(e){if(e.seq&&e.seq<=resetBeforeSequence)return;currentEventSequence=e.seq||0;if(e.direction==='rx')lines.push(e.text,e.ts);else if(e.direction==='system'){lines.reset();log(e.text);}});},
  onStatus:function(state){if(connected&&!state.connected){lines.reset();cancelStart();acquisition='idle';}connected=!!state.connected;streamControls();},
  onError:function(message){if(message)notice(message,'error');}
 });
 window.SerialClient.mountControls($('serial-connection'),client);client.start({replay:true});streamControls();
+function showBoardMessage(message,level){messageHistory.push(message);if(messageHistory.length>8)messageHistory.shift();$('board-message').hidden=false;$('board-message').dataset.level=level||'info';var textOnly=profile&&!profile.fields.length&&!profile.widgets.length;$('board-message').classList.toggle('message-console',!!textOnly);$('board-message-text').textContent=textOnly?messageHistory.join('\n'):message;}
+function refreshControlAvailability(){Object.keys(controlNodes).forEach(function(id){var ref=controlNodes[id];ref.elements.forEach(function(el){el.disabled=!connected||!!demo||!!ref.busy;});});}
+function setControlInput(ref,value){if(ref.control.type==='checkbox')ref.input.checked=!!value;else ref.input.value=value==null?'':String(value);if(ref.output)ref.output.textContent=String(value)+(ref.control.unit?' '+ref.control.unit:'');}
+function controlInputValue(ref){return ref.control.type==='checkbox'?ref.input.checked:ref.input.value;}
+function sameControlValue(ref,value){try{return P.controlValue(ref.control,controlInputValue(ref))===value;}catch(error){return false;}}
+function updateControlState(values){Object.keys(values).forEach(function(id){
+ var ref=controlNodes[id];if(!ref)return;var value=values[id];ref.boardValue=value;
+ if(ref.pending&&value===ref.sentValue)ref.pending=false;
+ if((ref.dirty||ref.pending)&&!sameControlValue(ref,value)){
+  ref.feedback.textContent='Board: '+String(value)+(ref.pending?' · waiting for confirmation':' · edit not sent');
+ }else{setControlInput(ref,value);ref.dirty=false;ref.feedback.textContent=ref.pending?'Sent · waiting for board confirmation':'Confirmed by board';}
+ ref.feedback.className='control-feedback';
+});}
+function buildControls(){
+ controlGeneration++;controlNodes=Object.create(null);$('control-list').replaceChildren();var controls=profile.controls||[];$('board-controls').hidden=!controls.length;
+ controls.forEach(function(control){
+  var box=node('div',null,'program-control'),row=node('div',null,'control-input-row'),label=node('label',control.label||control.id),feedback=node('span','','control-feedback'),element,send=null,output=null;
+  if(control.type==='button'){element=node('button',control.label||control.id);element.type='button';label.textContent='';}
+  else if(control.type==='select'){element=node('select');control.options.forEach(function(o){element.add(new Option(o.label,o.value));});}
+  else{element=node('input');element.type=control.type==='slider'?'range':control.type==='checkbox'?'checkbox':control.type==='number'?'number':'text';if(control.min!=null)element.min=control.min;if(control.max!=null)element.max=control.max;if(control.step!=null)element.step=control.step;else if(control.type==='number')element.step='any';if(control.maxLength!=null)element.maxLength=control.maxLength;}
+  element.id='program-control-'+control.id;element.setAttribute('aria-label',control.label||control.id);label.htmlFor=element.id;row.appendChild(element);var ref={control:control,input:element,feedback:feedback,elements:[element],busy:false,pending:false,dirty:false,boardValue:control.value,sentValue:undefined,output:null};
+  if(control.type==='slider'){output=node('output',null,'control-output');output.htmlFor=element.id;row.appendChild(output);ref.output=output;}
+  if(control.type==='number'||control.type==='text'){send=node('button','Send');send.type='button';send.setAttribute('aria-label','Send '+(control.label||control.id));row.appendChild(send);ref.elements.push(send);}
+  if(control.type!=='button'){setControlInput(ref,control.value);element.oninput=function(){ref.dirty=true;if(ref.output)ref.output.textContent=element.value+(control.unit?' '+control.unit:'');ref.feedback.textContent='Not sent yet';};}
+  async function transmit(){
+   if(!connected||demo||ref.busy)return;var generation=controlGeneration,command;
+   try{command=P.controlCommand(control,controlInputValue(ref));ref.sentValue=control.type==='button'?undefined:P.controlValue(control,controlInputValue(ref));}catch(error){feedback.textContent=error.message;feedback.className='control-feedback error';return;}
+   ref.busy=true;ref.pending=control.type!=='button';ref.dirty=false;feedback.textContent='Sending…';feedback.className='control-feedback';refreshControlAvailability();
+   try{await client.write(command,'lf');if(generation===controlGeneration){if(ref.pending)feedback.textContent='Sent · waiting for board confirmation';else if(control.type==='button')feedback.textContent='Command sent';}}
+   catch(error){if(generation===controlGeneration){feedback.textContent=error.message;feedback.className='control-feedback error';ref.pending=false;}}
+   finally{ref.busy=false;if(generation===controlGeneration)refreshControlAvailability();}
+  }
+  if(control.type==='button')element.onclick=transmit;else if(send){send.onclick=transmit;element.onkeydown=function(event){if(event.key==='Enter'){event.preventDefault();transmit();}};}else element.onchange=transmit;
+  box.append(label,row,feedback);if(control.help)box.appendChild(node('p',control.help,'hint'));$('control-list').appendChild(box);controlNodes[control.id]=ref;
+ });refreshControlAvailability();
+}
+function resetView(explicit){
+ cancelStart();acquisition='idle';lines.reset();waitingNotice=false;paused=false;$('pause').textContent='Pause view';$('pause').classList.remove('paused-label');if(window.PlotterImage){PlotterImage.pause(false);if(PlotterImage.reset)PlotterImage.reset();else PlotterImage.show(false);}
+ if(explicit)resetBeforeSequence=Math.max(Number(client.state.seq)||0,Number(client.cursor)||0);messageHistory=[];$('board-message').hidden=true;$('board-message-text').textContent='';
+ if(parser.mode==='manual'&&profile){parser.setProfile(profile);samples=[];total=0;dirty=true;if(explicit)imageWidgets=[];buildWidgets();buildControls();}
+ else{parser.reset();profile=null;samples=[];total=0;widgetNodes=[];imageWidgets=[];inlineImagesActive=true;legacyImageKey='';controlGeneration++;controlNodes=Object.create(null);$('control-list').replaceChildren();$('board-controls').hidden=true;$('dashboard-description').hidden=true;$('dashboard-title').textContent='Waiting for your board';$('dashboard-meta').textContent='The program supplies its own dashboard.';$('dashboard').replaceChildren(node('div','Connect, then press Start. The program’s header will create its readings and controls here.','empty'));}
+ $('sample-stats').textContent='0 samples';notice(parser.mode==='manual'?'Manual dashboard cleared; waiting for matching data.':'View reset. Waiting for a fresh dashboard header; press Start to request it.');streamControls();
+}
+$('reset-view').onclick=function(){if(demo)stopDemo();resetView(true);};
 function field(id){return profile.fields.find(function(f){return f.id===id;});}
 function series(w){return w.series||[{x:w.x,y:w.y}];}
 function names(w){if(w.type==='image')return[];if(w.type==='xy'){var keys=[];series(w).forEach(function(s){if(keys.indexOf(s.x)<0)keys.push(s.x);if(keys.indexOf(s.y)<0)keys.push(s.y);});return keys;}return w.fields||(w.field?[w.field]:[]);}
@@ -178,18 +228,44 @@ function render(now){
 }
 requestAnimationFrame(render);window.addEventListener('resize',function(){dirty=true;});
 $('pause').onclick=function(){paused=!paused;if(window.PlotterImage)PlotterImage.pause(paused);this.textContent=paused?'Resume view':'Pause view';this.classList.toggle('paused-label',paused);if(paused)notice('View paused. Serial reception, capture and Serial Monitor continue.');else{dirty=true;notice('Live view resumed.');}};
-$('clear').onclick=function(){samples=[];total=0;dirty=true;notice('Chart history cleared. Captured samples and scan images are kept.');};
+$('clear').onclick=function(){samples=[];total=0;messageHistory=[];$('board-message').hidden=true;$('board-message-text').textContent='';dirty=true;notice('Chart and message history cleared. Captured samples and scan images are kept.');};
 function manual(){cancelStart();if(acquisition==='waiting')acquisition='idle';$('mode').value='manual';parser.mode='manual';store(MODE,'manual');streamControls();}
-$('mode').onchange=function(){parser.mode=this.value;store(MODE,this.value);if(this.value==='manual')manual();notice(this.value==='manual'?'Manual mode: controller @plot and @use headers are ignored.':'Auto mode: the next @plot or @use header can change this dashboard.');};
+$('mode').onchange=function(){parser.mode=this.value;store(MODE,this.value);if(this.value==='manual')manual();else resetView(true);notice(this.value==='manual'?'Manual mode: controller @plot and @use headers are ignored.':'From board: waiting for the next dashboard header.');};
 $('time-axis').onchange=function(){store(AXIS,this.value);dirty=true;};
 $('profiles').onchange=function(){if(profiles[this.value]){apply(profiles[this.value],'saved profile');manual();store(LAST,profile.id);}};
 function download(name,body,type){var a=node('a');a.href=URL.createObjectURL(new Blob([body],{type:type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1000);}
 $('save-profile').onclick=function(){if(!profile){openConfig();return;}if(Object.keys(profiles).length>=100&&!profiles[profile.id]){notice('100 saved profiles maximum. Export or reuse an existing ID.','error');return;}profiles[profile.id]=profile;if(store(KEY,profiles)){refreshProfiles();$('profiles').value=profile.id;store(LAST,profile.id);notice('Saved '+profile.id+'. The controller can now send @use '+profile.id);}};
 $('export-profile').onclick=function(){if(!profile){notice('Create or receive a dashboard first.','error');return;}download(profile.id+'.plot.json',JSON.stringify(profile,null,2)+'\n','application/json');};
 function codeFor(header,values,baud){
- return '// Plotter Start sends START\\n; Stop sends STOP\\n.\n// No String allocation, blocking waits or extra hardware timers.\nbool streaming = false;\nchar command[8];\nbyte used = 0;\nbool commandOverflow = false;\nunsigned long lastSample = 0;\n\nvoid setup() {\n  Serial.begin('+baud+');\n}\n\nvoid loop() {\n  while (Serial.available()) {\n    char c = Serial.read();\n    if (c == \'\\r\') continue;\n    if (c == \'\\n\') {\n      command[used] = 0;\n      if (!commandOverflow && strcmp(command, "START") == 0) {\n        Serial.println(F('+JSON.stringify(header)+'));\n        streaming = true;\n        lastSample = millis();\n      } else if (!commandOverflow && strcmp(command, "STOP") == 0) {\n        streaming = false;\n      }\n      used = 0;\n      commandOverflow = false;\n    } else if (used < sizeof(command) - 1) command[used++] = c;\n    else commandOverflow = true;\n  }\n  if (streaming && millis() - lastSample >= 100) {\n    lastSample = millis();\n    // Replace these input values with sensor readings.\n    Serial.println(F('+JSON.stringify('@data '+JSON.stringify({id:profile.id,values:values}))+'));\n  }\n}\n';
+ function bytes(value){return encodeURIComponent(value).replace(/%[0-9A-F]{2}|./g,'x').length;}
+ var controls=profile.controls||[],lines=['// Upload this sketch, connect Plotter at '+baud+' baud, then press Start.','// Replace sample readings and onControl/onAction bodies with your hardware work.','#include <stdlib.h>','#include <string.h>','#include <math.h>',''],maxCommand=8;
+ controls.forEach(function(c,i){if(c.type==='button')maxCommand=Math.max(maxCommand,5+c.id.length);else maxCommand=Math.max(maxCommand,6+c.id.length+(c.type==='text'?c.maxLength:c.type==='select'?Math.max.apply(null,c.options.map(function(o){return bytes(o.value);})):32)+1);var name='parameter'+i;
+  if(c.type==='slider'||c.type==='number')lines.push('double '+name+' = '+Number(c.value)+'; // '+c.id);
+  else if(c.type==='checkbox')lines.push('bool '+name+' = '+(c.value?'true':'false')+'; // '+c.id);
+  else if(c.type!=='button')lines.push('char '+name+'['+(c.type==='text'?c.maxLength+1:Math.max.apply(null,c.options.map(function(o){return bytes(o.value);}))+1)+'] = '+JSON.stringify(c.value)+'; // '+c.id);
+ });
+ lines.push('','bool streaming = false;','char command['+maxCommand+'];','size_t used = 0;','bool commandOverflow = false;','unsigned long lastSample = 0;','',
+ 'void onControl(const char *id) {','  // A validated parameter changed. Use the parameter variables above here.','  // Example: if (strcmp(id, "enabled") == 0) digitalWrite(LED_BUILTIN, parameter0);','}',
+ 'void onAction(const char *id) {','  // A button was pressed. Add the operation for this action ID.','  Serial.print(F("@msg Action received: ")); Serial.println(id);','}',
+ 'void jsonText(const char *text) {','  Serial.write(\'"\');','  while (*text) { if (*text == \'"\' || *text == \'\\\\\') Serial.write(\'\\\\\'); Serial.write(*text++); }','  Serial.write(\'"\');','}',
+ 'void sendState() {','  Serial.print(F("@state {"));');
+ var count=0;controls.forEach(function(c,i){if(c.type==='button')return;lines.push('  Serial.print(F('+JSON.stringify((count++?',':'')+JSON.stringify(c.id)+':')+'));');if(c.type==='checkbox')lines.push('  Serial.print(parameter'+i+' ? F("true") : F("false"));');else if(c.type==='number'||c.type==='slider')lines.push('  Serial.print(parameter'+i+', 6);');else lines.push('  jsonText(parameter'+i+');');});
+ lines.push('  Serial.println(\'}\');','}','void announce() {','  Serial.println(F('+JSON.stringify(header)+'));');if(count)lines.push('  sendState();');lines.push('  Serial.println(F("@msg Ready. Press Start to see readings; use the controls to change parameters."));','}','void handleCommand() {',
+ '  if (strcmp(command, "START") == 0) { announce(); streaming = true; lastSample = millis(); Serial.println(F("@msg Running. Stop pauses sampling.")); return; }',
+ '  if (strcmp(command, "STOP") == 0) { streaming = false; Serial.println(F("@msg Stopped. Press Start to continue.")); return; }');
+ controls.forEach(function(c,i){var prefix=(c.type==='button'?'@do ':'@set ')+c.id+(c.type==='button'?'':' '),name='parameter'+i;
+  if(c.type==='button'){lines.push('  if (strcmp(command, '+JSON.stringify(prefix)+') == 0) { onAction('+JSON.stringify(c.id)+'); return; }');return;}
+  lines.push('  if (strncmp(command, '+JSON.stringify(prefix)+', '+prefix.length+') == 0) {','    const char *value = command + '+prefix.length+';');
+  if(c.type==='number'||c.type==='slider'){lines.push('    char *end; double number = strtod(value, &end);','    if (!*value || *end || !isfinite(number)'+(c.min!=null?' || number < '+c.min:'')+(c.max!=null?' || number > '+c.max:'')+') { Serial.println(F("@msg Invalid '+c.id+' value.")); return; }');if(c.step!=null)lines.push('    double ticks = (number - '+(c.min==null?0:c.min)+') / '+c.step+';','    if (fabs(ticks - round(ticks)) > 0.0001) { Serial.println(F("@msg Value does not match the step size.")); return; }');lines.push('    '+name+' = number;');}
+  else if(c.type==='checkbox')lines.push('    if (strcmp(value, "1") && strcmp(value, "0")) { Serial.println(F("@msg Expected 0 or 1.")); return; }','    '+name+' = value[0] == \'1\';');
+  else{if(c.type==='select')lines.push('    if ('+c.options.map(function(o){return 'strcmp(value, '+JSON.stringify(o.value)+')';}).join(' && ')+') { Serial.println(F("@msg Unknown selection.")); return; }');lines.push('    if (strlen(value) >= sizeof('+name+')) { Serial.println(F("@msg Text too long.")); return; }','    strcpy('+name+', value);');}
+  lines.push('    onControl('+JSON.stringify(c.id)+'); sendState(); return;','  }');
+ });
+ lines.push('  Serial.println(F("@msg Unknown command. Use the controls shown in Plotter."));','}','void setup() {','  Serial.begin('+baud+');','  announce();','}','void loop() {','  while (Serial.available()) {','    char c = Serial.read();','    if (c == \'\\r\') continue;','    if (c == \'\\n\') {','      command[used] = 0;','      if (!commandOverflow) handleCommand();','      else Serial.println(F("@msg Command too long; ignored."));','      used = 0; commandOverflow = false;','    } else if ((unsigned char)c < 32) commandOverflow = true;','    else if (used < sizeof(command) - 1) command[used++] = c;','    else commandOverflow = true;','  }');
+ if(values.length)lines.push('  if (streaming && millis() - lastSample >= 100) {','    lastSample = millis();','    // Replace these input values with sensor readings.','    Serial.println(F('+JSON.stringify('@data '+JSON.stringify({id:profile.id,values:values}))+'));','  }');
+ lines.push('}','');return lines.join('\n');
 }
-$('show-header').onclick=function(){if(!profile){notice('Configure or receive a dashboard first.','error');return;}var header='@plot '+JSON.stringify(profile),baud=client.state.baud||9600,values=(P.inputFields?P.inputFields(profile):profile.fields).map(function(f){return f.type==='string'?'sample':f.type==='boolean'?false:0;});$('header-text').value=header;$('use-header').textContent='Saved profile shortcut: @use '+profile.id+' (save this profile in the Plotter first)';$('arduino-code').value=codeFor(header,values,baud);$('header-dialog').showModal();};
+$('show-header').onclick=function(){if(!profile){notice('Configure or receive a dashboard first.','error');return;}var header='@plot '+JSON.stringify(profile),baud=client.state.baud||9600,values=(P.inputFields?P.inputFields(profile):profile.fields).map(function(f){return f.type==='string'?'sample':f.type==='boolean'?false:0;});$('header-text').value=header;$('use-header').textContent='Saved profile shortcut: @use '+profile.id+' (save this profile in the Plotter first)';$('arduino-code').value=codeFor(header,values,baud);var preview=['Board → Plotter:',header];if(values.length)preview.push('@data '+JSON.stringify({id:profile.id,values:values}));preview.push('@msg Turn the knob or try a control.','', 'Plotter → board (each ends with a newline):','START','STOP');(profile.controls||[]).forEach(function(c){preview.push(P.controlCommand(c,c.value));});if((profile.controls||[]).some(function(c){return c.type!=='button';}))preview.push('', 'Board confirms actual values with @state {"control-id":value}.');$('protocol-preview').textContent=preview.join('\n');$('header-dialog').showModal();};
 $('header-close').onclick=function(){$('header-dialog').close();};
 function copyText(id){var text=$(id).value;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){notice('Copied to clipboard.');}).catch(function(){$(id).select();notice('Select the text and copy it with Ctrl+C.');});else{$(id).select();notice('Select the text and copy it with Ctrl+C.');}}
 $('copy-header').onclick=function(){copyText('header-text');};$('copy-code').onclick=function(){copyText('arduino-code');};$('download-header').onclick=function(){download(profile.id+'-header.txt',$('header-text').value+'\n','text/plain');};
@@ -200,14 +276,14 @@ $('capture-start').onclick=function(){
  if(!Number.isInteger(limit)||limit<1||limit>100000){notice('Capture limit must be an integer from 1 to 100000.','error');return;}
  if(captured.length&&!confirm('Start a new capture and replace the previous unsaved capture?'))return;
  captured=[];captureRecords=[];captureBytes=0;captureName=!inlineImagesActive?PlotterImage.model.config.id:profile.id;capture={limit:limit};captureConfiguration();store(CAP,limit);
- $('capture-start').disabled=true;$('capture-stop').disabled=false;$('capture-count').textContent='0 / '+limit+' samples';updateCaptureButtons();notice('Capturing the next '+limit+' samples or pixel updates. Configuration changes stay in the same capture.');
+ $('capture-start').disabled=true;$('capture-stop').disabled=false;$('capture-count').textContent='0 / '+limit+' records';updateCaptureButtons();notice('Capturing the next '+limit+' readings, messages or pixel updates. Configuration changes stay in the same capture.');
 };
 $('capture-stop').onclick=function(){stopCapture('Capture stopped.');};
 function captureCSV(){
  var rows=[['kind','config_revision','received_iso','device_time','stream_id','field_id','value','raw','configuration_or_pixel'].map(P.csvCell).join(',')];
  captureRecords.forEach(function(record){var base=[record.kind,record.revision,new Date(record.ts).toISOString(),record.t,record.id||(record.profile&&record.profile.id)];
   if(record.kind==='sample')Object.keys(record.values).forEach(function(k){rows.push(base.concat([k,record.values[k],record.raw[k],'']).map(P.csvCell).join(','));});
-  else rows.push(base.concat(['','','',JSON.stringify(record.profile||record.image||record.values)]).map(P.csvCell).join(','));
+  else rows.push(base.concat(['','','',JSON.stringify(record.profile||record.image||(record.kind==='message'?{text:record.text,level:record.level}:record.values))]).map(P.csvCell).join(','));
  });return rows.join('\r\n')+'\r\n';
 }
 $('save-csv').onclick=function(){download(captureName+'-capture.csv',captureCSV(),'text/csv;charset=utf-8');};
@@ -225,9 +301,35 @@ function widgetRow(w){
  type.setAttribute('aria-label','Instrument type');titleInput.placeholder='Title (optional)';titleInput.setAttribute('aria-label','Instrument title');fields.placeholder='Field IDs';fields.setAttribute('aria-label','Instrument fields');points.placeholder='History';points.min=10;points.step=1;points.setAttribute('aria-label','Instrument history');points.title='Optional history for line or XY chart; blank uses dashboard history';
  remove.type='button';remove.onclick=function(){row.remove();};row.append(type,titleInput,fields,points,remove,hint);row._controls={type:type,title:titleInput,fields:fields,history:points};row._source=w;$('config-widgets').appendChild(row);
 }
-function defaultProfile(){return {version:1,id:'my-dashboard',title:'My dashboard',history:500,fields:[{id:'value',label:'Value',type:'number',min:0,max:1023}],widgets:[{type:'line',fields:['value']},{type:'gauge',field:'value'}]};}
-function openConfig(){var p=profile||defaultProfile();$('config-id').value=p.id;$('config-title').value=p.title;$('config-history').value=p.history;$('config-fields').replaceChildren();$('config-widgets').replaceChildren();p.fields.forEach(fieldRow);p.widgets.forEach(widgetRow);$('config-error').textContent='';$('configuration').showModal();}
-$('configure').onclick=openConfig;$('config-close').onclick=function(){$('configuration').close();};$('field-add').onclick=function(){fieldRow({id:'value'+($('config-fields').children.length+1),type:'number'});};$('widget-add').onclick=function(){widgetRow({type:'line',fields:[]});};
+function controlRow(source){
+ var row=node('div',null,'control-editor'),c={id:input(source.id||''),label:input(source.label||''),type:select([['slider','Slider'],['number','Number'],['checkbox','Checkbox'],['text','Text'],['select','Choice'],['button','Button']],source.type||'slider'),value:input(source.value),checked:input(null,'checkbox'),min:input(source.min,'number'),max:input(source.max,'number'),step:input(source.step,'number'),unit:input(source.unit),help:input(source.help),maxLength:input(source.maxLength||40,'number'),options:node('textarea')},wrappers={};
+ c.checked.checked=source.value===true;c.options.rows=3;c.options.value=(source.options||[{value:'first',label:'First'},{value:'second',label:'Second'}]).map(function(o){return o.value+' = '+o.label;}).join('\n');
+ function add(key,label,wide){var wrapper=node('label',label,wide?'wide':null);c[key].setAttribute('aria-label','Control '+label.toLowerCase());wrapper.appendChild(c[key]);row.appendChild(wrapper);wrappers[key]=wrapper;}
+ add('id','ID');add('label','Label');add('type','Type');add('value','Initial value');add('checked','Initially checked');add('min','Minimum');add('max','Maximum');add('step','Step');add('unit','Unit');add('maxLength','Maximum text bytes');add('options','Choices: value = label',true);add('help','Help',true);
+ var remove=node('button','Remove');remove.type='button';remove.onclick=function(){row.remove();};row.append(remove,node('span','The ID links this control to your program. Example: @set speed 250. Button: @do reset.','hint'));
+ function fields(){var type=c.type.value;['min','max','step','unit'].forEach(function(k){wrappers[k].hidden=type!=='slider'&&type!=='number';});wrappers.value.hidden=type==='checkbox'||type==='button';wrappers.checked.hidden=type!=='checkbox';wrappers.maxLength.hidden=type!=='text';wrappers.options.hidden=type!=='select';}
+ c.type.onchange=fields;fields();row._controls=c;row._source=source;$('config-controls').appendChild(row);
+}
+function controlFromRow(row){
+ var c=row._controls,type=c.type.value,result={id:c.id.value.trim(),label:c.label.value.trim(),type:type};if(c.help.value.trim())result.help=c.help.value.trim();
+ if(type==='button')return result;if(type==='checkbox')result.value=c.checked.checked;else result.value=c.value.value;
+ if(type==='slider'||type==='number'){['min','max','step'].forEach(function(key){if(c[key].value.trim())result[key]=Number(c[key].value);});if(c.unit.value.trim())result.unit=c.unit.value.trim();}
+ if(type==='text')result.maxLength=Number(c.maxLength.value);
+ if(type==='select')result.options=c.options.value.split('\n').map(function(line){var at=line.indexOf('=');return at<0?{value:line.trim(),label:line.trim()}:{value:line.slice(0,at).trim(),label:line.slice(at+1).trim()};}).filter(function(o){return o.value;});
+ return result;
+}
+function template(kind){
+ var sensor={version:1,id:'my-dashboard',title:'My sensor',description:'Connect the sensor as described in your program. Press Start and change its input to see the readings move.',history:200,fields:[{id:'value',label:'Reading',min:0,max:1023}],widgets:[{type:'line',fields:['value']},{type:'gauge',field:'value'}],controls:[]};
+ if(kind==='traces'){sensor.title='Compare two readings';sensor.fields.push({id:'reference',label:'Reference',min:0,max:1023});sensor.widgets=[{type:'line',fields:['value','reference']},{type:'gauge',fields:['value','reference']}];}
+ if(kind==='image'){sensor.title='Image and reading';sensor.widgets=[{type:'image',image:{id:'scan',width:32,height:24,mode:'gray',max:1023}},{type:'line',fields:['value']}];sensor.description='The board sends one pixel at a time. The computer keeps the picture and saves it as PNG.';}
+ if(kind==='controls'){sensor.title='Interactive program';sensor.description='These controls send parameter changes to your program. The board replies with a message and confirms actual values.';sensor.controls=[{id:'speed',type:'slider',label:'Speed',min:0,max:1000,step:10,value:250},{id:'enabled',type:'checkbox',label:'Enabled',value:true},{id:'label',type:'text',label:'Message',value:'Hello',maxLength:40},{id:'mode',type:'select',label:'Mode',value:'slow',options:[{value:'slow',label:'Slow'},{value:'fast',label:'Fast'}]},{id:'reset',type:'button',label:'Restart'}];}
+ return sensor;
+}
+function fillConfig(p){$('config-id').value=p.id;$('config-title').value=p.title;$('config-description').value=p.description||'';$('config-history').value=p.history||500;$('config-fields').replaceChildren();$('config-widgets').replaceChildren();$('config-controls').replaceChildren();p.fields.forEach(fieldRow);p.widgets.forEach(widgetRow);(p.controls||[]).forEach(controlRow);$('config-error').textContent='';}
+function defaultProfile(){return template('sensor');}
+function openConfig(){fillConfig(profile||defaultProfile());$('configuration').showModal();}
+$('configure').onclick=openConfig;if($('empty-configure'))$('empty-configure').onclick=openConfig;$('config-close').onclick=function(){$('configuration').close();};$('field-add').onclick=function(){fieldRow({id:'value'+($('config-fields').children.length+1),type:'number'});};$('widget-add').onclick=function(){widgetRow({type:'line',fields:[]});};$('control-add').onclick=function(){controlRow({id:'parameter'+($('config-controls').children.length+1),type:'slider',min:0,max:100,step:1,value:50});};
+document.querySelectorAll('[data-template]').forEach(function(button){button.onclick=function(){fillConfig(template(button.dataset.template));};});
 $('configuration-form').onsubmit=function(e){
  e.preventDefault();try{
   var fields=Array.prototype.map.call($('config-fields').children,function(row){var c=row._controls,f=Object.assign({},row._source,{id:c.id.value.trim(),label:c.label.value.trim(),unit:c.unit.value.trim(),type:c.type.value});['min','max','scale','offset'].forEach(function(k){delete f[k];if(c[k].value.trim())f[k]=Number(c[k].value);});return f;});
@@ -238,7 +340,7 @@ $('configuration-form').onsubmit=function(e){
    else if(!w.image)throw Error('Add an image widget in Advanced JSON to set its width, height and pixel range.');
    return w;
   });
-  apply({version:1,id:$('config-id').value.trim(),title:$('config-title').value,history:Number($('config-history').value),fields:fields,widgets:widgets},'manual configuration');manual();$('configuration').close();
+  var controls=Array.prototype.map.call($('config-controls').children,controlFromRow);apply({version:1,id:$('config-id').value.trim(),title:$('config-title').value,description:$('config-description').value,history:Number($('config-history').value),fields:fields,widgets:widgets,controls:controls},'manual configuration');manual();$('configuration').close();
  }catch(error){$('config-error').textContent=error.message;}
 };
 $('configure-json').onclick=function(){$('config-json').value=JSON.stringify(profile||defaultProfile(),null,2);$('json-error').textContent='';$('json-configuration').showModal();};
@@ -258,7 +360,7 @@ $('demo').onclick=function(){
  var phase=0,pixel=0;demo=setInterval(function(){phase+=.08;data('@data '+JSON.stringify({id:'demo-sensors',t:Math.round(phase*1000),values:{angle:90+80*Math.sin(phase/2),distance:95+65*Math.sin(phase),signal:50+40*Math.cos(phase*.7)}}),Date.now());if(imageWidgets.length){for(var i=0;i<32;i++){var x=pixel%32,y=Math.floor(pixel/32);data('@pixel demo-image '+x+','+y+','+Math.round(511.5*(1+Math.sin(x/5+phase)*Math.cos(y/4))),Date.now());pixel=(pixel+1)%640;}}},100);
  this.textContent='Stop demo';notice('DEMO — simulated samples. Live serial reception in Monitor continues; this Plotter temporarily ignores it.','demo');
 };
-var lastProfile=load(LAST,'');if(profiles[lastProfile]&&parser.mode==='manual')apply(profiles[lastProfile],'last saved dashboard');
+var lastProfile=load(LAST,'');if(profiles[lastProfile]&&parser.mode==='manual')apply(profiles[lastProfile],'last saved dashboard');else if(parser.mode==='manual'){$('mode').value='auto';parser.mode='auto';store(MODE,'auto');}
 window.addEventListener('beforeunload',function(e){if(capture){e.preventDefault();e.returnValue='A capture is still running.';}});
 window.addEventListener('pagehide',function(){cancelStart();client.stop();if(demo)clearInterval(demo);});
 })();

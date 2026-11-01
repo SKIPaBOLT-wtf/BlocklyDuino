@@ -4,13 +4,24 @@ The Pro Mini ATmega168 reference now has a versioned capability description,
 engine-aware allocation and explicit wiring-change notices. Connections explains
 hardware versus interrupt/loop engines and their resource limits.
 
-The grouped example catalogue covers all 20 named device types, includes target
-build sizes and beginner comments, and distinguishes legacy/advanced lessons.
+The grouped catalogue contains 78 curated examples covering all 20 named device
+types, with target build sizes, beginner comments and wiring/observation/change
+instructions. Advanced lessons identify their hardware and memory limits.
 LCD users can define eight 5×8 glyphs and display codes 0–7 from a prepared buffer;
 legacy zero-as-space buffers keep their previous behavior.
 
-Plotter Start/Stop sends ordinary serial commands. Controller headers describe
-multiple charts, overlaid traces, gauge needles, bars, raw tables and scan images.
+All 31 Serial examples announce their Plotter header and instructions on boot and
+on Start. Upload example 55, choose 115200 baud, Connect and Start for a board-only
+interactive LED experiment. A fresh or reset automatic Plotter waits for a header;
+Manual dashboard remains available for sketches without one. Start/Stop sends
+ordinary `START`/`STOP` serial lines.
+
+Controller headers describe multiple charts, overlaid traces, gauge needles,
+bars, raw tables and scan images, plus sliders, number/text inputs, checkboxes,
+selectors and buttons. `@msg` displays instructions in Board says; `@state`
+confirms control values. Ordinary serial commands carry input back to the sketch.
+Fit all instruments is the default; a larger scrolling layout is optional in
+settings, which remember their collapsed state.
 Bounded host formulas/statistics/integration keep the computation off the MCU.
 Capture retains configuration revisions and raw/calculated samples across live
 header changes. See the in-app Plotter guide for complete wire-format examples.
@@ -35,7 +46,7 @@ The additions are Apache-2.0; original notices and the separate v2 license remai
 | Low-level | unsigned bit operations, logic, masked AVR port/register access, custom SPI/I2C transactions | `bit_blocks.js`, `logic_blocks.js`, `avr_blocks.js`, `bus_blocks.js` |
 | Interrupts | named external/pin-change handlers, attach/detach, atomic access, configurable Timer1 | `interrupt_blocks.js`, `timer_interrupt_blocks.js` |
 | Workspace | undo/redo, stack selection, new/recover project, pointer-anchored 1–300% zoom, labelled areas | `editor_history.js`, `editor_actions.js`, `workspace_zoom.js`, `workspace_regions.js`, `blockly_helper.js` |
-| Serial | shared bidirectional connection, independent Monitor/Plotter, saved layouts and capture | `serial_client.js`, `serial_monitor.js`, `serial_plotter.js`, `serial_protocol.js` |
+| Serial | shared bidirectional connection, header-configured Plotter views and controls, board messages, saved layouts and capture | `serial_client.js`, `serial_monitor.js`, `serial_plotter.js`, `serial_protocol.js` |
 | Build target | actual installed board menus, port selection, applied target persistence, compact panels | `target_picker.js`, `panel_state.js`, `server/` |
 
 The static toolbox has 177 block types, supplemented by 20 device configurations

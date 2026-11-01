@@ -3,8 +3,9 @@
     <mutation uid="card36" />
     <field name="NAME">card</field>
     <field name="CS">10</field>
-    <comment pinned="false" w="340" h="170">Purpose: Open a known SD filename, write text and close it so the filesystem can finish the operation.
-Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+    <comment pinned="false" w="480" h="240">Purpose: Create or append a text file on an SPI SD card, then flush and close it. A FAT filesystem remains readable on a computer.
+Wiring: SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.
+Try: Change the filename and text, upload, then inspect the file on a computer.</comment>
   </block>
   <block type="arduino_setup_section" x="25" y="170">
     <statement name="DO">
@@ -65,14 +66,11 @@ Hardware: use Connections to check pin ownership for your selected board. Open t
                     </next>
                   </block>
                 </statement>
-                <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
               </block>
             </next>
           </block>
         </statement>
-        <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
       </block>
     </statement>
-    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
 </xml>

@@ -81,13 +81,39 @@ returning to blocks. This remains a single-sketch editor, not a multi-file IDE.
 
 ## Serial tools
 
-Monitor and Plotter are separate views sharing one serial connection. Choose a
-port and baud, then Connect. Monitor can send text with configurable line endings.
-Settings panels remember their collapsed state; both views preserve preferences.
-The plotter accepts numbers, CSV, labelled values, or a versioned JSON protocol.
-Its Guide describes `@plot`, `@use` and `@data`, saved dashboard profiles, gauges,
-line/XY charts and bounded CSV/JSONL capture. Start with examples 54–56 or the
-plotter's built-in demo. Opening a serial port can reset an Arduino via DTR.
+For a first working experiment on Pro Mini ATmega168:
+
+1. Open example **55 — Interactive LED lab** and upload it. Only the board and
+   USB-to-serial connection are needed; its built-in D13 LED begins blinking.
+2. Open **Serial Plotter**, choose the board's port and **115200** baud, then
+   **Connect** and **Start**.
+3. Read **Board says**, watch the LED-state chart, and try the interval slider,
+   Enabled checkbox, pattern selector or message field. No dashboard setup is
+   needed.
+
+All 31 Serial lessons in the 78-example catalogue send a configuration header and
+instructions on boot and again when they receive `START`. Some begin immediately;
+others wait for Start. A fresh or reset Plotter in **From board (automatic)** mode
+waits for a header rather than guessing a chart from incoming numbers. **Reset
+view**, then **Start**, asks a running example to describe its screen again.
+
+Headers describe readings, charts and optional controls. `@msg` lines appear in
+**Board says**; sliders, numbers, checkboxes, text fields, selectors and buttons
+send ordinary commands back to the sketch. `@state` lets the sketch confirm its
+current values. **Fit all instruments** is the default display size. Choose
+**Larger instruments · scroll** under **Dashboard settings & recording** if
+preferred; settings panels remember their collapsed state.
+
+For a sketch without a header, select **Manual dashboard** in settings and build
+or load a matching layout. Numbers, CSV, labelled values and `@data` are accepted
+after a header or explicit manual configuration. The in-app Plotter Guide gives
+small copyable headers, data and control-command examples, plus saved profiles,
+gauges, line/XY charts, retained images and bounded CSV/JSONL capture.
+
+Monitor and Plotter are separate views sharing one serial connection. Monitor
+can send text with configurable line endings. Plotter Start/Stop sends
+`START`/`STOP` followed by a newline; Stop leaves the connection open. Both views
+preserve connection preferences. Opening a serial port can reset an Arduino via DTR.
 
 All device wiring, memory format, interrupt and music guides are available from
 the editor's **Guide**. The example selectors open editable blocks, not screenshots.

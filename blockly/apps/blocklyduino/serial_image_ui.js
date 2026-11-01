@@ -38,5 +38,5 @@
    return {kind:command[1]==='pixel'?'pixel':'image-clear',id:found.model.config.id,values:command[1]==='pixel'?values.split(',').map(Number):null};
   }catch(e){return {kind:'error',message:e.message};}
  }
- window.PlotterImage={pause:function(value){paused=value;if(!paused)draw();},consume:consume,show:show,model:model,result:function(){return lastResult;},draw:draw,widget:widget,route:route,live:function(line){if(demo&&/^@(image|pixel|image-clear)(?:\s|$)/.test(line)){clearInterval(demo);demo=null;$('scan-demo').textContent='Try image demo';}return consume(line);}};
+ window.PlotterImage={reset:function(){if(demo){clearInterval(demo);demo=null;$('scan-demo').textContent='Try image demo';}model.config=null;model.pixels=null;model.updates=0;model.revision++;rendered=-1;pending=false;$('scan-save').disabled=true;canvas.width=canvas.height=1;show(false);},pause:function(value){paused=value;if(!paused)draw();},consume:consume,show:show,model:model,result:function(){return lastResult;},draw:draw,widget:widget,route:route,live:function(line){if(demo&&/^@(image|pixel|image-clear)(?:\s|$)/.test(line)){clearInterval(demo);demo=null;$('scan-demo').textContent='Try image demo';}return consume(line);}};
 })();

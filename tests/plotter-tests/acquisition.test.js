@@ -60,9 +60,15 @@ async function main(){
  await $('stream-start').onclick();rx('@pixel scan 3,0,300\n');
  assert($('stream-status').textContent.includes('Receiving'),'A manual image can acknowledge Start with pixels alone');
  assert(![...timers.values()].some(t=>t.ms===1800));await $('stream-stop').onclick();
- // Example55 has no @plot header. A new Auto run must forget the previous
- // one-column schema, discover two columns and stop retrying after real data.
+ // Explicit Manual Reset keeps the schema but starts a genuinely empty image.
+ const previousImage=d.querySelector('.widget-image canvas');$('reset-view').click();draw();const resetImage=d.querySelector('.widget-image canvas');
+ assert.notEqual(resetImage,previousImage,'Explicit Reset must not reuse the populated inline image');
+ assert(painted.some(p=>p.canvas===resetImage&&p.data.every(value=>value===0)),'Manual Reset clears all retained pixel values');
+ assert(d.querySelector('.image-status').textContent.includes('0 pixel updates'));rx('@pixel scan 0,0,1023\n');assert(painted.some(p=>p.canvas===resetImage&&p.data[0]===255),'The preserved Manual schema accepts fresh pixels after Reset');
+ // Fresh Auto view waits for a header, even when numeric data arrives.
  $('mode').value='auto';$('mode').dispatchEvent(new w.Event('change'));await $('stream-start').onclick();rx('100,200\n');
+ assert($('stream-status').textContent.includes('Waiting'));assert.equal(d.querySelectorAll('.widget').length,0);
+ rx('@plot '+JSON.stringify({version:1,id:'new',fields:[{id:'a'},{id:'b'}]})+'\n100,200\n');
  assert($('dashboard-meta').textContent.includes('2 fields'));assert($('stream-status').textContent.includes('Receiving'));
  assert(![...timers.values()].some(t=>t.ms===1800));await $('stream-stop').onclick();
  // No header: exactly three START writes, then an actionable status without disconnecting.

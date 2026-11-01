@@ -15,8 +15,7 @@
     "Sound and music",
     "Memory, files and images",
     "Ports, bits and interrupts",
-    "Serial Monitor and Plotter",
-    "Legacy imports"
+    "Serial Monitor and Plotter"
   ],
   "examples": [
     {
@@ -41,6 +40,13 @@
         "transitive": []
       },
       "description": "Turn the built-in D13 LED on and off. Learn the order of statements and milliseconds.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter; use the built-in L / D13 LED.",
+        "observe": "Turn the built-in D13 LED on and off. Learn the order of statements and milliseconds.",
+        "change": "Change both wait values from 1000 to 200 ms and compare the blink rate.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -50,100 +56,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "3fec4585cba28c4983686f0a837fedb3ac9cf3f9ff9307b58f837c79ea0595ce",
         "flash": 924,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13412,
-        "classification": "fits",
-        "sketchSha256": "a1ad8cb76db433637b09df87a30e82bdd8af5e9970497d78902cbecd04544c8c"
-      }
-    },
-    {
-      "id": "02",
-      "file": "02-serial-hello.xml",
-      "title": "Serial hello",
-      "group": "Start here",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "serial",
-          "label": "USB–Serial adapter"
-        }
-      ],
-      "libraries": [
-        "Arduino AVR core (no extra library)"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [],
-        "transitive": []
-      },
-      "description": "Print a short greeting repeatedly in Serial Monitor. Match the sketch and Monitor baud rates.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 1628,
-        "flashLimit": 14336,
-        "staticRam": 194,
-        "staticRamLimit": 1024,
-        "ramRemaining": 830,
-        "flashRemaining": 12708,
-        "classification": "fits",
-        "sketchSha256": "cd0673a6fc6b1f4d4a467861c08c937c427229cf43122498a96e1e241090f3bf"
-      }
-    },
-    {
-      "id": "03",
-      "file": "03-pot-serial.xml",
-      "title": "Potentiometer values in Monitor",
-      "group": "Start here",
-      "level": "beginner",
-      "recommended": true,
-      "hardware": [
-        {
-          "id": "analog-input",
-          "label": "Analog source / potentiometer"
-        },
-        {
-          "id": "serial",
-          "label": "USB–Serial adapter"
-        }
-      ],
-      "libraries": [
-        "Arduino AVR core (no extra library)"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [],
-        "transitive": []
-      },
-      "description": "Read a potentiometer on A0 and print its 0–1023 ADC value. Turn the knob to see the number change.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 1890,
-        "flashLimit": 14336,
-        "staticRam": 188,
-        "staticRamLimit": 1024,
-        "ramRemaining": 836,
-        "flashRemaining": 12446,
-        "classification": "fits",
-        "sketchSha256": "08422d946cce7043be99723dd183bfb22cdb78b51e84da1de0c726243c717432"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -172,6 +92,13 @@
         "transitive": []
       },
       "description": "Map an A0 potentiometer reading to PWM brightness for an LED. A PWM output is required for analogWrite.",
+      "lesson": {
+        "wiring": "analog write: PIN D9; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Map an A0 potentiometer reading to PWM brightness for an LED. A PWM output is required for analogWrite.",
+        "change": "Change the map output maximum from 255 to 80 to limit LED brightness.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -181,14 +108,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "92c47576a80c1c6a5eaad4fcb4c836b2450230d44a361855e268c56dafaf97fc",
         "flash": 2182,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 12154,
-        "classification": "fits",
-        "sketchSha256": "870f1f340c283e2e56877fde85c3dc45ab3d0d4f8c127eea92d3303d019dab4d"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -213,6 +140,13 @@
         "transitive": []
       },
       "description": "Read a button and change an LED. The input needs the pull-up or wiring described in the blocks.",
+      "lesson": {
+        "wiring": "Button between D2 and GND; internal pull-up is enabled. The output is the built-in D13 LED.",
+        "observe": "Read a button and change an LED. The input needs the pull-up or wiring described in the blocks.",
+        "change": "Swap the HIGH/LOW actions to make the LED light when the button is released.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -222,14 +156,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "8b357330f1309a29cd4e4ef3f7a33f7bf4d041a328b8b62f9b1bdb9e73c8fd06",
         "flash": 1040,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13296,
-        "classification": "fits",
-        "sketchSha256": "e3661a05af0af337226a7a73e8fab9263999a9e85648e13e68181c52cfbc5729"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -254,6 +188,13 @@
         "transitive": []
       },
       "description": "Run a simple red/amber/green traffic-light sequence. Each wait makes the next visible phase last longer.",
+      "lesson": {
+        "wiring": "Red LED D2, amber D3, green D4; each LED needs its own series resistor to GND.",
+        "observe": "Run a simple red/amber/green traffic-light sequence. Each wait makes the next visible phase last longer.",
+        "change": "Change the red, amber and green wait times separately.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -263,14 +204,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "5a9a42b78b0f7e3e867075d3affa3d43c9ac9252e3e3b1c12a2488e3586d9741",
         "flash": 1030,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13306,
-        "classification": "fits",
-        "sketchSha256": "211a7a6aa1571abd3e8165dfbcb6b458df031886278c027667e9cccde45e9b0c"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -310,6 +251,13 @@
         ]
       },
       "description": "Request a DS18B20 conversion without waiting, read it after 800 ms, and show a thermometer dashboard after Plotter Start.",
+      "lesson": {
+        "wiring": "DS18B20: PIN D2; Powered DS18B20: data needs a 4.7 kΩ pull-up to VCC. Common GND; use each module’s required supply.",
+        "observe": "Request a DS18B20 conversion without waiting, read it after 800 ms, and show a thermometer dashboard after Plotter Start.",
+        "change": "Warm the sensor with your fingers. Change the graph gauge bounds, keeping the 800 ms sensor interval.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "line",
@@ -322,14 +270,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 6554,
+        "sketchSha256": "9e62e83e7d339f096f03cfb5fd167e7e977e093f3fd3f5f29748be59706b1e02",
+        "flash": 7226,
         "flashLimit": 14336,
-        "staticRam": 255,
+        "staticRam": 256,
         "staticRamLimit": 1024,
-        "ramRemaining": 769,
-        "flashRemaining": 7782,
-        "classification": "fits",
-        "sketchSha256": "7d4b0773af45ab296d50074b361262efd41beccc861669f2b130f7194918c91f"
+        "flashRemaining": 7110,
+        "ramRemaining": 768,
+        "classification": "fits"
       }
     },
     {
@@ -365,6 +313,13 @@
         ]
       },
       "description": "Show a greeting on a 16×2 HD44780 LCD with PCF8574 I2C backpack. Check address and contrast first.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Show a greeting on a 16×2 HD44780 LCD with PCF8574 I2C backpack. Check address and contrast first.",
+        "change": "Edit the two text values. Row 0 is the first line; row 1 is the second.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -374,14 +329,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "00aefcdb59e87002047af9bf9a972b7a3250505c82300eb9f9ebbd37167c7896",
         "flash": 3274,
         "flashLimit": 14336,
         "staticRam": 277,
         "staticRamLimit": 1024,
-        "ramRemaining": 747,
         "flashRemaining": 11062,
-        "classification": "fits",
-        "sketchSha256": "0120b362217a10701fee244209eb5d41a86e308498ea36157e71fc542d81be64"
+        "ramRemaining": 747,
+        "classification": "fits"
       }
     },
     {
@@ -421,6 +376,13 @@
         ]
       },
       "description": "Read a potentiometer and print the value on a 16×2 I2C LCD. Learn how repeated prints update a text display.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; analog read: PIN A0; I2C SDA A4, SCL A5; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Read a potentiometer and print the value on a 16×2 I2C LCD. Learn how repeated prints update a text display.",
+        "change": "Turn the potentiometer. Edit the label and move its output column.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -430,14 +392,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "a1ab546a947b94f8f7645bc71e64b0548495ff3e0a9edfb4eb316ed1a2736ea4",
         "flash": 3538,
         "flashLimit": 14336,
         "staticRam": 267,
         "staticRamLimit": 1024,
-        "ramRemaining": 757,
         "flashRemaining": 10798,
-        "classification": "fits",
-        "sketchSha256": "74feac0c01424aa4b8644b9063dbe3028df0ed895a04c9ce7e05c304d95e11fa"
+        "ramRemaining": 757,
+        "classification": "fits"
       }
     },
     {
@@ -479,6 +441,13 @@
         ]
       },
       "description": "Count seconds on an SSD1306 SPI OLED using a named device and no framebuffer. Update with millis timing.",
+      "lesson": {
+        "wiring": "SSD1306 SPI OLED: CS D10, DC D9, RESET D8; SPI MOSI D11, SCK D13; MISO is unused; CS/DC/RESET as listed. Common GND; use each module’s required supply.",
+        "observe": "Count seconds on an SSD1306 SPI OLED using a named device and no framebuffer. Update with millis timing.",
+        "change": "Edit the heading or move the counter to another text row.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -488,14 +457,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "c45a104ed6d0d00f16cb0af923fbd2966101dc96752d061163189d85bbaf87c8",
         "flash": 5602,
         "flashLimit": 14336,
         "staticRam": 359,
         "staticRamLimit": 1024,
-        "ramRemaining": 665,
         "flashRemaining": 8734,
-        "classification": "fits",
-        "sketchSha256": "3dfc403290d3163676c90e99c42691ec270356977805d52594591be0553bf983"
+        "ramRemaining": 665,
+        "classification": "fits"
       }
     },
     {
@@ -555,6 +524,13 @@
         ]
       },
       "description": "Print text and an analog reading on an ST7735 colour TFT over hardware SPI. Match the panel type and wiring.",
+      "lesson": {
+        "wiring": "ST7735 TFT: MOSI D11, SCK D13, CS D10, DC D9, RESET D8; MISO is unused. Potentiometer wiper A0, outer legs VCC/GND. Match the display’s supply and logic levels.",
+        "observe": "Print text and an analog reading on an ST7735 colour TFT over hardware SPI. Match the panel type and wiring.",
+        "change": "Change the foreground colour, text row or the potentiometer label.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -564,14 +540,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "34f078fa33b2add624573d8f8e7c8837d9d6851f7479330d7583aa14a2aa4d05",
         "flash": 12278,
         "flashLimit": 14336,
         "staticRam": 432,
         "staticRamLimit": 1024,
-        "ramRemaining": 592,
         "flashRemaining": 2058,
-        "classification": "fits",
-        "sketchSha256": "c9363a60394c99e489f7da54e40494edbfdf89193b6086e0ee21c6830386fa8f"
+        "ramRemaining": 592,
+        "classification": "fits"
       }
     },
     {
@@ -602,23 +578,32 @@
         "transitive": []
       },
       "description": "Scan the I2C bus and print responding addresses in Monitor. Use it to discover the address of an attached module.",
+      "lesson": {
+        "wiring": "I2C module SDA→A4 and SCL→A5, with matching supply and common GND. Several modules can share the bus.",
+        "observe": "Scan the I2C bus and print responding addresses in Monitor. Use it to discover the address of an attached module.",
+        "change": "Disconnect one I2C module and scan again; its address disappears.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 3710,
+        "sketchSha256": "91d40e445a68b56aef53e8130f416dcf702127512e09760bc6fbbd5f56be23e2",
+        "flash": 4628,
         "flashLimit": 14336,
-        "staticRam": 418,
+        "staticRam": 427,
         "staticRamLimit": 1024,
-        "ramRemaining": 606,
-        "flashRemaining": 10626,
-        "classification": "fits",
-        "sketchSha256": "cc7db10351194c0cb645d8f84046eeac09244b1ddbbcd0892a24c8b7f306e2c7"
+        "flashRemaining": 9708,
+        "ramRemaining": 597,
+        "classification": "fits"
       }
     },
     {
@@ -664,6 +649,13 @@
         ]
       },
       "description": "Print text on a 128×32 SSD1306 I2C OLED. U8x8 sends character tiles without a full pixel framebuffer.",
+      "lesson": {
+        "wiring": "SSD1306 I2C OLED: address 0x3C; analog read: PIN A0; I2C SDA A4, SCL A5; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Print text on a 128×32 SSD1306 I2C OLED. U8x8 sends character tiles without a full pixel framebuffer.",
+        "change": "Edit the heading. Keep text rows within the 128×32 display height.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -673,14 +665,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "ffbec67e9d612cb5d5458bf2fc464e46489bc439f47510eef02e069e629432b8",
         "flash": 6398,
         "flashLimit": 14336,
         "staticRam": 440,
         "staticRamLimit": 1024,
-        "ramRemaining": 584,
         "flashRemaining": 7938,
-        "classification": "fits",
-        "sketchSha256": "e30e60cf07ab6e67ab392a5739a515641f52c3dbd26c2f5640c91ce8b6ab53f1"
+        "ramRemaining": 584,
+        "classification": "fits"
       }
     },
     {
@@ -709,6 +701,13 @@
         "transitive": []
       },
       "description": "Use the text and RGB backlight of a Grove JHD1313 LCD. This module uses a different library from PCF8574 backpacks.",
+      "lesson": {
+        "wiring": "Grove JHD1313 RGB LCD: SDA→A4, SCL→A5, supply and GND.",
+        "observe": "Use the text and RGB backlight of a Grove JHD1313 LCD. This module uses a different library from PCF8574 backpacks.",
+        "change": "Change red, green and blue backlight values and edit the greeting.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -718,14 +717,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "3df4641fc9a6e0cef8a96ee4c92b706be325e943c7346d4c885e8c6b8f46fcb1",
         "flash": 3376,
         "flashLimit": 14336,
         "staticRam": 266,
         "staticRamLimit": 1024,
-        "ramRemaining": 758,
         "flashRemaining": 10960,
-        "classification": "fits",
-        "sketchSha256": "bd74ebed195e7f41a4700edb5f2d9fcc2a2cd258605c03c4d57cc0bcf7997992"
+        "ramRemaining": 758,
+        "classification": "fits"
       }
     },
     {
@@ -750,6 +749,13 @@
         "transitive": []
       },
       "description": "Make a passive piezo beep using the Arduino core tone function. This AVR engine uses Timer2 interrupts.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D8. Common GND; use each module’s required supply.",
+        "observe": "Make a passive piezo beep using the Arduino core tone function. This AVR engine uses Timer2 interrupts.",
+        "change": "Change the frequency from 440 Hz to 880 Hz; compare one octave.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -759,14 +765,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "ce863f68dcd342e7ee9a27362d2f83d276a3c766137201dd74d0f27d9d581c3a",
         "flash": 1688,
         "flashLimit": 14336,
         "staticRam": 28,
         "staticRamLimit": 1024,
-        "ramRemaining": 996,
         "flashRemaining": 12648,
-        "classification": "fits",
-        "sketchSha256": "e2ad2488a45a41237b3caa65705c9be6f6a139e9c5c2963cbf056fc032b69745"
+        "ramRemaining": 996,
+        "classification": "fits"
       }
     },
     {
@@ -791,6 +797,13 @@
         "transitive": []
       },
       "description": "Play a short tune with the basic core tone blocks. Compare this blocking lesson with the nonblocking named music examples.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D8. Common GND; use each module’s required supply.",
+        "observe": "Play a short tune with the basic core tone blocks. Compare this blocking lesson with the nonblocking named music examples.",
+        "change": "Change the note frequencies and note durations independently.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -800,14 +813,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "317694bb960a071aaf26b2babe66a8c45e8edc656f61f83e5cbd30ef8c5ff676",
         "flash": 2068,
         "flashLimit": 14336,
         "staticRam": 28,
         "staticRamLimit": 1024,
-        "ramRemaining": 996,
         "flashRemaining": 12268,
-        "classification": "fits",
-        "sketchSha256": "eb9882a95c4c7cd17d5b76e40153a2ba364e3bf609f4534fdbcf82b97705e73f"
+        "ramRemaining": 996,
+        "classification": "fits"
       }
     },
     {
@@ -857,6 +870,13 @@
         ]
       },
       "description": "Read a DS18B20 temperature and show it on an I2C character LCD. Check the sensor pull-up and LCD address.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; DS18B20: PIN D2; I2C SDA A4, SCL A5; Powered DS18B20: data needs a 4.7 kΩ pull-up to VCC. Common GND; use each module’s required supply.",
+        "observe": "Read a DS18B20 temperature and show it on an I2C character LCD. Check the sensor pull-up and LCD address.",
+        "change": "Warm the DS18B20, then change the temperature label or LCD row.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -866,66 +886,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "7bf23ca3982b83f02e706eb3d3952e1b22069085bd4b919dd27fd3bf6da8f1b1",
         "flash": 7126,
         "flashLimit": 14336,
         "staticRam": 328,
         "staticRamLimit": 1024,
-        "ramRemaining": 696,
         "flashRemaining": 7210,
-        "classification": "fits",
-        "sketchSha256": "a4449d1e61e6dc713a285fb286bf214b986fe17bbec3ecf908421a0a86cdd577"
-      }
-    },
-    {
-      "id": "18",
-      "file": "18-lcd20x4-animation.xml",
-      "title": "20×4 LCD animation (legacy helper)",
-      "group": "Displays and LED outputs",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "device_lcd",
-          "label": "HD44780 I2C LCD"
-        }
-      ],
-      "libraries": [
-        "LiquidCrystal_I2C",
-        "Wire"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [
-          "LiquidCrystal_I2C.h",
-          "Wire.h"
-        ],
-        "transitive": [
-          {
-            "library": "Wire",
-            "viaHeaders": [
-              "LiquidCrystal_I2C.h"
-            ]
-          }
-        ]
-      },
-      "description": "Play a preset 20×4 LCD animation with an older helper. Example 28 exposes the animation as individual blocks.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 3702,
-        "flashLimit": 14336,
-        "staticRam": 339,
-        "staticRamLimit": 1024,
-        "ramRemaining": 685,
-        "flashRemaining": 10634,
-        "classification": "fits",
-        "sketchSha256": "f50ba1d08badfaf6d7481cfc0b25e25e1ccb6af1adf8831dcf0ed56c73272435"
+        "ramRemaining": 696,
+        "classification": "fits"
       }
     },
     {
@@ -965,6 +933,13 @@
         ]
       },
       "description": "Show a potentiometer reading on a 20×4 LCD. Use the named LCD and buffer examples for reusable display logic.",
+      "lesson": {
+        "wiring": "lcd user init: address 0x27; analog read: PIN A0; I2C SDA A4, SCL A5; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Show a potentiometer reading on a 20×4 LCD. Use the named LCD and buffer examples for reusable display logic.",
+        "change": "Turn A0 and change which LCD row shows the ADC reading.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -974,14 +949,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "ba1b006ad24dea15ed24db0ae44aedb57f683505a665222a7ea83572cd246cc2",
         "flash": 3634,
         "flashLimit": 14336,
         "staticRam": 287,
         "staticRamLimit": 1024,
-        "ramRemaining": 737,
         "flashRemaining": 10702,
-        "classification": "fits",
-        "sketchSha256": "17cd7cb850e4c603bc58b93c7ac577c8f8cd0d23baf26ada177ee61b82662ab4"
+        "ramRemaining": 737,
+        "classification": "fits"
       }
     },
     {
@@ -1008,6 +983,13 @@
         "transitive": []
       },
       "description": "Move a hobby servo between three angles with the core Servo library. Pulse edges are timer interrupt driven; the waits pause the main loop.",
+      "lesson": {
+        "wiring": "Servo: PIN D9. Common GND; use each module’s required supply.",
+        "observe": "Move a hobby servo between three angles with the core Servo library. Pulse edges are timer interrupt driven; the waits pause the main loop.",
+        "change": "Change the three angle targets, keeping them within your servo mechanism’s clear travel.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1017,59 +999,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "f70c391a6a4eb9b5b219ae3d3cfe7ff5b0811ba6fa486dd36b9afb8db1684423",
         "flash": 2024,
         "flashLimit": 14336,
         "staticRam": 50,
         "staticRamLimit": 1024,
-        "ramRemaining": 974,
         "flashRemaining": 12312,
-        "classification": "fits",
-        "sketchSha256": "309d3186b7079d8c9e5a0bfa272513bd2d7ff2aa25c5f0404434dfec9964965a"
-      }
-    },
-    {
-      "id": "21",
-      "file": "21-28byj-stepper.xml",
-      "title": "28BYJ stepper (blocking legacy lesson)",
-      "group": "Motors and motion",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "device_stepper_coils",
-          "label": "28BYJ-48 + ULN2003"
-        }
-      ],
-      "libraries": [
-        "Stepper"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [
-          "Stepper.h"
-        ],
-        "transitive": []
-      },
-      "description": "Move a 28BYJ-48 through a ULN2003 using a blocking legacy helper. Example 30 provides named, accelerated, nonblocking control.",
-      "notes": [
-        "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
-      ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 2300,
-        "flashLimit": 14336,
-        "staticRam": 35,
-        "staticRamLimit": 1024,
-        "ramRemaining": 989,
-        "flashRemaining": 12036,
-        "classification": "fits",
-        "sketchSha256": "4ff0eb82816db76c01b31cfbeb92bc6a3cab52b4b7e36c19a8287ea0c8c31549"
+        "ramRemaining": 974,
+        "classification": "fits"
       }
     },
     {
@@ -1108,6 +1045,13 @@
         ]
       },
       "description": "Read DHT22 temperature and humidity every 2.1 seconds. Plotter Start opens separate temperature and humidity views; invalid readings are reported as text.",
+      "lesson": {
+        "wiring": "DHT11/22: PIN D2; Bare DHT sensor data needs a pull-up; select its exact model. Common GND; use each module’s required supply.",
+        "observe": "Read DHT22 temperature and humidity every 2.1 seconds. Plotter Start opens separate temperature and humidity views; invalid readings are reported as text.",
+        "change": "Breathe gently near the sensor and watch humidity. Change gauge bounds without making sampling faster than 2.1 s.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "line",
@@ -1121,20 +1065,20 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 5860,
+        "sketchSha256": "600c6cf57e3a9145a050824c7f3d88a59d9ed4767e6f5439bf799149f65dc06b",
+        "flash": 6478,
         "flashLimit": 14336,
-        "staticRam": 231,
+        "staticRam": 232,
         "staticRamLimit": 1024,
-        "ramRemaining": 793,
-        "flashRemaining": 8476,
-        "classification": "fits",
-        "sketchSha256": "081e5c62fb3b5ce81eead69ecfa37f2d43aa641754d7e652c9ec9ffcf0c47955"
+        "flashRemaining": 7858,
+        "ramRemaining": 792,
+        "classification": "fits"
       }
     },
     {
       "id": "23",
       "file": "23-hc-sr04-serial.xml",
-      "title": "HC-SR04 distance in Monitor",
+      "title": "HC-SR04 distance gauge",
       "group": "Sensors and input",
       "level": "beginner",
       "recommended": false,
@@ -1157,23 +1101,33 @@
         "transitive": []
       },
       "description": "Measure HC-SR04 echo duration and print distance. Sensor reads can block while waiting for an echo; leave at least 60 ms between readings.",
+      "lesson": {
+        "wiring": "HC-SR04: TRIG D3, ECHO D4. Common GND; use each module’s required supply.",
+        "observe": "Measure HC-SR04 echo duration and print distance. Sensor reads can block while waiting for an echo; leave at least 60 ms between readings.",
+        "change": "Move a flat object toward the sensor. Change the gauge maximum from 200 to 50 cm.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "gauge",
+        "line"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 3950,
+        "sketchSha256": "007a9e386252f174e5e267666dcd8d5118381df3c3fa36b2b8f34825c9ddc03f",
+        "flash": 5062,
         "flashLimit": 14336,
-        "staticRam": 200,
+        "staticRam": 213,
         "staticRamLimit": 1024,
-        "ramRemaining": 824,
-        "flashRemaining": 10386,
-        "classification": "fits",
-        "sketchSha256": "00cedd65c4fff74c7896539b8ee471923da542f2f528c35a13fe6236eb118b3f"
+        "flashRemaining": 9274,
+        "ramRemaining": 811,
+        "classification": "fits"
       }
     },
     {
@@ -1200,6 +1154,13 @@
         "transitive": []
       },
       "description": "Change WS2812 RGB LED colours. The strip library keeps a small colour buffer and sends it on show.",
+      "lesson": {
+        "wiring": "WS2812 RGB LEDs: PIN D6. Common GND; use each module’s required supply.",
+        "observe": "Change WS2812 RGB LED colours. The strip library keeps a small colour buffer and sends it on show.",
+        "change": "Change the RGB values or the LED count to match your strip.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1209,20 +1170,20 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "19566fc339c694abee19936678cde5e92a80135bd20a1d49fe6e6cb2fcd914a1",
         "flash": 2650,
         "flashLimit": 14336,
         "staticRam": 41,
         "staticRamLimit": 1024,
-        "ramRemaining": 983,
         "flashRemaining": 11686,
-        "classification": "fits",
-        "sketchSha256": "ac8d0ac4ea8b13fa061f3d15fed2ff4f4a08e5845784e7d5e114405cffc47234"
+        "ramRemaining": 983,
+        "classification": "fits"
       }
     },
     {
       "id": "25",
       "file": "25-ir-nec-serial.xml",
-      "title": "NEC remote commands",
+      "title": "Read NEC remote buttons",
       "group": "Sensors and input",
       "level": "beginner",
       "recommended": true,
@@ -1247,23 +1208,32 @@
         "transitive": []
       },
       "description": "Read each NEC remote command once and print only valid frames. Poll promptly while IRremote uses Timer2 for reception.",
+      "lesson": {
+        "wiring": "NEC IR receiver: PIN D2. Common GND; use each module’s required supply.",
+        "observe": "Read each NEC remote command once and print only valid frames. Poll promptly while IRremote uses Timer2 for reception.",
+        "change": "Press different remote buttons and note their command values.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "raw"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 3506,
+        "sketchSha256": "9b72be660654cbd9fac145ea48e02b6f3966d66d42490c27a06986d19cd65cb6",
+        "flash": 4844,
         "flashLimit": 14336,
-        "staticRam": 433,
+        "staticRam": 446,
         "staticRamLimit": 1024,
-        "ramRemaining": 591,
-        "flashRemaining": 10830,
-        "classification": "fits",
-        "sketchSha256": "ace6afc7efcdfd8b2008a2341de4157a48990b11444664e2ec98f82fe34d6d0c"
+        "flashRemaining": 9492,
+        "ramRemaining": 578,
+        "classification": "fits"
       }
     },
     {
@@ -1288,6 +1258,13 @@
         "transitive": []
       },
       "description": "Send a shifting one-bit pattern to a 74HC595 so one LED chases across eight outputs. Wiring is declared once.",
+      "lesson": {
+        "wiring": "74HC595: DATA D8, CLOCK D9, LATCH D10. Common GND; use each module’s required supply.",
+        "observe": "Send a shifting one-bit pattern to a 74HC595 so one LED chases across eight outputs. Wiring is declared once.",
+        "change": "Reverse the shift direction or increase the 150 ms interval.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1297,57 +1274,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "b81fd30e38079a71d300e50772822320ae001879887de90ec823638e65e476c9",
         "flash": 992,
         "flashLimit": 14336,
         "staticRam": 14,
         "staticRamLimit": 1024,
-        "ramRemaining": 1010,
         "flashRemaining": 13344,
-        "classification": "fits",
-        "sketchSha256": "c3f3cb4efd1627aab00a8950dc8084d86de06d9ccbe7d18e1494490518fa4998"
-      }
-    },
-    {
-      "id": "27",
-      "file": "27-a4988-step-dir.xml",
-      "title": "STEP/DIR stepping (legacy helper)",
-      "group": "Motors and motion",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "device_stepper_driver",
-          "label": "STEP/DIR driver"
-        }
-      ],
-      "libraries": [
-        "Arduino AVR core (no extra library)"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [],
-        "transitive": []
-      },
-      "description": "Generate a simple STEP/DIR movement with a legacy helper. Use example 70 for fast hardware-timed continuous motion.",
-      "notes": [
-        "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
-      ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 1052,
-        "flashLimit": 14336,
-        "staticRam": 9,
-        "staticRamLimit": 1024,
-        "ramRemaining": 1015,
-        "flashRemaining": 13284,
-        "classification": "fits",
-        "sketchSha256": "0be53281b6a97c6f42f357239b3dd327bdefc34e3976811951904db2c5fc63e5"
+        "ramRemaining": 1010,
+        "classification": "fits"
       }
     },
     {
@@ -1383,6 +1317,13 @@
         ]
       },
       "description": "Build a 20×4 moving-text animation from editable blocks rather than a preset animation helper.",
+      "lesson": {
+        "wiring": "lcd user init: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Build a 20×4 moving-text animation from editable blocks rather than a preset animation helper.",
+        "change": "Edit the message and the update interval to change its movement.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1392,59 +1333,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "07d8021c9688e80215c62f6227a89f730c1ea22c9fa48fc43a711510686ae39e",
         "flash": 3416,
         "flashLimit": 14336,
         "staticRam": 273,
         "staticRamLimit": 1024,
-        "ramRemaining": 751,
         "flashRemaining": 10920,
-        "classification": "fits",
-        "sketchSha256": "18fe2cef66dba680c10136d932627787831b1cb4eafcb36680a644d403a1377a"
-      }
-    },
-    {
-      "id": "29",
-      "file": "29-accelstepper-a4988.xml",
-      "title": "STEP/DIR acceleration (legacy helper)",
-      "group": "Motors and motion",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "device_stepper_driver",
-          "label": "STEP/DIR driver"
-        }
-      ],
-      "libraries": [
-        "AccelStepper"
-      ],
-      "libraryEvidence": {
-        "source": "audited-generated-sketch-includes",
-        "headers": [
-          "AccelStepper.h"
-        ],
-        "transitive": []
-      },
-      "description": "Request STEP/DIR positions and repeatedly call AccelStepper run to accelerate and decelerate. Older helper format retained for comparison.",
-      "notes": [
-        "Legacy lesson retained for existing projects. Prefer named-device examples 30, 62 or 70 for new work."
-      ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "compiled",
-        "physical": "not-tested-in-this-audit",
-        "ok": true,
-        "flash": 5958,
-        "flashLimit": 14336,
-        "staticRam": 119,
-        "staticRamLimit": 1024,
-        "ramRemaining": 905,
-        "flashRemaining": 8378,
-        "classification": "fits",
-        "sketchSha256": "83c1647ddda961847b29b30818225879d52d66d1be73de1d95573434c056dc11"
+        "ramRemaining": 751,
+        "classification": "fits"
       }
     },
     {
@@ -1471,6 +1367,13 @@
         "transitive": []
       },
       "description": "Use one named 28BYJ-48 motor to travel between two positions with acceleration. Call run continuously; no delay interrupts the coil sequence.",
+      "lesson": {
+        "wiring": "28BYJ-48 + ULN2003: IN1 D8, IN2 D9, IN3 D10, IN4 D11. Common GND; use each module’s required supply.",
+        "observe": "Use one named 28BYJ-48 motor to travel between two positions with acceleration. Call run continuously; no delay interrupts the coil sequence.",
+        "change": "Change target 512 to 256 half-steps or reduce maximum speed and acceleration.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1480,14 +1383,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "4ed93f6db96d6a29b23c924748eac80eb27b9cc8569131b06ba9f7bdaec88309",
         "flash": 6014,
         "flashLimit": 14336,
         "staticRam": 123,
         "staticRamLimit": 1024,
-        "ramRemaining": 901,
         "flashRemaining": 8322,
-        "classification": "fits",
-        "sketchSha256": "d83bd06f1b3b8750b55a0f1f6746591a6c6e7860826fc8452a1a064ac5e14d1c"
+        "ramRemaining": 901,
+        "classification": "fits"
       }
     },
     {
@@ -1516,23 +1419,33 @@
         "transitive": []
       },
       "description": "Separate one-time setup from repeated loop work, create a variable, and call a reusable function.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter; observe the built-in D13 LED.",
+        "observe": "Separate one-time setup from repeated loop work, create a variable, and call a reusable function.",
+        "change": "Edit the blink function once; every function call uses the new timing.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "raw"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2278,
+        "sketchSha256": "b5cac2bdba802fb6f3b25adbe61ac8a86497fa1f244880dded05d2c737292ecb",
+        "flash": 3288,
         "flashLimit": 14336,
-        "staticRam": 198,
+        "staticRam": 211,
         "staticRamLimit": 1024,
-        "ramRemaining": 826,
-        "flashRemaining": 12058,
-        "classification": "fits",
-        "sketchSha256": "1c3a8ddc1d3b32f6a33cfe4acd12918252f3f97dc429a95fd2c82d298ce847b5"
+        "flashRemaining": 11048,
+        "ramRemaining": 813,
+        "classification": "fits"
       }
     },
     {
@@ -1557,23 +1470,32 @@
         "transitive": []
       },
       "description": "Try arithmetic, ranges and mathematical operations. Observe how connected value blocks form expressions.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Try arithmetic, ranges and mathematical operations. Observe how connected value blocks form expressions.",
+        "change": "Change one input and compare the labelled mathematical results.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2438,
+        "sketchSha256": "e2e09a5cf510dc69a24def52420c629639e6e6f149488693b3fd1ff0b2a4ee54",
+        "flash": 3332,
         "flashLimit": 14336,
-        "staticRam": 196,
+        "staticRam": 211,
         "staticRamLimit": 1024,
-        "ramRemaining": 828,
-        "flashRemaining": 11898,
-        "classification": "fits",
-        "sketchSha256": "6d668c6f2c3f8f30ffa69823480d705396fa5ca5710cbc3ee48a5a00a8358ef4"
+        "flashRemaining": 11004,
+        "ramRemaining": 813,
+        "classification": "fits"
       }
     },
     {
@@ -1598,23 +1520,32 @@
         "transitive": []
       },
       "description": "Update array data on a millis schedule so loop can continue between animation steps.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Update array data on a millis schedule so loop can continue between animation steps.",
+        "change": "Change an array element and the update interval; compare the sequence printed below.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1938,
+        "sketchSha256": "bb4b2530d132a79449cf75402877f9049a1fab20418ad1b4bc4bf5d4acb0ffd0",
+        "flash": 2854,
         "flashLimit": 14336,
-        "staticRam": 216,
+        "staticRam": 229,
         "staticRamLimit": 1024,
-        "ramRemaining": 808,
-        "flashRemaining": 12398,
-        "classification": "fits",
-        "sketchSha256": "2f61ff8e5acf2fd80b600307f55a694fb1fb54806bbc09f4647c6c4e699be9e2"
+        "flashRemaining": 11482,
+        "ramRemaining": 795,
+        "classification": "fits"
       }
     },
     {
@@ -1639,23 +1570,32 @@
         "transitive": []
       },
       "description": "Compare global and local declarations and address a two-dimensional array with zero-based indices.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Compare global and local declarations and address a two-dimensional array with zero-based indices.",
+        "change": "Change one 2D array index and compare the selected element; local variables exist only inside their function.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1796,
+        "sketchSha256": "cb60ea257607f0b87885636e2fcb23fa85e4fd94a53cd4ef3b0540fc0bc23a1e",
+        "flash": 2778,
         "flashLimit": 14336,
-        "staticRam": 220,
+        "staticRam": 229,
         "staticRamLimit": 1024,
-        "ramRemaining": 804,
-        "flashRemaining": 12540,
-        "classification": "fits",
-        "sketchSha256": "3b606e14b84b078bf173c7e3335944f064f1077ca46905ee99269daaecfdd17f"
+        "flashRemaining": 11558,
+        "ramRemaining": 795,
+        "classification": "fits"
       }
     },
     {
@@ -1682,6 +1622,13 @@
         "transitive": []
       },
       "description": "Declare a STEP/DIR device once, request target positions and keep servicing the loop engine until each target is reached.",
+      "lesson": {
+        "wiring": "STEP/DIR driver: STEP D3, DIR D4. Common GND; use each module’s required supply.",
+        "observe": "Declare a STEP/DIR device once, request target positions and keep servicing the loop engine until each target is reached.",
+        "change": "Change the two position targets or the acceleration; call run on every loop pass.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1691,14 +1638,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "7c63447feb266a9d1e1e991bf40a10fcad6871fd7d05faa7a655aede7e44ecc8",
         "flash": 5970,
         "flashLimit": 14336,
         "staticRam": 119,
         "staticRamLimit": 1024,
-        "ramRemaining": 905,
         "flashRemaining": 8366,
-        "classification": "fits",
-        "sketchSha256": "abd720dc35aabff9ba0b49f90818a94ad098601843c0cd83b7e9ed55dbee08ea"
+        "ramRemaining": 905,
+        "classification": "fits"
       }
     },
     {
@@ -1734,6 +1681,13 @@
         ]
       },
       "description": "Declare a 20×4 I2C LCD once and print through its named actions without repeating address or dimensions.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Declare a 20×4 I2C LCD once and print through its named actions without repeating address or dimensions.",
+        "change": "Change the message or the LCD columns/rows once in the device definition.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -1743,14 +1697,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "334fe347db02f7d4ffb02dfa1fed1dabc4934a798c0f5e672a79a7e114a45a2d",
         "flash": 3448,
         "flashLimit": 14336,
         "staticRam": 271,
         "staticRamLimit": 1024,
-        "ramRemaining": 753,
         "flashRemaining": 10888,
-        "classification": "fits",
-        "sketchSha256": "e3d95cc40522e655daeedcac8d8ea47eb6976779b45aae69aabe7c4258411571"
+        "ramRemaining": 753,
+        "classification": "fits"
       }
     },
     {
@@ -1775,33 +1729,43 @@
         }
       ],
       "libraries": [
-        "Servo"
+        "BlocklyMotion"
       ],
       "libraryEvidence": {
         "source": "audited-generated-sketch-includes",
         "headers": [
-          "Servo.h"
+          "BlocklyHardwareServo.h"
         ],
         "transitive": []
       },
       "description": "Sweep a servo and take HC-SR04 distance readings. Allow settling time and remember that an echo read briefly blocks.",
+      "lesson": {
+        "wiring": "Servo: PIN D9; HC-SR04: TRIG D5, ECHO D6. Common GND; use each module’s required supply.",
+        "observe": "Sweep a servo and take HC-SR04 distance readings. Allow settling time and remember that an echo read briefly blocks.",
+        "change": "Move an object into the sweep and narrow the servo angle range.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "xy",
+        "gauge"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 5030,
+        "sketchSha256": "2cfbc925a8b56179b360ef6223a360b10f537d3e220e159fd1a843cb761d9b92",
+        "flash": 5884,
         "flashLimit": 14336,
-        "staticRam": 243,
+        "staticRam": 226,
         "staticRamLimit": 1024,
-        "ramRemaining": 781,
-        "flashRemaining": 9306,
-        "classification": "fits",
-        "sketchSha256": "65b6073be1c535b3b9d5572b270df6688b204585ce82a20c0d9e43ec97cee231"
+        "flashRemaining": 8452,
+        "ramRemaining": 798,
+        "classification": "fits"
       }
     },
     {
@@ -1847,25 +1811,34 @@
         ]
       },
       "description": "Write and read typed values and text in a 24LC256 I2C EEPROM. Addresses are byte offsets, separate from its I2C bus address.",
+      "lesson": {
+        "wiring": "24LC256 EEPROM: address 0x50; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Write and read typed values and text in a 24LC256 I2C EEPROM. Addresses are byte offsets, separate from its I2C bus address.",
+        "change": "Change the stored number/text, using separate byte addresses for each record.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [
         "Writes a small EEPROM test area. Use a chip with no data you need to retain."
       ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 4742,
+        "sketchSha256": "040c4e8d57c577d38b3ecfdff7999ae3c85b67b99aaed942421f62bf525cf767",
+        "flash": 5814,
         "flashLimit": 14336,
-        "staticRam": 424,
+        "staticRam": 432,
         "staticRamLimit": 1024,
-        "ramRemaining": 600,
-        "flashRemaining": 9594,
-        "classification": "fits",
-        "sketchSha256": "ca3ba5edca486a1c24bd7cc3055111ae40f8ee1a94c6374f123078b795fd85ba"
+        "flashRemaining": 8522,
+        "ramRemaining": 592,
+        "classification": "fits"
       }
     },
     {
@@ -1911,25 +1884,34 @@
         ]
       },
       "description": "Write and read typed values and text in a 25LC256 SPI EEPROM using one named chip-select configuration.",
+      "lesson": {
+        "wiring": "25LC256 EEPROM: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Write and read typed values and text in a 25LC256 SPI EEPROM using one named chip-select configuration.",
+        "change": "Change the stored number/text without changing the SPI bus pins.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [
         "Writes a small EEPROM test area. Use a chip with no data you need to retain."
       ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 3644,
+        "sketchSha256": "093d961a05c37311586ec49dabdc42b872236c42563fbe74ce775ab1703434af",
+        "flash": 4648,
         "flashLimit": 14336,
-        "staticRam": 322,
+        "staticRam": 330,
         "staticRamLimit": 1024,
-        "ramRemaining": 702,
-        "flashRemaining": 10692,
-        "classification": "fits",
-        "sketchSha256": "05ec14e31c02503358e089b4a1f363696b584734e392dd4dc6da766ca293f53b"
+        "flashRemaining": 9688,
+        "ramRemaining": 694,
+        "classification": "fits"
       }
     },
     {
@@ -1975,25 +1957,34 @@
         ]
       },
       "description": "Erase a W25Q32 Flash sector, write a value/text, then read it back. Flash cannot overwrite programmed bits without erase.",
+      "lesson": {
+        "wiring": "W25Q32 Flash: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Erase a W25Q32 Flash sector, write a value/text, then read it back. Flash cannot overwrite programmed bits without erase.",
+        "change": "Change the test value inside the erased sector; Flash must be erased before bits can return to 1.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [
         "Erases a whole 4 KB Flash sector before writing. Use a chip with no data you need to retain."
       ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 3822,
+        "sketchSha256": "4473ed1ae9fcb73fcd585f82cae602f4eba11a2c1b772193f778264fb5a00d9d",
+        "flash": 4942,
         "flashLimit": 14336,
-        "staticRam": 322,
+        "staticRam": 330,
         "staticRamLimit": 1024,
-        "ramRemaining": 702,
-        "flashRemaining": 10514,
-        "classification": "fits",
-        "sketchSha256": "1ec6647e85becea6b23c027f578c01200bb4b185e919b294ad99d115213bb27a"
+        "flashRemaining": 9394,
+        "ramRemaining": 694,
+        "classification": "fits"
       }
     },
     {
@@ -2035,6 +2026,13 @@
         ]
       },
       "description": "Create or append a text file on an SPI SD card, then flush and close it. A FAT filesystem remains readable on a computer.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Create or append a text file on an SPI SD card, then flush and close it. A FAT filesystem remains readable on a computer.",
+        "change": "Change the filename and text, upload, then inspect the file on a computer.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2044,14 +2042,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "0d70c7967511e9cca81cbe97a5832cfc027ad1af3f82f4471985ac01b126cc39",
         "flash": 9770,
         "flashLimit": 14336,
         "staticRam": 719,
         "staticRamLimit": 1024,
-        "ramRemaining": 305,
         "flashRemaining": 4566,
-        "classification": "fits",
-        "sketchSha256": "75aa450b13d7197fd63df4c9c286eaf1656d1d89f23dfcf4b8dac3ab9b4916e9"
+        "ramRemaining": 305,
+        "classification": "fits"
       }
     },
     {
@@ -2093,6 +2091,13 @@
         ]
       },
       "description": "Create a small BMP file on SD and write pixels by coordinates. File storage replaces a full image array in RAM.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Create a small BMP file on SD and write pixels by coordinates. File storage replaces a full image array in RAM.",
+        "change": "Change the coordinates and pixel values, then open the resulting BMP on a computer.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2102,14 +2107,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "4041ef4030e9e3b4c1616b10abed3e7991a8d19e1a18e4c2606391fe17bcf3b5",
         "flash": 10982,
         "flashLimit": 14336,
         "staticRam": 699,
         "staticRamLimit": 1024,
-        "ramRemaining": 325,
         "flashRemaining": 3354,
-        "classification": "fits",
-        "sketchSha256": "72e8655b9499a4ad21d3d62d39087f69c4c70260de343307ed7a6e204ff549a7"
+        "ramRemaining": 325,
+        "classification": "fits"
       }
     },
     {
@@ -2161,6 +2166,13 @@
         ]
       },
       "description": "Sweep a servo, measure distance, and draw results into an SD BMP. This combined sketch has little memory margin on ATmega168.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; Servo: PIN D9; HC-SR04: TRIG D5, ECHO D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Sweep a servo, measure distance, and draw results into an SD BMP. This combined sketch has little memory margin on ATmega168.",
+        "change": "Move an object in the scan arc. Inspect the completed BMP; keep this small-memory combined project advanced.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Small remaining memory margin: 240 bytes Flash and 284 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
         "Combined SD, sensing and motion: advanced, little stack/heap headroom on ATmega168. Compile size is not a runtime stack test."
@@ -2173,14 +2185,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "4d10c7f62244d305715816f7a4deb63383bfaf0ecc31b4427f57461405ff04ac",
         "flash": 14096,
         "flashLimit": 14336,
         "staticRam": 740,
         "staticRamLimit": 1024,
-        "ramRemaining": 284,
         "flashRemaining": 240,
-        "classification": "tight",
-        "sketchSha256": "9c3026af8df7d0fd3ff723cfc8436773d77fa2524a9689187c938d7ed95c299a"
+        "ramRemaining": 284,
+        "classification": "tight"
       }
     },
     {
@@ -2222,6 +2234,13 @@
         ]
       },
       "description": "Write a monochrome BMP in raster order, one pixel at a time, then finish the file. No full image buffer is allocated.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Write a monochrome BMP in raster order, one pixel at a time, then finish the file. No full image buffer is allocated.",
+        "change": "Change the pixel formula to make stripes or a checkerboard; finish the image before reading it on the computer.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2231,14 +2250,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "a5c37a5fff8668c7ba93bc8580b1f144689855e29d721cf4367017b66c2123c4",
         "flash": 12200,
         "flashLimit": 14336,
         "staticRam": 711,
         "staticRamLimit": 1024,
-        "ramRemaining": 313,
         "flashRemaining": 2136,
-        "classification": "fits",
-        "sketchSha256": "493cf0ee7f6468333999ec090611e894cf7873c8a2e2a684600c05da4c8128c2"
+        "ramRemaining": 313,
+        "classification": "fits"
       }
     },
     {
@@ -2277,6 +2296,13 @@
         ]
       },
       "description": "Start a nonblocking note on a named passive buzzer while the main loop remains available for other tasks.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D4; digital write: PIN D13. Common GND; use each module’s required supply.",
+        "observe": "Start a nonblocking note on a named passive buzzer while the main loop remains available for other tasks.",
+        "change": "Change the beep duration while the LED continues its separate task.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2286,14 +2312,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "ee39cc879a8b05ce748cb480117944115daa95f00ba9732e4af0e4b41805aa07",
         "flash": 1758,
         "flashLimit": 14336,
         "staticRam": 48,
         "staticRamLimit": 1024,
-        "ramRemaining": 976,
         "flashRemaining": 12578,
-        "classification": "fits",
-        "sketchSha256": "b97d3b716db2f163e832dca3a1340d882f719a961d9d87d852acfbd78e719b0f"
+        "ramRemaining": 976,
+        "classification": "fits"
       }
     },
     {
@@ -2329,6 +2355,13 @@
         ]
       },
       "description": "Play three independent melody voices on three passive buzzers. The optional IRQ mixer shares one Timer2 and consumes periodic CPU time.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D4; Passive buzzer: PIN D5; Passive buzzer: PIN D6. Common GND; use each module’s required supply.",
+        "observe": "Play three independent melody voices on three passive buzzers. The optional IRQ mixer shares one Timer2 and consumes periodic CPU time.",
+        "change": "Change one voice’s notes while the other two voices keep their own melodies.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Three-voice IRQ music shares Timer2. Each passive buzzer uses a separate output; Timer2 is unavailable for another independent engine."
       ],
@@ -2340,14 +2373,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "c70eb2384e5d152a8fd0092fcdc54bce254d328fef1b72bb802db0cad4f464c0",
         "flash": 2492,
         "flashLimit": 14336,
         "staticRam": 72,
         "staticRamLimit": 1024,
-        "ramRemaining": 952,
         "flashRemaining": 11844,
-        "classification": "fits",
-        "sketchSha256": "073c0db3e74d40ffc9edb9f91a91d0d38a12f6fdf5f94ef6d212068c58f1051c"
+        "ramRemaining": 952,
+        "classification": "fits"
       }
     },
     {
@@ -2383,6 +2416,13 @@
         ]
       },
       "description": "Define a reusable flash melody with rests and play it through a named buzzer.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D4. Common GND; use each module’s required supply.",
+        "observe": "Define a reusable flash melody with rests and play it through a named buzzer.",
+        "change": "Edit one note or rest in the melody definition; play it again.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2392,14 +2432,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "290ce7a30de088cd4cfcfedfcdf68ab3c1d4e91fdedbf539df18beef4f6ef2f4",
         "flash": 2282,
         "flashLimit": 14336,
         "staticRam": 54,
         "staticRamLimit": 1024,
-        "ramRemaining": 970,
         "flashRemaining": 12054,
-        "classification": "fits",
-        "sketchSha256": "b8d6baee7b4b2741579c6ce4fd4368854d81b4062670a7b0dfd5133cf83680c0"
+        "ramRemaining": 970,
+        "classification": "fits"
       }
     },
     {
@@ -2455,6 +2495,13 @@
         ]
       },
       "description": "Read text notes from a known SD file and pass each note record to the buzzer. The line parser avoids loading the whole tune.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; Passive buzzer: PIN D4; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Read text notes from a known SD file and pass each note record to the buzzer. The line parser avoids loading the whole tune.",
+        "change": "Edit the note file on the SD card, using the note syntax from the SD music guide.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Small remaining memory margin: 820 bytes Flash and 276 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation."
       ],
@@ -2466,14 +2513,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "8f6640bf8d748c4e426d240c5ea1def18a39700b19389c603abb9838be72254a",
         "flash": 13516,
         "flashLimit": 14336,
         "staticRam": 748,
         "staticRamLimit": 1024,
-        "ramRemaining": 276,
         "flashRemaining": 820,
-        "classification": "tight",
-        "sketchSha256": "4256da7c72511a119ac66b45d3cd7c27a8b9fe53c6d1939f0d95c6dfa311e522"
+        "ramRemaining": 276,
+        "classification": "tight"
       }
     },
     {
@@ -2525,6 +2572,13 @@
         ]
       },
       "description": "Convert a polar servo/distance scan into row-ordered BMP output on SD. Advanced example with tight AVR memory margins.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; Servo: PIN D9; HC-SR04: TRIG D5, ECHO D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Convert a polar servo/distance scan into row-ordered BMP output on SD. Advanced example with tight AVR memory margins.",
+        "change": "Change the pixel/intensity mapping after understanding the polar-to-raster conversion.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Small remaining memory margin: 804 bytes Flash and 276 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
         "Combined SD, sensing and motion: advanced, little stack/heap headroom on ATmega168. Compile size is not a runtime stack test."
@@ -2537,14 +2591,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "79c6c9f83946eb218c283f9766e0cd674b9e6fdaf4abbda1a183bbb0abc68708",
         "flash": 13532,
         "flashLimit": 14336,
         "staticRam": 748,
         "staticRamLimit": 1024,
-        "ramRemaining": 276,
         "flashRemaining": 804,
-        "classification": "tight",
-        "sketchSha256": "e8f95faaa4a70156eaf0f1b39da4fb67544e226d8a202ca46bdb22c91961e748"
+        "ramRemaining": 276,
+        "classification": "tight"
       }
     },
     {
@@ -2569,23 +2623,32 @@
         "transitive": []
       },
       "description": "Use variables for every index of a multidimensional array. Fixed dimensions reserve RAM; indices choose an element at runtime.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Use variables for every index of a multidimensional array. Fixed dimensions reserve RAM; indices choose an element at runtime.",
+        "change": "Change row and column variables to select another cell; keep indices inside the declared shape.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1984,
+        "sketchSha256": "427a3c2f1fab2eae25db04c2404e59c9e0645a76941faa2f139e8739326fb02e",
+        "flash": 3012,
         "flashLimit": 14336,
-        "staticRam": 204,
+        "staticRam": 213,
         "staticRamLimit": 1024,
-        "ramRemaining": 820,
-        "flashRemaining": 12352,
-        "classification": "fits",
-        "sketchSha256": "61c66e1ebeb4de4a801a80c72c8612758f4167c51303785ac551ab0f37f21af7"
+        "flashRemaining": 11324,
+        "ramRemaining": 811,
+        "classification": "fits"
       }
     },
     {
@@ -2627,6 +2690,13 @@
         ]
       },
       "description": "Create a grayscale BMP with selected palette levels and append calculated shades. Values must fit the chosen output range.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Create a grayscale BMP with selected palette levels and append calculated shades. Values must fit the chosen output range.",
+        "change": "Change the number of palette shades and the pixel formula together.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2636,14 +2706,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "719b4828a101f384f2afab46431bbd2c3863cab5c8dbb7d13a4f7f7a69eea6b3",
         "flash": 12072,
         "flashLimit": 14336,
         "staticRam": 716,
         "staticRamLimit": 1024,
-        "ramRemaining": 308,
         "flashRemaining": 2264,
-        "classification": "fits",
-        "sketchSha256": "41411965cc90a7cc85f6f80fb2ea49215ebbb5af60a30284e765f1c07ea9d63f"
+        "ramRemaining": 308,
+        "classification": "fits"
       }
     },
     {
@@ -2689,6 +2759,13 @@
         ]
       },
       "description": "Stream an RGB gradient into a BMP file without keeping the picture in AVR RAM.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; digital write: PIN D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Stream an RGB gradient into a BMP file without keeping the picture in AVR RAM.",
+        "change": "Change the red, green or blue formula to produce another colour gradient.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2698,14 +2775,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "4626fa7c39b77531561eaccc963ac1c1376e9a0d36421a5d05783e1090d780f4",
         "flash": 12296,
         "flashLimit": 14336,
         "staticRam": 736,
         "staticRamLimit": 1024,
-        "ramRemaining": 288,
         "flashRemaining": 2040,
-        "classification": "fits",
-        "sketchSha256": "fa30a4e7d8ff2d45459de748491e374a3ce26c869140f33918aef3d8ad3904cf"
+        "ramRemaining": 288,
+        "classification": "fits"
       }
     },
     {
@@ -2751,6 +2828,13 @@
         ]
       },
       "description": "Write a 1024-level grayscale PGM, preserving more than 8 bits per sample. Use a computer image viewer that supports PGM.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; digital write: PIN D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Write a 1024-level grayscale PGM, preserving more than 8 bits per sample. Use a computer image viewer that supports PGM.",
+        "change": "Change a 0–1023 pixel value and open the PGM in a viewer that supports that precision.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2760,14 +2844,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "5396d857c9b7baedff74eb67cc4409960e744febd59c4f58c2f106fed983a84f",
         "flash": 12282,
         "flashLimit": 14336,
         "staticRam": 738,
         "staticRamLimit": 1024,
-        "ramRemaining": 286,
         "flashRemaining": 2054,
-        "classification": "fits",
-        "sketchSha256": "c9e67707d9323bfb734a290fa97e6b81b6bd279d8b8d5466d064840d211a6f79"
+        "ramRemaining": 286,
+        "classification": "fits"
       }
     },
     {
@@ -2813,6 +2897,13 @@
         ]
       },
       "description": "Write a high-depth RGB PPM with selected per-channel range. This format preserves precision beyond an 8-bit BMP channel.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; digital write: PIN D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Write a high-depth RGB PPM with selected per-channel range. This format preserves precision beyond an 8-bit BMP channel.",
+        "change": "Change one colour-channel formula while keeping values within the configured range.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2822,14 +2913,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "7cdd954d73d149ce0bf5cc18691a27a5386b5196b39d381b4c47e5df034dc854",
         "flash": 12418,
         "flashLimit": 14336,
         "staticRam": 740,
         "staticRamLimit": 1024,
-        "ramRemaining": 284,
         "flashRemaining": 1918,
-        "classification": "fits",
-        "sketchSha256": "52592b9db1cfbfcbc7fdbec034f66141ccf89361f49a91551af7e4d9b6b91757"
+        "ramRemaining": 284,
+        "classification": "fits"
       }
     },
     {
@@ -2854,23 +2945,32 @@
         "transitive": []
       },
       "description": "Define a function with typed float and uint32_t arguments and an explicit result type.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Define a function with typed float and uint32_t arguments and an explicit result type.",
+        "change": "Change the arguments to the function and compare its returned value.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1900,
+        "sketchSha256": "3861f0310fef145e3f4d1766043274231f0bacbe6e7c40890f2974fc8dfcb534",
+        "flash": 2784,
         "flashLimit": 14336,
-        "staticRam": 188,
+        "staticRam": 197,
         "staticRamLimit": 1024,
-        "ramRemaining": 836,
-        "flashRemaining": 12436,
-        "classification": "fits",
-        "sketchSha256": "0190ab3c79ae2497dd5500947ede171876402b79062abe0a720942a2417b609c"
+        "flashRemaining": 11552,
+        "ramRemaining": 827,
+        "classification": "fits"
       }
     },
     {
@@ -2895,23 +2995,32 @@
         "transitive": []
       },
       "description": "Pack several flags and small fields into integers with masks, shifts and extraction blocks.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Pack several flags and small fields into integers with masks, shifts and extraction blocks.",
+        "change": "Change one bit index or packed field, then compare the printed number.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2038,
+        "sketchSha256": "40e6e65b296bfb217da0e9aa3428efe3f36acc3378111ee21e749afa95ce4156",
+        "flash": 3012,
         "flashLimit": 14336,
-        "staticRam": 191,
+        "staticRam": 200,
         "staticRamLimit": 1024,
-        "ramRemaining": 833,
-        "flashRemaining": 12298,
-        "classification": "fits",
-        "sketchSha256": "1450c619c04a25b6d1b98bec2a85dfc00d719154de8b7fdb7c92df66e00cf735"
+        "flashRemaining": 11324,
+        "ramRemaining": 824,
+        "classification": "fits"
       }
     },
     {
@@ -2938,6 +3047,13 @@
         "transitive": []
       },
       "description": "Blink D13 through AVR port registers. Compare the generated code and Flash use with ordinary digitalWrite.",
+      "lesson": {
+        "wiring": "Only the Pro Mini; PB5 is the built-in L / D13 LED.",
+        "observe": "Blink D13 through AVR port registers. Compare the generated code and Flash use with ordinary digitalWrite.",
+        "change": "Change the wait times; PB5 is the built-in D13 LED.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2947,14 +3063,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "e98b0f4fe34dbf559c95e707771a124d98249b639841bcdb3a9217c78b66fd0f",
         "flash": 642,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13694,
-        "classification": "fits",
-        "sketchSha256": "0d02a2148d527b274cfb3c1fc9d5c524fcf4231a8eaedd192f1f03e609e727f2"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -2981,6 +3097,13 @@
         "transitive": []
       },
       "description": "Configure an AVR port input and pull-up with masks, then read its bit without changing neighbouring pins.",
+      "lesson": {
+        "wiring": "Button between D2 and GND; observe the built-in D13 LED.",
+        "observe": "Configure an AVR port input and pull-up with masks, then read its bit without changing neighbouring pins.",
+        "change": "Press and release the D2 button and watch D13 follow the port input.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -2990,14 +3113,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "bcadf52d9dcb1826440564c7a5d77916ebd779e33cefe13e58b9036df5ab0098",
         "flash": 462,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13874,
-        "classification": "fits",
-        "sketchSha256": "48e1d1888cb5477bcac9f808d8c641d4a860e57dc987af9a342c4a6ab3fda370"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -3024,6 +3147,13 @@
         "transitive": []
       },
       "description": "Drive a byte pattern through direct port operations. This advanced lesson exposes register ownership and bit masks.",
+      "lesson": {
+        "wiring": "74HC595 SER→D8, SRCLK→D9, RCLK→D10, OE→GND, MR→VCC. Add a resistor to each output LED.",
+        "observe": "Drive a byte pattern through direct port operations. This advanced lesson exposes register ownership and bit masks.",
+        "change": "Change the byte pattern sent to the 74HC595 and watch Q0–Q7.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3033,14 +3163,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "c9cb4fca1a096e9891861f940f8e2600d5ef601a7357cf0fb97bc58be73114c8",
         "flash": 750,
         "flashLimit": 14336,
         "staticRam": 9,
         "staticRamLimit": 1024,
-        "ramRemaining": 1015,
         "flashRemaining": 13586,
-        "classification": "fits",
-        "sketchSha256": "ff4d8b1ce6228be0e45db74de2331c2fd1d3571ad7a3f9bc2c275f0830f69be4"
+        "ramRemaining": 1015,
+        "classification": "fits"
       }
     },
     {
@@ -3071,23 +3201,32 @@
         "transitive": []
       },
       "description": "Send the JEDEC-ID command to an SPI Flash chip and read its identification bytes using generic SPI blocks.",
+      "lesson": {
+        "wiring": "Custom SPI device: CS D10; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Send the JEDEC-ID command to an SPI Flash chip and read its identification bytes using generic SPI blocks.",
+        "change": "Read the three JEDEC bytes and compare with the Flash chip’s datasheet.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2272,
+        "sketchSha256": "d5aceac24623eec31791579a680a7c414cec08861e91c56c0bd9054d97ca4207",
+        "flash": 3202,
         "flashLimit": 14336,
-        "staticRam": 207,
+        "staticRam": 222,
         "staticRamLimit": 1024,
-        "ramRemaining": 817,
-        "flashRemaining": 12064,
-        "classification": "fits",
-        "sketchSha256": "73723043e471a4d8ed5e7cfbb88dec0ea1e7f9de2a93706c2d0100c360a9183f"
+        "flashRemaining": 11134,
+        "ramRemaining": 802,
+        "classification": "fits"
       }
     },
     {
@@ -3118,23 +3257,32 @@
         "transitive": []
       },
       "description": "Write a register pointer and read data from an I2C device using generic transactions. Match the address/register to the attached chip.",
+      "lesson": {
+        "wiring": "Custom I2C device: address 0x68; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Write a register pointer and read data from an I2C device using generic transactions. Match the address/register to the attached chip.",
+        "change": "Set the actual I2C address and register for your chip before interpreting its bytes.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 4336,
+        "sketchSha256": "97797ef7b5f3221dcc09e803145649ddd99a001a404aebeed1cfc461ddbfa3da",
+        "flash": 5332,
         "flashLimit": 14336,
-        "staticRam": 456,
+        "staticRam": 475,
         "staticRamLimit": 1024,
-        "ramRemaining": 568,
-        "flashRemaining": 10000,
-        "classification": "fits",
-        "sketchSha256": "14cd02ee5c32ea4c6b7b6b85cb53270bc67f6bf32514e56852e7624aa74a8ecd"
+        "flashRemaining": 9004,
+        "ramRemaining": 549,
+        "classification": "fits"
       }
     },
     {
@@ -3163,29 +3311,39 @@
         "transitive": []
       },
       "description": "Increment a volatile counter in an interrupt and copy it atomically before using it in loop.",
+      "lesson": {
+        "wiring": "Pulse input or button D2→GND with the configured pull-up. D13 gives a visible indication.",
+        "observe": "Increment a volatile counter in an interrupt and copy it atomically before using it in loop.",
+        "change": "Pulse D2 and watch the counter. Keep Serial output outside the interrupt handler.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "raw"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1778,
+        "sketchSha256": "01d49c67828a49ef4097ed33b7cde69802de40f0d94ca2c92de86ec4484ada83",
+        "flash": 2798,
         "flashLimit": 14336,
-        "staticRam": 192,
+        "staticRam": 201,
         "staticRamLimit": 1024,
-        "ramRemaining": 832,
-        "flashRemaining": 12558,
-        "classification": "fits",
-        "sketchSha256": "3c89e11a1662afc24c9a845d7c2718371318c1619f90ba74f16f141b3ac309de"
+        "flashRemaining": 11538,
+        "ramRemaining": 823,
+        "classification": "fits"
       }
     },
     {
       "id": "54",
       "file": "54-serial-monitor-echo.xml",
-      "title": "Bidirectional Serial echo",
+      "title": "Send text and receive the board’s reply",
       "group": "Serial Monitor and Plotter",
       "level": "beginner",
       "recommended": true,
@@ -3203,37 +3361,47 @@
         "headers": [],
         "transitive": []
       },
-      "description": "Echo incoming Serial bytes back to Monitor. Test sending text and different line endings without a blocking String read.",
+      "description": "Type a short message in Plotter. The board receives the text and sends it back to the visible message box.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter.",
+        "observe": "Type a short message in Plotter. The board receives the text and sends it back to the visible message box.",
+        "change": "Type a short message in Plotter and send it; the board returns the same characters.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "messages",
+        "controls"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 1556,
+        "sketchSha256": "fbe748ef64e30ece6669ac31b2d7e749f8a7042cbf1144acb6dca82c99504a35",
+        "flash": 2614,
         "flashLimit": 14336,
-        "staticRam": 188,
+        "staticRam": 242,
         "staticRamLimit": 1024,
-        "ramRemaining": 836,
-        "flashRemaining": 12780,
-        "classification": "fits",
-        "sketchSha256": "a1d91313c7861f3d2b079cb54235e3bc99b0e9b4663cc262611abb6c1b27e543"
+        "flashRemaining": 11722,
+        "ramRemaining": 782,
+        "classification": "fits"
       }
     },
     {
       "id": "55",
       "file": "55-serial-auto-plot.xml",
-      "title": "Plotter: automatic lines",
+      "title": "Interactive LED lab: your first controls",
       "group": "Serial Monitor and Plotter",
       "level": "beginner",
       "recommended": true,
       "hardware": [
         {
-          "id": "analog-input",
-          "label": "Analog source / potentiometer"
+          "id": "basic-gpio",
+          "label": "LEDs / button / GPIO"
         },
         {
           "id": "serial",
@@ -3248,10 +3416,19 @@
         "headers": [],
         "transitive": []
       },
-      "description": "After Plotter Start, send two numeric CSV columns from A0. Automatic mode discovers two line traces without a JSON header.",
+      "description": "The built-in LED blinks immediately after upload. Plotter creates controls for interval, on-time, enable, pattern and a text reply from the board.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter; L / D13 is built in.",
+        "observe": "The built-in LED blinks immediately after upload. Plotter creates controls for interval, on-time, enable, pattern and a text reply from the board.",
+        "change": "Try a slower interval, a different on-time, Steady light, and a text message. Each control changes the running board.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
-        "auto-line"
+        "line",
+        "controls",
+        "messages"
       ],
       "startCommand": "START\n",
       "stopCommand": "STOP\n",
@@ -3260,14 +3437,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2254,
+        "sketchSha256": "0f06d289a518d91ac16623468bdc84df5b07bb0a39298d14724d3ed06e5231a8",
+        "flash": 7686,
         "flashLimit": 14336,
-        "staticRam": 200,
+        "staticRam": 318,
         "staticRamLimit": 1024,
-        "ramRemaining": 824,
-        "flashRemaining": 12082,
-        "classification": "fits",
-        "sketchSha256": "a1d2b850a324756df1159cc589c64ab072cd5262855c7df9827a56ce8dfa2d68"
+        "flashRemaining": 6650,
+        "ramRemaining": 706,
+        "classification": "fits"
       }
     },
     {
@@ -3296,6 +3473,13 @@
         "transitive": []
       },
       "description": "After Plotter Start, send one A0 value. A Flash-resident header asks the PC to calculate voltage and show lines, a gauge, a bar and raw values.",
+      "lesson": {
+        "wiring": "analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "After Plotter Start, send one A0 value. A Flash-resident header asks the PC to calculate voltage and show lines, a gauge, a bar and raw values.",
+        "change": "Turn A0. Edit the header’s voltage formula only if your measured ADC reference differs from 5 V.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "line",
@@ -3310,14 +3494,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2702,
+        "sketchSha256": "1209d851ad38cce047540ed244ccb54ecb306b58bea1a711551a5c7420e717f6",
+        "flash": 3252,
         "flashLimit": 14336,
-        "staticRam": 200,
+        "staticRam": 201,
         "staticRamLimit": 1024,
-        "ramRemaining": 824,
-        "flashRemaining": 11634,
-        "classification": "fits",
-        "sketchSha256": "843cb6615caf57885c53061e2a86078819b95bc900ccf115d48d0f130e223acc"
+        "flashRemaining": 11084,
+        "ramRemaining": 823,
+        "classification": "fits"
       }
     },
     {
@@ -3350,23 +3534,33 @@
         "transitive": []
       },
       "description": "Count edges on external interrupt D2. A physical button may bounce and create several electrical edges per press.",
+      "lesson": {
+        "wiring": "Button between D2 and GND; internal pull-up is enabled.",
+        "observe": "Count edges on external interrupt D2. A physical button may bounce and create several electrical edges per press.",
+        "change": "Press the D2 button; electrical contact bounce may count several edges per press.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "raw"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2294,
+        "sketchSha256": "1ef660e43d108c87ed7e32779dae766ecb896e5a653ce6291c35579a83d6277d",
+        "flash": 3306,
         "flashLimit": 14336,
-        "staticRam": 194,
+        "staticRam": 203,
         "staticRamLimit": 1024,
-        "ramRemaining": 830,
-        "flashRemaining": 12042,
-        "classification": "fits",
-        "sketchSha256": "36d354f487c9d9d323a77dc7e2959b11d51cd9b318aba130b01c75a165b3c004"
+        "flashRemaining": 11030,
+        "ramRemaining": 821,
+        "classification": "fits"
       }
     },
     {
@@ -3399,23 +3593,33 @@
         "transitive": []
       },
       "description": "Use pin-change interrupts on D4 and D5 to keep separate counters, then copy the values safely in loop.",
+      "lesson": {
+        "wiring": "Two buttons: D4→GND and D5→GND; both inputs use internal pull-ups.",
+        "observe": "Use pin-change interrupts on D4 and D5 to keep separate counters, then copy the values safely in loop.",
+        "change": "Press each button independently and compare its own counter trace.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line-multiple",
+        "raw"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2436,
+        "sketchSha256": "e250bd09275261ca24636eb3ceb19a79fbcf5195f64c7d8b758c3ab6286f48dd",
+        "flash": 3432,
         "flashLimit": 14336,
-        "staticRam": 193,
+        "staticRam": 202,
         "staticRamLimit": 1024,
-        "ramRemaining": 831,
-        "flashRemaining": 11900,
-        "classification": "fits",
-        "sketchSha256": "9ead6e1100cc4609dd74d3a1d47e313aef2630c8c5244e9bf84ee5409f27ec09"
+        "flashRemaining": 10904,
+        "ramRemaining": 822,
+        "classification": "fits"
       }
     },
     {
@@ -3443,24 +3647,34 @@
         ],
         "transitive": []
       },
-      "description": "Use Timer1 for a periodic interrupt and keep the handler short. The timer is then unavailable to Servo, fast stepper and its PWM channels.",
+      "description": "The counter rises ten times per second. Plotter shows it five times per second; Running pauses/resumes Timer1, Clear resets the count, and Restart begins a fresh timer period.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter. Timer1 supplies periodic interrupts.",
+        "observe": "The counter rises ten times per second. Plotter shows it five times per second; Running pauses/resumes Timer1, Clear resets the count, and Restart begins a fresh timer period.",
+        "change": "Pause/resume the timer with its checkbox and clear the counter with the button.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "controls"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2198,
+        "sketchSha256": "bd3662afe46846cb5b3a3e64a63e4931da1576a5ef6f3e65d8573688e8bc2764",
+        "flash": 4190,
         "flashLimit": 14336,
-        "staticRam": 193,
+        "staticRam": 228,
         "staticRamLimit": 1024,
-        "ramRemaining": 831,
-        "flashRemaining": 12138,
-        "classification": "fits",
-        "sketchSha256": "74bb036f64c765be25b0384601c760b13c33319f8b3454a79bc69e8e3e028c18"
+        "flashRemaining": 10146,
+        "ramRemaining": 796,
+        "classification": "fits"
       }
     },
     {
@@ -3488,24 +3702,34 @@
         ],
         "transitive": []
       },
-      "description": "Attach or detach a configured interrupt using Monitor commands while preserving the accumulated counter.",
+      "description": "Starts detached. Check Attached, then press the D2 button. Detach pauses counting while preserving the count; Clear resets it.",
+      "lesson": {
+        "wiring": "Button between D2 and GND; internal pull-up is enabled.",
+        "observe": "Starts detached. Check Attached, then press the D2 button. Detach pauses counting while preserving the count; Clear resets it.",
+        "change": "Attach the interrupt, press the button, detach it, then compare the counter.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "controls"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2434,
+        "sketchSha256": "1ec7ac5c78cba64adff9c98e467e7328151fbde1f09bbdbbecf8bed20f29633d",
+        "flash": 4138,
         "flashLimit": 14336,
-        "staticRam": 194,
+        "staticRam": 227,
         "staticRamLimit": 1024,
-        "ramRemaining": 830,
-        "flashRemaining": 11902,
-        "classification": "fits",
-        "sketchSha256": "9bcb02840f71987d61177ee8b2e8d939d2fc3886fea42ecce1097d954a8cd081"
+        "flashRemaining": 10198,
+        "ramRemaining": 797,
+        "classification": "fits"
       }
     },
     {
@@ -3540,6 +3764,13 @@
         "transitive": []
       },
       "description": "After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.",
+      "lesson": {
+        "wiring": "Servo: PIN D9; Servo: PIN D10; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "After Plotter Start, scan a photocell with two hardware servos. Send one gray pixel and chart sample at a time; the computer retains the image.",
+        "change": "Move light across the sensor and change scan bounds or settle time to match the mechanism.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "image-gray",
@@ -3553,14 +3784,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 4438,
+        "sketchSha256": "50aed817063805fb472d207fb54f90564fe7c9b2d35f08e16f44d7f623e79e2e",
+        "flash": 5258,
         "flashLimit": 14336,
-        "staticRam": 221,
+        "staticRam": 222,
         "staticRamLimit": 1024,
-        "ramRemaining": 803,
-        "flashRemaining": 9898,
-        "classification": "fits",
-        "sketchSha256": "1d32aac94e38e95450c7ddf884f258973a67f10600809874f02435212109c6f4"
+        "flashRemaining": 9078,
+        "ramRemaining": 802,
+        "classification": "fits"
       }
     },
     {
@@ -3593,6 +3824,13 @@
         "transitive": []
       },
       "description": "Use a potentiometer to set signed continuous stepper speed with acceleration. The software loop engine must still be serviced every pass.",
+      "lesson": {
+        "wiring": "STEP/DIR driver: STEP D3, DIR D4; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Use a potentiometer to set signed continuous stepper speed with acceleration. The software loop engine must still be serviced every pass.",
+        "change": "Turn A0 slowly through the centre to stop and reverse. Narrow the speed range for finer ADC control.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3602,14 +3840,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "72e0b1615f261851d040fff45151188417027ce1d7eb3958e8b934f3119910e6",
         "flash": 6800,
         "flashLimit": 14336,
         "staticRam": 145,
         "staticRamLimit": 1024,
-        "ramRemaining": 879,
         "flashRemaining": 7536,
-        "classification": "fits",
-        "sketchSha256": "e5a28d26edd78cac5e19338075d5936466ff3daafa6e5bad9c7cad153e6bf95e"
+        "ramRemaining": 879,
+        "classification": "fits"
       }
     },
     {
@@ -3640,6 +3878,13 @@
         "transitive": []
       },
       "description": "Map a potentiometer to servo pulse microseconds for finer command increments than whole degree values.",
+      "lesson": {
+        "wiring": "Servo: PIN D9; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Map a potentiometer to servo pulse microseconds for finer command increments than whole degree values.",
+        "change": "Turn A0 and adjust the minimum/maximum pulse widths to your servo’s usable travel.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3649,14 +3894,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "44974ecb61491863031d602b0ac0298964cd92b1fb41c308853e38d927bac8fb",
         "flash": 2962,
         "flashLimit": 14336,
         "staticRam": 50,
         "staticRamLimit": 1024,
-        "ramRemaining": 974,
         "flashRemaining": 11374,
-        "classification": "fits",
-        "sketchSha256": "585b28edc24c294553d60235e0567e62804be4a99ee050759cfcc43292877224"
+        "ramRemaining": 974,
+        "classification": "fits"
       }
     },
     {
@@ -3694,6 +3939,13 @@
         ]
       },
       "description": "Prepare an 80-byte LCD character grid in RAM, then send the finished 20×4 frame once. Legacy text mode treats zero as a space.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Prepare an 80-byte LCD character grid in RAM, then send the finished 20×4 frame once. Legacy text mode treats zero as a space.",
+        "change": "Change characters in the frame array, then send the complete frame.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3703,14 +3955,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "0423980877af4ac89e3f9d7faa4fdee250fcdd3808d78c683d63af7e5483ab6c",
         "flash": 3474,
         "flashLimit": 14336,
         "staticRam": 342,
         "staticRamLimit": 1024,
-        "ramRemaining": 682,
         "flashRemaining": 10862,
-        "classification": "fits",
-        "sketchSha256": "16d3b1aaf29549fad10de5ef73d9be0bc1ad6539f09783bc8ff78f3d76bb016d"
+        "ramRemaining": 682,
+        "classification": "fits"
       }
     },
     {
@@ -3754,6 +4006,13 @@
         ]
       },
       "description": "Build a 128-byte packed OLED tile: each byte stores eight vertical pixels. Send the tile without allocating a full-screen buffer.",
+      "lesson": {
+        "wiring": "SSD1306 I2C OLED: address 0x3C; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Build a 128-byte packed OLED tile: each byte stores eight vertical pixels. Send the tile without allocating a full-screen buffer.",
+        "change": "Change bits in the 128-byte tile; each byte represents eight vertical pixels.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Uses a 128-byte tile. Do not allocate a 1024-byte OLED framebuffer on a board with 1024 bytes total SRAM."
       ],
@@ -3765,14 +4024,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "441a3fba4c526aa5caaa55ab9862eb43048e3fce5337628441833773dca759ba",
         "flash": 6382,
         "flashLimit": 14336,
         "staticRam": 567,
         "staticRamLimit": 1024,
-        "ramRemaining": 457,
         "flashRemaining": 7954,
-        "classification": "fits",
-        "sketchSha256": "14ca2b64778623f827c1c29c06456c58d43a3c5dc394c257725e7b7e0c0f111f"
+        "ramRemaining": 457,
+        "classification": "fits"
       }
     },
     {
@@ -3801,6 +4060,13 @@
         "transitive": []
       },
       "description": "Prepare RGB values in an array, copy them to the NeoPixel library buffer and call show once for the finished frame.",
+      "lesson": {
+        "wiring": "WS2812 RGB LEDs: PIN D6. Common GND; use each module’s required supply.",
+        "observe": "Prepare RGB values in an array, copy them to the NeoPixel library buffer and call show once for the finished frame.",
+        "change": "Change one RGB triplet in the array, then call show once for the finished frame.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3810,14 +4076,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "b360ab4a98d8e8f4b40e75aba4b5ffa7c1ea34515a792e58828a095130c1bb8f",
         "flash": 2650,
         "flashLimit": 14336,
         "staticRam": 68,
         "staticRamLimit": 1024,
-        "ramRemaining": 956,
         "flashRemaining": 11686,
-        "classification": "fits",
-        "sketchSha256": "c99e8538eb6ae6f48d198e71be9a4c8cf17e6c1579c2002bc3fc445ffce8eb46"
+        "ramRemaining": 956,
+        "classification": "fits"
       }
     },
     {
@@ -3875,6 +4141,13 @@
         ]
       },
       "description": "Prepare a small RGB565 colour tile and send it to an ST7735 TFT in one SPI transaction.",
+      "lesson": {
+        "wiring": "ST7735 SPI TFT: CS D10, DC D9, RESET D8; SPI MOSI D11, SCK D13; MISO is unused; CS/DC/RESET as listed. Common GND; use each module’s required supply.",
+        "observe": "Prepare a small RGB565 colour tile and send it to an ST7735 TFT in one SPI transaction.",
+        "change": "Change RGB565 tile values or its target position without allocating a full-screen buffer.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3884,14 +4157,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "f9dde024830b0fc5241773b71f364edddcb7e95c3ccee2e02d73ddddecd8ebea",
         "flash": 12034,
         "flashLimit": 14336,
         "staticRam": 556,
         "staticRamLimit": 1024,
-        "ramRemaining": 468,
         "flashRemaining": 2302,
-        "classification": "fits",
-        "sketchSha256": "0eab50001d303e6c0db7925549c335e0fc45e31fadc8997f2b2c79cd5fa576b7"
+        "ramRemaining": 468,
+        "classification": "fits"
       }
     },
     {
@@ -3926,6 +4199,13 @@
         ]
       },
       "description": "Pass a note record through a variable to the music parser. The same format can come from EEPROM, Serial or an SD line.",
+      "lesson": {
+        "wiring": "Passive buzzer: PIN D4. Common GND; use each module’s required supply.",
+        "observe": "Pass a note record through a variable to the music parser. The same format can come from EEPROM, Serial or an SD line.",
+        "change": "Replace the note text with another note or a rest, using the same parser.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -3935,14 +4215,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "473b19f2408a1df7c4520d8678ca6854a03a1a66cc687ed0b9a3dc36770aecd3",
         "flash": 4692,
         "flashLimit": 14336,
         "staticRam": 72,
         "staticRamLimit": 1024,
-        "ramRemaining": 952,
         "flashRemaining": 9644,
-        "classification": "fits",
-        "sketchSha256": "ed0d36078eae949065d42dd12055a758897d14c7b48e23ac88837a12e338d8bd"
+        "ramRemaining": 952,
+        "classification": "fits"
       }
     },
     {
@@ -3999,6 +4279,13 @@
         ]
       },
       "description": "Play a timed, polyphonic score from SD without loading it all into RAM. Three IRQ voices and the SD cache leave a small stack margin.",
+      "lesson": {
+        "wiring": "SPI SD card: CS D10; Passive buzzer: PIN D4; Passive buzzer: PIN D5; Passive buzzer: PIN D6; SPI MOSI D11, MISO D12, SCK D13; CS as listed. Common GND; use each module’s required supply.",
+        "observe": "Play a timed, polyphonic score from SD without loading it all into RAM. Three IRQ voices and the SD cache leave a small stack margin.",
+        "change": "Edit one voice’s events in the SD score. This example has little free RAM; keep the buffer sizes unchanged.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [
         "Small remaining memory margin: 842 bytes Flash and 196 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
         "Three-voice IRQ music shares Timer2. Each passive buzzer uses a separate output; Timer2 is unavailable for another independent engine."
@@ -4011,14 +4298,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "d72440ce07ff395b5a63dcf58ac27dbf270635ec087fea14c7bf025583ae8917",
         "flash": 13494,
         "flashLimit": 14336,
         "staticRam": 828,
         "staticRamLimit": 1024,
-        "ramRemaining": 196,
         "flashRemaining": 842,
-        "classification": "tight",
-        "sketchSha256": "b26fa07da168329687d1ffb3a02bc0d36889191725e853ff23cfeb5220a8ad8c"
+        "ramRemaining": 196,
+        "classification": "tight"
       }
     },
     {
@@ -4056,26 +4343,37 @@
           }
         ]
       },
-      "description": "Start a Timer1 STEP/DIR motor stopped, then change signed target speed in small or large increments through Monitor. Hardware pulses and acceleration continue independently of loop.",
+      "description": "Starts stationary. Enter a signed target pulse rate in Plotter; Timer1 ramps toward it with acceleration 5000 steps/s². The chart shows the requested rate, not measured motor speed.",
+      "lesson": {
+        "wiring": "TB6600 STEP signal D9, DIR D4 and common signal GND. Follow the module’s input-voltage wiring; power the motor through the driver.",
+        "observe": "Starts stationary. Enter a signed target pulse rate in Plotter; Timer1 ramps toward it with acceleration 5000 steps/s². The chart shows the requested rate, not measured motor speed.",
+        "change": "Enter -30000..30000 steps/s; Stop ramps to zero. Change acceleration in the device block. Adjacent high-speed requests can map to the same timer period. This sketch has almost no spare Flash.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [
-        "Small remaining memory margin: 832 bytes Flash and 388 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation."
+        "Small remaining memory margin: 24 bytes Flash and 359 bytes SRAM before stack/heap. Keep this advanced; compile success does not measure stack or dynamic allocation.",
+        "Very tight Flash budget on ATmega168. Compile after any edit; a larger header or extra library may not fit."
       ],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
+      "plotterModes": [
+        "line",
+        "controls"
+      ],
+      "startCommand": "START\n",
+      "stopCommand": "STOP\n",
       "verification": {
         "target": "arduino:avr:pro:cpu=16MHzatmega168",
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 13504,
+        "sketchSha256": "5fdac7da6b8cba4b628afef7e77d2c492e55ebdc09e8251c60a4106f0e5203b5",
+        "flash": 14312,
         "flashLimit": 14336,
-        "staticRam": 636,
+        "staticRam": 665,
         "staticRamLimit": 1024,
-        "ramRemaining": 388,
-        "flashRemaining": 832,
-        "classification": "tight",
-        "sketchSha256": "64cc7dddc9c2c18c32440b6e7164987764358a08cb302b0771fae69fffd68cc9"
+        "flashRemaining": 24,
+        "ramRemaining": 359,
+        "classification": "tight"
       }
     },
     {
@@ -4112,6 +4410,13 @@
         "transitive": []
       },
       "description": "Use a potentiometer to control hardware Servo pulses on D9 while a hardware buzzer on D11 plays a melody. Timer1 and Timer2 have separate owners.",
+      "lesson": {
+        "wiring": "Servo: PIN D9; Passive buzzer: PIN D11; analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Use a potentiometer to control hardware Servo pulses on D9 while a hardware buzzer on D11 plays a melody. Timer1 and Timer2 have separate owners.",
+        "change": "Turn A0 and edit the melody. Servo and sound use separate hardware timers.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -4121,14 +4426,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
+        "sketchSha256": "2b16a6f2abaccd32de35572e275fbf4c5070fa305b876190ffe0e0da0f06acd3",
         "flash": 3526,
         "flashLimit": 14336,
         "staticRam": 66,
         "staticRamLimit": 1024,
-        "ramRemaining": 958,
         "flashRemaining": 10810,
-        "classification": "fits",
-        "sketchSha256": "83c2f940db93f11b570aaee1b79927d9d1ac6d882adaeef678e818bde79159f5"
+        "ramRemaining": 958,
+        "classification": "fits"
       }
     },
     {
@@ -4166,6 +4471,13 @@
         ]
       },
       "description": "Define a 5×8 face in LCD glyph slot 0, then animate two faces through an 80-byte raw-code buffer. Eight slots and variable indices are supported.",
+      "lesson": {
+        "wiring": "HD44780 I2C LCD: address 0x27; I2C SDA A4, SCL A5. Common GND; use each module’s required supply.",
+        "observe": "Define a 5×8 face in LCD glyph slot 0, then animate two faces through an 80-byte raw-code buffer. Eight slots and variable indices are supported.",
+        "change": "Edit the eight faceRows values (0–31), or define a second face in slot 1.",
+        "serial": "none",
+        "baud": null
+      },
       "notes": [],
       "plotterModes": [],
       "startCommand": null,
@@ -4175,7 +4487,7 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "sketchSha256": "471b27246a5c2db61d69a1af3fda5009b626763df90bc3176ff5384f0a73e5a4",
+        "sketchSha256": "a54ef241177cf958ccd25053709746d54c43e8a9a5725ff312e95c9d56a04fae",
         "flash": 3736,
         "flashLimit": 14336,
         "staticRam": 354,
@@ -4211,6 +4523,13 @@
         "transitive": []
       },
       "description": "Compare A0 with a generated triangle in overlaid lines, a multi-needle gauge, grouped bars, two XY traces and a raw table. Start/Stop controls one shared stream.",
+      "lesson": {
+        "wiring": "analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Compare A0 with a generated triangle in overlaid lines, a multi-needle gauge, grouped bars, two XY traces and a raw table. Start/Stop controls one shared stream.",
+        "change": "Turn A0 and compare the same value in lines, gauge, bars and XY plots.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "line-multiple",
@@ -4226,14 +4545,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 4430,
+        "sketchSha256": "4bf5d4822ef82ab4101067c86bc7032d29303332789ad09b802fef6e75c515ad",
+        "flash": 5112,
         "flashLimit": 14336,
-        "staticRam": 215,
+        "staticRam": 216,
         "staticRamLimit": 1024,
-        "ramRemaining": 809,
-        "flashRemaining": 9906,
-        "classification": "fits",
-        "sketchSha256": "fa30d88199ac77d4e20c4a9cae304891fadbb77df4861ca7ecdd4644fb6c2aef"
+        "flashRemaining": 9224,
+        "ramRemaining": 808,
+        "classification": "fits"
       }
     },
     {
@@ -4262,6 +4581,13 @@
         "transitive": []
       },
       "description": "Send one voltage plus device time and let the PC calculate mean, RMS, limits, sum, derivative and integral. After five seconds, a live header changes the averaging window.",
+      "lesson": {
+        "wiring": "analog read: PIN A0; Potentiometer outer legs VCC/GND; wiper on the listed analog input. Common GND; use each module’s required supply.",
+        "observe": "Send one voltage plus device time and let the PC calculate mean, RMS, limits, sum, derivative and integral. After five seconds, a live header changes the averaging window.",
+        "change": "Keep A0 steady, then turn it. After five seconds the header changes the averaging window while streaming.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [],
       "plotterModes": [
         "line-multiple",
@@ -4277,14 +4603,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 5756,
+        "sketchSha256": "647b29df1fe514f92f0c630684cb888e35ce2525189e605def5996b15ec5eccb",
+        "flash": 6558,
         "flashLimit": 14336,
-        "staticRam": 216,
+        "staticRam": 217,
         "staticRamLimit": 1024,
-        "ramRemaining": 808,
-        "flashRemaining": 8580,
-        "classification": "fits",
-        "sketchSha256": "9da7a8803151998a2498593cb655ed69fe068fd4ee5dff08ea81ff72078222a1"
+        "flashRemaining": 7778,
+        "ramRemaining": 807,
+        "classification": "fits"
       }
     },
     {
@@ -4309,6 +4635,13 @@
         "transitive": []
       },
       "description": "Paint an RGB gradient one pixel at a time while charts and bars show the colours. No external hardware or AVR image buffer is needed.",
+      "lesson": {
+        "wiring": "Only the Pro Mini and USB–Serial adapter; the image is generated mathematically.",
+        "observe": "Paint an RGB gradient one pixel at a time while charts and bars show the colours. No external hardware or AVR image buffer is needed.",
+        "change": "Change the RGB formulas or image dimensions, upload, and watch the computer build the new picture.",
+        "serial": "plotter",
+        "baud": 115200
+      },
       "notes": [
         "All pixels are held on the computer. The Arduino sends one pixel and chart sample at a time."
       ],
@@ -4324,120 +4657,14 @@
         "status": "compiled",
         "physical": "not-tested-in-this-audit",
         "ok": true,
-        "flash": 2892,
+        "sketchSha256": "6b8245dcb49b4edb96ef7883ad8c0b8f0aacfbbfda8c243099f0d5dbbd5adab2",
+        "flash": 3656,
         "flashLimit": 14336,
-        "staticRam": 203,
+        "staticRam": 204,
         "staticRamLimit": 1024,
-        "ramRemaining": 821,
-        "flashRemaining": 11444,
-        "classification": "fits",
-        "sketchSha256": "0ca548066a4b48509a7ae21823475c65a67a8f886549dfe70260854fdfb7f374"
-      }
-    },
-    {
-      "id": "blink.xml",
-      "file": "blink.xml",
-      "title": "blink",
-      "group": "Legacy imports",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "basic-gpio",
-          "label": "LEDs / button / GPIO"
-        }
-      ],
-      "libraries": [
-        "Arduino AVR core (no extra library)"
-      ],
-      "libraryEvidence": {
-        "source": "reviewed-legacy-generators (not compiled)",
-        "headers": [],
-        "transitive": []
-      },
-      "description": "Original BlocklyDuino blink workspace retained for importing older projects.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "not-compiled",
-        "physical": "not-tested-in-this-audit"
-      }
-    },
-    {
-      "id": "click_color.xml",
-      "file": "click_color.xml",
-      "title": "click color",
-      "group": "Legacy imports",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "grove-chainable-rgb",
-          "label": "Grove chainable RGB LED (clock + data)"
-        },
-        {
-          "id": "basic-gpio",
-          "label": "LEDs / button / GPIO"
-        }
-      ],
-      "libraries": [
-        "Arduino AVR core (no extra library)"
-      ],
-      "libraryEvidence": {
-        "source": "reviewed-legacy-generators (not compiled)",
-        "headers": [],
-        "transitive": []
-      },
-      "description": "Original BlocklyDuino demonstration workspace retained as a legacy import, outside the current AVR168 compile audit.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "not-compiled",
-        "physical": "not-tested-in-this-audit"
-      }
-    },
-    {
-      "id": "servo_potentio.xml",
-      "file": "servo_potentio.xml",
-      "title": "servo potentio",
-      "group": "Legacy imports",
-      "level": "beginner",
-      "recommended": false,
-      "hardware": [
-        {
-          "id": "device_servo",
-          "label": "Servo"
-        },
-        {
-          "id": "analog-input",
-          "label": "Analog source / potentiometer"
-        }
-      ],
-      "libraries": [
-        "Servo"
-      ],
-      "libraryEvidence": {
-        "source": "reviewed-legacy-generators (not compiled)",
-        "headers": [
-          "Servo.h"
-        ],
-        "transitive": []
-      },
-      "description": "Original potentiometer-to-servo workspace retained as a legacy import. Prefer the named servo lessons for new work.",
-      "notes": [],
-      "plotterModes": [],
-      "startCommand": null,
-      "stopCommand": null,
-      "verification": {
-        "target": "arduino:avr:pro:cpu=16MHzatmega168",
-        "status": "not-compiled",
-        "physical": "not-tested-in-this-audit"
+        "flashRemaining": 10680,
+        "ramRemaining": 820,
+        "classification": "fits"
       }
     }
   ]

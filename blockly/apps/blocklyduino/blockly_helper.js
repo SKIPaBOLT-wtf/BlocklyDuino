@@ -55,6 +55,7 @@ function backup_blocks() {
 function setWorkspaceSource(source) {
   workspaceReady=true;
   currentExample=source || '';
+  if(window.BlocklyExamples)BlocklyExamples.showLesson(currentExample);
   history.replaceState(null,'',location.pathname+(currentExample?'?url='+encodeURIComponent(currentExample):''));
   backup_blocks();
 }
@@ -73,6 +74,7 @@ function restore_blocks() {
     return false;
   }
   currentExample=stored;
+  if(window.BlocklyExamples)BlocklyExamples.showLesson(currentExample);
   editorStatus('Restored saved blocks. Choose an example to load its original version.',false);
   return true;
 }
