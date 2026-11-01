@@ -19,5 +19,6 @@ int main(){
  assert(a.busy());ticks(400);assert(!a.busy());
  a.note(1000,500);ticks(30);a.stop();assert(!a.busy()&&!high(4));
  a.note(0,0);assert(!a.busy());assert(BlocklyBuzzer::midiFrequency(69)==440);
+ assert(a.noteRecord(String("F#5 250")));assert(a.busy());assert(!a.noteRecord("C4 0"));assert(a.busy());a.stop();
  printf("PASS: three independent edge counts=%u,%u,%u; ISR expiry, rests, delayed sequence update, stop, slot limits\n",edges[0],edges[1],edges[2]);
 }

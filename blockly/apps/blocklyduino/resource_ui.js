@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 (function(){'use strict';
  var R=BoardResources,p=null,pending=null,installed=false;
- function records(ws){return (ws||Blockly.mainWorkspace).getAllBlocks().map(function(b){var f={};b.inputList.forEach(function(i){i.fieldRow.forEach(function(v){if(v.name)f[v.name]=b.getFieldValue(v.name);});});var mask=b.getInputTargetBlock&&b.getInputTargetBlock('MASK');if(mask&&mask.type==='math_number')f._MASK=Number(mask.getFieldValue('NUM'));return{id:b.id,type:b.type,name:f.NAME||b.type,fields:f,disabled:b.disabled||(b.getInheritedDisabled&&b.getInheritedDisabled())};});}
+ function records(ws){var blocks=(ws||Blockly.mainWorkspace).getAllBlocks();return blocks.map(function(b){var f={};b.inputList.forEach(function(i){i.fieldRow.forEach(function(v){if(v.name)f[v.name]=b.getFieldValue(v.name);});});if(/^lcd_user_/.test(b.type)){var init=blocks.find(function(c){return c.type==='lcd_user_init'&&!c.disabled;});f.ADDR=init?init.getFieldValue('ADDR'):'0x27';}var mask=b.getInputTargetBlock&&b.getInputTargetBlock('MASK');if(mask&&mask.type==='math_number')f._MASK=Number(mask.getFieldValue('NUM'));return{id:b.id,type:b.type,name:f.NAME||b.type,fields:f,disabled:b.disabled||(b.getInheritedDisabled&&b.getInheritedDisabled())};});}
  function analysis(ws){return R.analyze(records(ws),p||R.profile(''));}
  function options(b,key){if(!p)return null;var rs=records(b.workspace.isFlyout?Blockly.mainWorkspace:b.workspace);if(!rs.some(function(r){return r.id===b.id;}))rs=rs.concat(records(b.workspace).filter(function(r){return r.id===b.id;}));return R.choices(rs,b.id,key,p).map(function(v){return[R.label(p,v),v];});}
  function wire(b){var s=R.specs[b.type];if(!s)return;
-  Object.keys(s.pins||{}).forEach(function(key){var field=b.getField(key);if(!field||field.resourceWired_)return;field.resourceWired_=true;var original=field.menuGenerator_;
+  Object.keys(s.pins||{}).forEach(function(key){var field=b.getField(key);if(!field&&s.fixed&&s.fixed[key]){field=new Blockly.FieldDropdown([[R.label(p||R.profile('arduino:avr:uno'),s.fixed[key]),s.fixed[key]]]);b.appendDummyInput().appendField(key).appendField(field,key);}if(!field||field.resourceWired_)return;field.resourceWired_=true;if(s.fixed&&s.fixed[key]){field.EDITABLE=false;if(field.updateEditable)field.updateEditable();return;}var original=field.menuGenerator_;
    field.menuGenerator_=function(){var list=options(b,key);if(list===null)return typeof original==='function'?original.call(this):original;return list.length?list:[['No compatible free pin','']];};
    field.changeHandler_=function(value){var list=options(b,key);return !list||list.some(function(x){return x[1]===value;})?value:null;};
   });
@@ -13,7 +13,7 @@
  }
  function update(){if(!p||!Blockly.mainWorkspace)return;var ws=Blockly.mainWorkspace,a=analysis(ws);
   ws.getAllBlocks().forEach(function(b){var s=R.specs[b.type];if(!s)return;wire(b);
-   Object.keys(s.pins||{}).forEach(function(key){var field=b.getField(key),opts=options(b,key);if(!field||!opts)return;var editable=opts.length>1||(opts.length===1&&opts[0][1]!==field.getValue());if(field.EDITABLE!==editable){field.EDITABLE=editable;if(field.updateEditable)field.updateEditable();}});
+   Object.keys(s.pins||{}).forEach(function(key){var field=b.getField(key),opts=options(b,key);if(!field||!opts)return;var editable=!(s.fixed&&s.fixed[key])&&(opts.length>1||(opts.length===1&&opts[0][1]!==field.getValue()));if(field.EDITABLE!==editable){field.EDITABLE=editable;if(field.updateEditable)field.updateEditable();}});
    if(s.bus){var bus=p.buses[s.bus],f=b.getField('BOARD_BUS');if(f)f.setText(bus?s.bus+' · '+Object.keys(bus).map(function(k){return k+' '+R.label(p,bus[k]);}).join(' · '):'No compatible '+s.bus+' bus');}
    var errs=a.errors.filter(function(e){return e.id===b.id;});b.setWarningText(errs.length?errs.map(function(e){return e.message;}).join('\n'):null);
   });
@@ -28,6 +28,8 @@
   if(s.bus==='I2C'&&b.getField('ADDR')){var f=b.getField('ADDR'),used=records(b.workspace).filter(function(r){return r.id!==b.id&&!r.disabled&&R.specs[r.type]&&R.specs[r.type].bus==='I2C';}).map(function(r){return Number(r.fields.ADDR);});var opts=f.getOptions_?f.getOptions_():null;if(!opts){opts=[];for(var address=8;address<0x78;address++)opts.push(['0x'+address.toString(16),'0x'+address.toString(16)]);}var free=opts.filter(function(x){return used.indexOf(Number(x[1]))<0;});if(!free.length)throw Error('All supported I2C addresses for this module are occupied.');if(used.indexOf(Number(f.getValue()))>=0)f.setValue(free[0][1]);}
   var a=analysis(b.workspace);var error=a.errors.find(function(e){return e.id===b.id||e.id==='limits'||e.id==='timers';});if(error)throw Error(error.message);
  }
+ // Legacy Grove generators use an adjacent signal; honour the actual board map.
+ var oldNext=window._get_next_pin;window._get_next_pin=function(raw){if(!p||!p.known)return oldNext(raw);var n=R.nextPin(R.pin(p,raw));if(p.digital.concat(p.analog).indexOf(n)<0)throw Error('No compatible adjacent pin after '+raw);return n;};
  function install(){if(installed)return;installed=true;Blockly.mainWorkspace.addChangeListener(function(){clearTimeout(pending);pending=setTimeout(update,180);});update();}
  // Hook definitions before XML import so the pin selectors are dynamic from birth.
  Object.keys(R.specs).forEach(function(type){var d=Blockly.Blocks[type];if(!d)return;var init=d.init;d.init=function(){init.call(this);wire(this);};});

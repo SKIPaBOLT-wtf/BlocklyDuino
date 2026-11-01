@@ -3,6 +3,8 @@
     <mutation uid="raw_sensor" />
     <field name="NAME">sensor</field>
     <field name="ADDR">0x68</field>
+    <comment pinned="false" w="340" h="170">Purpose: Read an I2C register using a named device address.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_setup_section" x="25" y="100">
     <statement name="DO">
@@ -28,10 +30,13 @@
                 <field name="TEXT">I2C ready: WHO_AM_I register read</field>
               </block>
             </value>
+            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
           </block>
         </statement>
+        <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
   <block type="arduino_loop_section" x="600" y="25">
     <statement name="DO">
@@ -123,8 +128,10 @@
                                 </value>
                               </block>
                             </statement>
+                            <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
                           </block>
                         </next>
+                        <comment pinned="false" w="340" h="170">Create received as uint8_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
                       </block>
                     </statement>
                     <next>
@@ -150,19 +157,24 @@
                                     <field name="NUM">1000</field>
                                   </block>
                                 </value>
+                                <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                               </block>
                             </next>
                           </block>
                         </next>
+                        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="170">Create status as uint8_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
               </block>
             </next>
           </block>
         </next>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

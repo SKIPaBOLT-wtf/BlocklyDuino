@@ -48,3 +48,17 @@ SD, memory ICs, music, motion and alternate-board examples have software/compile
 coverage, but are not presented as a complete physically verified hardware matrix.
 
 The usability suites cover board pin/resource contracts, all example declarations, recent target configurations, continuous stepper generation, servo pulse units, map inputs, and streaming image parsing/view/export. Browser checks should additionally exercise pin/unpin, catalogue ordering and a real PNG download.
+
+The refinement suite exercises compact text/JSON editing, hidden legacy colour
+fields, sidebar configuration, free-pitch records, whole-array references and
+XML snapshot undo/redo (including stable device IDs and labelled areas).
+Host simulations also test buffer orientation/clipping, packed OLED bits,
+one NeoPixel show, bounded file-line reading, and polyphonic absolute/delta scores
+with overlapping voices, rollover and malformed input. The supplied POLY.TXT is
+fed through the same parser as an executable fixture.
+
+For a browser smoke check, open examples 61 and 69, inspect Code and Connections,
+edit an ordinary serial header and a Project devices colour, then undo/redo.
+Check that non-Blocks views have no selection/zoom/example controls. Compilation
+alone cannot establish SD latency, physical note synchronisation or spare runtime
+stack space on ATmega168.

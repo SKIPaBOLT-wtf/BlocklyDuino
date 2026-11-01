@@ -1,6 +1,8 @@
 <xml>
   <block type="serial_config" x="25" y="25">
     <field name="BAUD">115200</field>
+    <comment pinned="false" w="340" h="170">Purpose: Watch pin changes on several inputs and keep separate counters.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_typed_variable" x="25" y="95">
     <field name="VAR">leftCount</field>
@@ -11,6 +13,7 @@
         <field name="NUM">0</field>
       </block>
     </value>
+    <comment pinned="false" w="340" h="170">Create leftCount as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
   </block>
   <block type="arduino_typed_variable" x="25" y="165">
     <field name="VAR">rightCount</field>
@@ -21,9 +24,10 @@
         <field name="NUM">0</field>
       </block>
     </value>
+    <comment pinned="false" w="340" h="170">Create rightCount as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
   </block>
   <block type="irq_pin_change" x="430" y="25">
-    <mutation uid="irq-left-input"></mutation>
+    <mutation uid="irq-left-input" />
     <field name="NAME">leftInput</field>
     <field name="PIN">4</field>
     <field name="EDGE">FALLING</field>
@@ -47,11 +51,13 @@
             </value>
           </block>
         </value>
+        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">This is an interrupt handler. Keep the body short: update counters/flags here and do slow display, serial or SD work in loop. Use atomic access for shared multibyte values.</comment>
   </block>
   <block type="irq_pin_change" x="430" y="185">
-    <mutation uid="irq-right-input"></mutation>
+    <mutation uid="irq-right-input" />
     <field name="NAME">rightInput</field>
     <field name="PIN">5</field>
     <field name="EDGE">FALLING</field>
@@ -75,16 +81,20 @@
             </value>
           </block>
         </value>
+        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">This is an interrupt handler. Keep the body short: update counters/flags here and do slow display, serial or SD work in loop. Use atomic access for shared multibyte values.</comment>
   </block>
   <block type="arduino_setup_section" x="25" y="285">
     <statement name="DO">
       <block type="serial_text">
         <field name="TEXT">D4/D5 falling edges. Each button connects its pin to GND.</field>
         <field name="END">println</field>
+        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
   <block type="arduino_loop_section" x="430" y="385">
     <statement name="DO">
@@ -125,8 +135,10 @@
                             <field name="VAR">rightCount</field>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
                   </block>
                 </statement>
                 <next>
@@ -160,21 +172,30 @@
                                         <field name="NUM">100</field>
                                       </block>
                                     </value>
+                                    <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                                   </block>
                                 </next>
+                                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                               </block>
                             </next>
+                            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                           </block>
                         </next>
+                        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="160">Temporarily prevent interrupts while reading or changing shared multi-byte data. Keep this section short; it restores the previous interrupt state afterward.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="170">Create rightSnapshot as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="170">Create leftSnapshot as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

@@ -401,6 +401,21 @@
       variable + ' += (' + startName + ' <= ' + endName + ' ? ' + stepName + ' : -' + stepName + ')) {\n' + body + '}\n';
   };
 
+  Blockly.Blocks.arduino_array_ref={init:function(){this.setColour(330);this.appendDummyInput().appendField('array').appendField(arrayField(),'VAR');this.setOutput(true,'Array');this.setTooltip('Pass the whole array to an operation, without copying it. Its dimensions and element type come from the declaration. Use get [index] for a single element.');},getVars:getVars,renameVar:renameVar};
+  A.arduino_array_ref=function(){arrayDeclaration(this,null,true);return [nameOf(this),A.ORDER_ATOMIC];};
+  Blockly.ArrayRegistry={declaration:arrayDeclaration,shape:shape,name:nameOf};
+  var previousScrub=A.scrub_;
+  A.scrub_=function(block,code){
+    if(code===''&&block.getCommentText()){
+      var comment=A.prefixLines(block.getCommentText(),'// ')+'\n';
+      if(block.type==='arduino_setup_section')A.setups_['user_setup_'+block.id]=comment+(A.setups_['user_setup_'+block.id]||'');
+      else A.definitions_['comment_'+block.id]=comment;
+      // These declarations already emitted code elsewhere. Only scrub the next
+      // statement here; otherwise their comments incorrectly appear in loop.
+      return A.blockToCode(block.nextConnection&&block.nextConnection.targetBlock());
+    }
+    return previousScrub.call(this,block,code);
+  };
   // One compact Variables flyout instead of a getter/setter pair for every name.
   Blockly.Variables.flyoutCategory = function (blocks, gaps, margin, workspace) {
     var target=workspace.targetWorkspace, all=target.getAllBlocks(), scalar='value', array='data';
@@ -409,7 +424,7 @@
       if (all[i].type==='arduino_array_declare') array=all[i].getFieldValue('VAR');
     }
     var specs=[['arduino_typed_variable',scalar],['variables_set',scalar],['variables_get',scalar],
-      ['arduino_array_declare',array],['arduino_array_set',array],['arduino_array_get',array],['arduino_array_length',array]];
+      ['arduino_array_declare',array],['arduino_array_set',array],['arduino_array_get',array],['arduino_array_length',array],['arduino_array_ref',array]];
     for(var i=0;i<specs.length;i++) {
       var block=Blockly.Block.obtain(workspace,specs[i][0]); block.initSvg(); block.setFieldValue(specs[i][1],'VAR');
       if(block.syncArrayShape_)block.syncArrayShape_();

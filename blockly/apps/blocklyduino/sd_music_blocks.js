@@ -4,7 +4,11 @@
 function player(b){
  var card=Blockly.StorageRegistry.resolve(b,'sd');
  var buzzer=Blockly.MusicRegistry.name(Blockly.MusicRegistry.resolve(b,'buzzer','BUZZER'));
- var declaration='BxSDMelody<decltype('+card+')> bxScore('+card+', '+buzzer+');';
+ var start=b.type==='sd_music_start'?b:b.workspace.getAllBlocks().filter(function(x){return x.type==='sd_music_start'&&!x.disabled;})[0];
+ var extra=[];for(var v=2;start&&v<=Number(start.getFieldValue('VOICES')||1);v++)extra.push('&'+Blockly.MusicRegistry.name(Blockly.MusicRegistry.resolve(start,'buzzer','VOICE'+v)));
+ var names=[buzzer].concat(extra.map(function(x){return x.slice(1);}));if(new Set(names).size!==names.length)throw Error('Choose a different buzzer for each score voice.');
+ var format=start&&start.getFieldValue('VOICES')||'1';
+ var declaration=(format==='1'?'BxSDMelody':'BxSDScore')+'<decltype('+card+')> bxScore('+card+', '+buzzer+(extra.length?', '+extra.join(', '):'')+');';
  if(A.definitions_.sd_score_object&&A.definitions_.sd_score_object!==declaration)
    throw Error('Use one SD score player per program. Select the same card and buzzer in all score actions.');
  A.definitions_.sd_score_include='#include <BlocklySDMusic.h>';
@@ -20,8 +24,12 @@ function def(type,label,output,tip,extra){
  this.setTooltip(tip);this.setHelpUrl('examples/sd-music-guide.html');},onchange:Blockly.MusicRegistry.refresh({BUZZER:'buzzer'})};
 }
 def('sd_music_start','play score',false,'Open a known text file and start streaming notes to the chosen buzzer. Uses the card’s one open file. Call service score on each loop pass.',function(){this.appendValueInput('PATH').appendField('file');});
+var oldStart=Blockly.Blocks.sd_music_start.init;
+Blockly.Blocks.sd_music_start.init=function(){oldStart.call(this);this.appendDummyInput().appendField('format').appendField(new Blockly.FieldDropdown([['sequence · one voice','1'],['timed · one voice','T1'],['timed · two voices','2'],['timed · three voices','3']]),'VOICES');for(var n=2;n<=3;n++)this.appendDummyInput('VOICE_ROW'+n).appendField('voice '+n).appendField(Blockly.MusicRegistry.field('buzzer'),'VOICE'+n).setVisible(false);this.setTooltip('Play C4 250 records, or timed polyphonic records: time_ms,voice,note,duration_ms. Voices map to these declared buzzers once. Optional header @score 1 absolute or @score 1 delta. Notes can overlap; call service score continuously, without delays.');};
+var oldChange=Blockly.Blocks.sd_music_start.onchange;
+Blockly.Blocks.sd_music_start.onchange=function(){if(oldChange)oldChange.call(this);for(var n=2;n<=3;n++){var input=this.getInput('VOICE_ROW'+n),visible=n<=Number(this.getFieldValue('VOICES'));if(input.isVisible()!==visible){input.setVisible(visible);if(this.rendered)this.render();}}};
 A.sd_music_start=function(){return player(this)+'.start('+ (A.valueToCode(this,'PATH',A.ORDER_NONE)||'"MELODY.TXT"')+');\n';};
-def('sd_music_update','service score',false,'Call on every loop pass. Reads at most32 text characters per pass and starts the next note when the previous one ends. SD access can still pause briefly.');
+def('sd_music_update','service score',false,'Call on every loop pass. Reads at most 32 characters per pass. Timed records can start overlapping notes on three voices; single-note records advance in sequence. SD access can still pause briefly.');
 A.sd_music_update=function(){return player(this)+'.update();\n';};
 def('sd_music_stop','stop score',false,'Stop sound and close the score file.');
 A.sd_music_stop=function(){return player(this)+'.stop();\n';};

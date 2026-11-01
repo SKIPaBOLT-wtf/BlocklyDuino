@@ -3,6 +3,8 @@
     <mutation uid="card40" />
     <field name="NAME">card</field>
     <field name="CS">10</field>
+    <comment pinned="false" w="340" h="170">Purpose: Convert polar scan samples into rows of a streamed BMP on SD.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="device_servo" x="300" y="20">
     <mutation uid="pan40" />
@@ -21,6 +23,7 @@
         <value name="IF0">
           <block type="st_sd_ok">
             <field name="DEVICE">card40</field>
+            <comment pinned="false" w="340" h="160">True when the most recent operation on this card succeeded. Check it before using data from a read or continuing a file write.</comment>
           </block>
         </value>
         <statement name="DO0">
@@ -47,6 +50,7 @@
                 <value name="IF0">
                   <block type="st_sd_ok">
                     <field name="DEVICE">card40</field>
+                    <comment pinned="false" w="340" h="160">True when the most recent operation on this card succeeded. Check it before using data from a read or continuing a file write.</comment>
                   </block>
                 </value>
                 <statement name="DO0">
@@ -147,28 +151,38 @@
                                             </value>
                                           </block>
                                         </value>
+                                        <comment pinned="false" w="340" h="160">Append the next pixel in scan order. The image writer packs the file format as it streams, so the complete image need not fit in RAM.</comment>
                                       </block>
                                     </statement>
+                                    <comment pinned="false" w="340" h="170">Repeat the body with radius taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
                                   </block>
                                 </next>
+                                <comment pinned="false" w="340" h="170">Create distance as int. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
                               </block>
                             </next>
+                            <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                           </block>
                         </next>
+                        <comment pinned="false" w="340" h="160">Send a target position to the named servo. The library keeps generating pulses; reaching the target takes mechanical time. Position mode uses degrees, pulse mode uses microseconds.</comment>
                       </block>
                     </statement>
                     <next>
                       <block type="st_bmp_stream_finish">
                         <field name="DEVICE">card40</field>
+                        <comment pinned="false" w="340" h="160">Finish and close the image file after all expected pixels. An incomplete scan is reported as an error rather than a complete image.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Repeat the body with angle taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
                   </block>
                 </statement>
+                <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
               </block>
             </next>
           </block>
         </statement>
+        <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
 </xml>

@@ -3,6 +3,8 @@
     <mutation uid="memory36" />
     <field name="NAME">settings</field>
     <field name="CS">10</field>
+    <comment pinned="false" w="340" h="170">Purpose: Store and read numbers/text in an SPI EEPROM using a separate chip-select.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_setup_section" x="25" y="170">
     <statement name="DO">
@@ -60,11 +62,13 @@
                     </value>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
               </block>
             </next>
           </block>
         </next>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
 </xml>

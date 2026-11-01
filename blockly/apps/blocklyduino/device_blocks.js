@@ -91,7 +91,7 @@
       this.setColour(195);
       this.appendDummyInput().appendField(field(deviceKind),'DEVICE').appendField(title);
       if(build) build.call(this);
-      this.setPreviousStatement(true);this.setNextStatement(true);this.setTooltip(tooltip);
+      this.setInputsInline(true);this.setPreviousStatement(true);this.setNextStatement(true);this.setTooltip(tooltip);
     },onchange:refreshReference(deviceKind)};
   }
   function out(type, deviceKind, title, build, tooltip, outputType) {

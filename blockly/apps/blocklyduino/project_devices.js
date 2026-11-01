@@ -36,12 +36,24 @@
   });root.insertBefore(group,root.firstChild);return root;
  }
  function focusDevice(d){if(!ensureBlocksMode())return;var ws=Blockly.mainWorkspace;ws.toolbox_.clearSelection();d.block.select();var m=ws.getMetrics(),p=d.block.getRelativeToSurfaceXY();if(ws.scrollbar)ws.scrollbar.set(Math.max(0,p.x*(ws.scale||1)-m.contentLeft-35),Math.max(0,p.y*(ws.scale||1)-m.contentTop-35));editorStatus('Configuration: '+d.name+'. Change its name or wiring here.',false);}
+ function deviceSettings(d){
+  var old=document.getElementById('device-settings');if(old)old.remove();
+  var dialog=document.createElement('dialog');dialog.id='device-settings';dialog.className='workbench-dialog';
+  var title=document.createElement('h2');title.textContent=d.name+' · '+d.meta.label;dialog.appendChild(title);
+  var label=document.createElement('label');label.textContent='Block colour ';var choice=document.createElement('select');choice.setAttribute('aria-label',d.name+' block colour');
+  d.block.getField('DEVICE_HUE').getOptions_().forEach(function(v){choice.add(new Option(v[0],v[1]));});choice.value=d.block.getFieldValue('DEVICE_HUE');label.appendChild(choice);dialog.appendChild(label);
+  var sample=document.createElement('span');sample.className='device-colour-sample';sample.textContent='Preview';dialog.appendChild(sample);function preview(){sample.style.backgroundColor=Blockly.makeColour(Number(choice.value));}choice.onchange=preview;preview();
+  var actions=document.createElement('div');actions.className='dialog-actions';
+  function button(text,fn){var b=document.createElement('button');b.textContent=text;b.onclick=fn;actions.appendChild(b);}
+  button('Find definition',function(){dialog.close();focusDevice(d);});button('Cancel',function(){dialog.close();});button('Save',function(){d.block.setFieldValue(choice.value,'DEVICE_HUE');d.block.workspace.fireChangeEvent();refresh(true);dialog.close();});
+  dialog.appendChild(actions);document.body.appendChild(dialog);dialog.showModal();choice.focus();
+ }
  function treeLabel(node){var el=node.getRowElement&&node.getRowElement();var label=el&&el.querySelector('.blocklyTreeLabel');return label?label.textContent:'';}
  function decorate(devices){
   var ws=Blockly.mainWorkspace,toolbox=ws.toolbox_,tree=toolbox.tree_,rootChildren=tree.getChildren(),project=rootChildren[0],rows=project?project.getChildren():[];
   if(project&&project.getRowElement())project.getRowElement().setAttribute('data-project-heading','true');
   rows.forEach(function(node,i){var d=devices[i],row=node.getRowElement();if(!d||!row)return;row.classList.add('project-device-row');row.style.borderLeftColor=Blockly.makeColour(Number(d.block.getFieldValue('DEVICE_HUE')||d.meta.hue));row.dataset.deviceId=d.id;
-   var gear=document.createElement('button');gear.className='device-config-button';gear.textContent='⚙';gear.type='button';gear.title='Edit '+d.name+' configuration';gear.setAttribute('aria-label','Edit '+d.name+' configuration');gear.onmousedown=function(e){e.stopPropagation();};gear.onclick=function(e){e.stopPropagation();focusDevice(d);};row.appendChild(gear);
+   var gear=document.createElement('button');gear.className='device-config-button';gear.textContent='⚙';gear.type='button';gear.title='Edit '+d.name+' configuration';gear.setAttribute('aria-label','Edit '+d.name+' configuration');gear.onmousedown=function(e){e.stopPropagation();};gear.onclick=function(e){e.stopPropagation();deviceSettings(d);};row.appendChild(gear);
   });
   var container=toolbox.HtmlDiv,button=container.querySelector('.sidebar-add-device');
   if(!button){button=document.createElement('button');button.type='button';button.className='sidebar-add-device';button.textContent='+ Add device';button.onclick=openPicker;container.insertBefore(button,container.firstChild);}
@@ -80,12 +92,12 @@
   }
   search.addEventListener('input',render);render();document.body.appendChild(dialog);dialog.showModal();search.focus();
  }
-  catalog().forEach(function(meta){[meta.type].concat(meta.actions||[]).forEach(function(type){var def=Blockly.Blocks[type];if(!def||def.projectColorApplied_)return;var original=def.init;def.init=function(){original.call(this);this.setColour(meta.hue);if(type===meta.type){this.appendDummyInput().appendField('colour').appendField(new Blockly.FieldDropdown([["Default",String(meta.hue)],["Red","0"],["Orange","30"],["Yellow","55"],["Green","110"],["Teal","165"],["Blue","210"],["Indigo","240"],["Purple","280"],["Pink","325"]]),'DEVICE_HUE');}};def.projectColorApplied_=true;});});
+  catalog().forEach(function(meta){[meta.type].concat(meta.actions||[]).forEach(function(type){var def=Blockly.Blocks[type];if(!def||def.projectColorApplied_)return;var original=def.init;def.init=function(){original.call(this);this.setColour(meta.hue);if(type===meta.type){this.appendDummyInput('DEVICE_STYLE').appendField(new Blockly.FieldDropdown([["Default",String(meta.hue)],["Red","0"],["Orange","30"],["Yellow","55"],["Green","110"],["Teal","165"],["Blue","210"],["Indigo","240"],["Purple","280"],["Pink","325"]]),'DEVICE_HUE').setVisible(false);}};def.projectColorApplied_=true;});});
  function install(){
   if(installed)return;installed=true;baseTree=document.getElementById('toolbox').cloneNode(true);
 
   var flyout=Blockly.mainWorkspace.toolbox_.flyout_,show=flyout.show;flyout.show=function(){var result=show.apply(this,arguments);colorBlocks(this.workspace_,deviceList(Blockly.mainWorkspace));return result;};
   refresh(true);Blockly.mainWorkspace.addChangeListener(function(){clearTimeout(timer);timer=setTimeout(refresh,150);});
  }
- window.BlocklyProjectDevices={buildToolbox:buildToolbox,deviceList:deviceList,refresh:refresh,add:add,openPicker:openPicker,install:install};
+ window.BlocklyProjectDevices={buildToolbox:buildToolbox,deviceList:deviceList,refresh:refresh,add:add,openPicker:openPicker,deviceSettings:deviceSettings,install:install};
 }());

@@ -42,26 +42,62 @@
   avr_port_read:{rawPort:true,avr:true},avr_port_bits:{rawPort:true,avr:true},avr_port_replace:{rawPort:true,avr:true},avr_port_write:{rawPort:true,avr:true},avr_port_direction:{rawPort:true,avr:true},
   avr_isr:{rawRegister:true,avr:true},avr_register_read:{rawRegister:true,avr:true},avr_register_write:{rawRegister:true,avr:true},avr_register_bits:{rawRegister:true,avr:true},avr_register_flags:{rawRegister:true,avr:true}
  };
+ // Legacy examples retain their original blocks, but use the same pin contracts.
+ Object.assign(specs,{
+  button_pullup_pressed:{pins:{PIN:'digital'},gpio:true,read:true},
+  ds18b20_temperature:{pins:{PIN:'digital'},legacy:'ds18b20'},
+  dht_temperature:{pins:{PIN:'digital'},legacy:'dht'},dht_humidity:{pins:{PIN:'digital'},legacy:'dht'},
+  ultrasonic_cm:{pins:{TRIG:'digital',ECHO:'digital'},legacy:'ultrasonic'},
+  stepper_28byj_init:{pins:{IN1:'digital',IN2:'digital',IN3:'digital',IN4:'digital'},legacy:'28byj'},
+  stepper_step_dir:{pins:{STEP:'digital',DIR:'digital'},legacy:'stepdir'},
+  accel_driver_init:{pins:{STEP:'digital',DIR:'digital'},legacy:'accel'},
+  accel_4wire_init:{pins:{IN1:'digital',IN2:'digital',IN3:'digital',IN4:'digital'},legacy:'accel'},
+  neopixel_init:{pins:{PIN:'digital'},legacy:'pixels'},ir_nec_read:{pins:{PIN:'digital'},legacy:'ir',resource:'ir'},
+  shift595_write:{pins:{DATA:'digital',CLK:'digital',LATCH:'digital'},legacy:'595'},
+  lcd1602_i2c_print:{bus:'I2C',legacy:'lcd1602'},lcd_user_init:{bus:'I2C',legacy:'lcdUser'},
+  i2c_scan_serial:{bus:'I2C'},oled_ssd1306_091_i2c_print:{bus:'I2C',legacy:'oled091',fixed:{ADDR:'0x3C'}},
+  grove_rgb_lcd_print:{bus:'I2C',legacy:'groveLcd',fixed:{ADDR:'0x3E'},extraAddresses:['0x62']},
+  grove_rgb_lcd_color:{bus:'I2C',legacy:'groveLcd',fixed:{ADDR:'0x3E'},extraAddresses:['0x62']},
+  oled_ssd1306_spi_print:{bus:'SPI',legacy:'oledSpi',fixed:{CS:'10',DC:'9',RESET:'8'},pins:{CS:'digital',DC:'digital',RESET:'digital'}},
+  tft_st7735_spi_print:{bus:'SPI',legacy:'tftSpi',fixed:{CS:'10',DC:'9',RESET:'8'},pins:{CS:'digital',DC:'digital',RESET:'digital'}}
+ });
+ ['grove_led','grove_piezo_buzzer','grove_relay'].forEach(function(t){specs[t]={pins:{PIN:'digital'},gpio:true};});
+ ['grove_button','grove_tilt_switch','grove_pir_motion_sensor','grove_line_finder'].forEach(function(t){specs[t]={pins:{PIN:'digital'},gpio:true,read:true};});
+ ['grove_rotary_angle','grove_temporature_sensor','grove_sound_sensor'].forEach(function(t){specs[t]={pins:{PIN:'analog'},gpio:true,read:true};});
+ specs.grove_ultrasonic_ranger={pins:{PIN:'digital'},legacy:'groveRange'};
+ ['grove_serial_lcd_print','grove_serial_lcd_power','grove_serial_lcd_effect'].forEach(function(t){specs[t]={pins:{PIN:'pcint'},pair:'digital',legacy:'groveSerialLCD',avr:true};});
+ specs.grove_rgb_led={pins:{PIN:'digital'},pair:'digital',legacy:'groveRGB'};
+ specs.grove_bluetooth_slave={pins:{PIN:'pcint'},pair:'digital',legacy:'groveBluetooth',avr:true};
+ specs.grove_thumb_joystick={pins:{PIN:'analog'},pair:'analog',gpio:true,read:true};
+ specs.grove_motor_shield={legacy:'groveMotor',fixed:{IN1:'8',IN2:'11',IN3:'12',IN4:'13',PWMA:'9',PWMB:'10'},pins:{IN1:'digital',IN2:'digital',IN3:'digital',IN4:'digital',PWMA:'pwm',PWMB:'pwm'}};
+ ['lcd20x4_title','lcd20x4_bounce','lcd20x4_counter','lcd20x4_heart','lcd20x4_ticker'].forEach(function(t){specs[t]={bus:'I2C',legacy:'lcd20',fixed:{ADDR:'0x27'}};});
+ ['lcd_user_print','lcd_user_print_at','lcd_user_clear_row','lcd_user_heart_at','lcd_user_clear','lcd_user_backlight'].forEach(function(t){specs[t]={bus:'I2C',legacy:'lcdUser'};});
+ ['stepper_28byj_move'].forEach(function(t){specs[t]={requires:['stepper_28byj_init'],fallback:{IN1:'8',IN2:'9',IN3:'10',IN4:'11'}};});
+ ['neopixel_set','neopixel_show','neopixel_clear'].forEach(function(t){specs[t]={requires:['neopixel_init'],fallback:{PIN:'6'}};});
+ ['accel_move_to','accel_move_relative','accel_run','accel_set_max_speed','accel_set_acceleration','accel_distance_to_go','accel_current_position'].forEach(function(t){specs[t]={requires:['accel_driver_init','accel_4wire_init'],fallback:{STEP:'3',DIR:'4'},motor:true};});
+ function normalized(records){return records.filter(active).map(function(r){var s=specs[r.type];if(s&&s.requires&&!records.some(function(c){return active(c)&&s.requires.indexOf(c.type)>=0&&(!s.motor||c.fields.MOTOR===r.fields.MOTOR);})){r=Object.assign({},r,{type:s.requires[0],fields:Object.assign({},s.fallback,r.fields)});s=specs[r.type];}var fields=Object.assign({},r.fields,s&&s.fixed);if(!s)return r;return Object.assign({},r,{fields:fields,owner:s.legacy?'legacy:'+s.legacy+':'+Object.keys(s.pins||{}).concat(['ADDR','KIND','MOTOR']).map(function(k){return fields[k]||'';}).join(':'):r.id});});}
+ function nextPin(v){var m=String(v).match(/^(.*?)([0-9]+)$/);return m?m[1]+(Number(m[2])+1):'';}
  function pin(p,v){v=String(v==null?'':v).replace(/^D(?=\d)/,'');return p.aliases[v]||v;}
  function label(p,v){v=pin(p,v);return p.id==='pico'?'GP'+v:/^\d+$/.test(v)?'D'+v:v;}
  function active(r){return !r.disabled;}
  function analyze(records,p){
-  var claims={},errors=[],counts={},timers={},addresses={},rows=[],servoPins={},notes=[];
+  var claims={},errors=[],counts={},timers={},addresses={},rows=[],servoPins={},notes=[],counted={};
   function error(r,msg){errors.push({id:r.id,message:(r.name||r.type)+': '+msg});}
   function claim(r,v,role,share){v=pin(p,v);if(!v)return;var c={id:r.id,name:r.name||r.type,role:role,share:share||'',pin:v,observer:!!(specs[r.type]&&specs[r.type].read),irq:!!(specs[r.type]&&specs[r.type].irq)};(claims[v]||(claims[v]=[])).push(c);return c;}
-  var live=records.filter(active);
+  var live=normalized(records);
   live.forEach(function(r){var s=specs[r.type];if(!s){if(/^(lcd|grove_|oled_|dht_|ds18b20_|neopixel_|stepper_|accel_|ultrasonic_|ir_nec_)/.test(r.type))notes.push('Legacy hardware blocks do not declare reusable devices. Replace them with Add device definitions for complete pin tracking.');if(/^(user_|arduino_raw)/.test(r.type))notes.push('Custom C++ may use resources beyond these declarations.');return;}
    if(!p.known){error(r,'choose a board with a verified pin profile.');return;}
    if(s.avr&&p.id!=='avr328')error(r,'this block requires ATmega168/328.');
-   if(s.resource){if(!s.legacyServo||!servoPins[pin(p,r.fields.PIN)])counts[s.resource]=(counts[s.resource]||0)+1;if(s.legacyServo)servoPins[pin(p,r.fields.PIN)]=true;}
-   var row={id:r.id,name:r.name||r.type,type:r.type,wires:[]};rows.push(row);
+   if(s.resource&&!counted[r.owner]){counted[r.owner]=true;if(!s.legacyServo||!servoPins[pin(p,r.fields.PIN)])counts[s.resource]=(counts[s.resource]||0)+1;if(s.legacyServo)servoPins[pin(p,r.fields.PIN)]=true;}
+   var row={id:r.id,name:r.name||r.type,type:r.type,fields:r.fields,wires:[]};rows.push(row);
    if(s.fixedLED){claim(r,p.led,'LED','gpio:'+p.led);row.wires.push('LED → '+label(p,p.led));}
    Object.keys(s.pins||{}).forEach(function(f){var v=pin(p,r.fields[f]),kind=s.pins[f],valid=p[kind]||[];
     if(valid.map(function(x){return pin(p,x);}).indexOf(v)<0)error(r,f+' needs a compatible '+kind+' pin; '+label(p,v)+' is unavailable.');
-    var shared=s.gpio?'gpio:'+v:s.legacyServo?'servo:'+v:'';
+    var shared=s.gpio?'gpio:'+v:s.legacyServo?'servo:'+v:s.legacy?r.owner+':'+f:'';
     row.wires.push(f+' → '+label(p,v));claim(r,v,f,shared);
     if(kind==='pwm'&&p.pwmTimer)timers[p.pwmTimer[v]]=timers[p.pwmTimer[v]]||[];
    });
+   if(s.pair){var paired=nextPin(pin(p,r.fields.PIN));if((p[s.pair]||[]).indexOf(paired)<0)error(r,'PIN needs a compatible adjacent '+s.pair+' pin.');else {claim(r,paired,'paired pin',s.gpio?'gpio:'+paired:r.owner+':pair');row.wires.push('paired pin → '+label(p,paired));}}
    if(s.rawPort||s.rawRegister){
     var reg=String(r.fields.REGISTER||r.fields.VECTOR||''),port=s.rawPort?r.fields.PORT:(/^(PORT|DDR|PIN)[BCD]$/.test(reg)?reg.slice(-1):null);
     if(port){var mask=Number.isInteger(r.fields._MASK)?r.fields._MASK:255;var list=p.avrpin||[];list.filter(function(v){return v[0]===port&&(mask&(1<<Number(v[1])));}).forEach(function(v){var physical=pin(p,v);claim(r,physical,'PORT'+port,'gpio:'+physical);row.wires.push(v+' → '+label(p,physical));});}
@@ -71,10 +107,10 @@
     Object.keys(bus).forEach(function(role){row.wires.push(role+' → '+label(p,bus[role]));claim(r,bus[role],role,s.bus+':'+role);});
     // AVR SPI must keep hardware SS configured as output, even with another CS.
     if(s.bus==='SPI'&&p.spiSS&&!live.some(function(d){return specs[d.type]&&specs[d.type].bus==='SPI'&&pin(p,d.fields.CS)===p.spiSS;}))claim(r,p.spiSS,'hardware SS','SPI:SS');
-    if(s.bus==='I2C'&&r.fields.ADDR){var a=Number(r.fields.ADDR);if(addresses[a])error(r,'I2C address '+r.fields.ADDR+' is already used by '+addresses[a]+'.');else addresses[a]=row.name;}
+    if(s.bus==='I2C'&&r.fields.ADDR)[r.fields.ADDR].concat(s.extraAddresses||[]).forEach(function(value){var a=Number(value);if(addresses[a]&&addresses[a].owner!==r.owner)error(r,'I2C address '+value+' is already used by '+addresses[a].name+'.');else addresses[a]={owner:r.owner,name:row.name};});
    }
   });
-  if(live.some(function(r){return /^serial_|^text_print$|^st_memory_text_stream$|^st_file_stream$/.test(r.type);}))p.serial.forEach(function(v){claim({id:'serial',name:'Hardware Serial'},v,'UART','UART');});
+  if(live.some(function(r){return /^serial_|^text_print$|^ll_serial_number$|^i2c_scan_serial$|^grove_bluetooth_slave$|^st_sd_list$|^st_memory_text_stream$|^st_file_stream$/.test(r.type);}))p.serial.forEach(function(v){claim({id:'serial',name:'Hardware Serial'},v,'UART','UART');});
   Object.keys(claims).forEach(function(v){var cs=claims[v];for(var i=0;i<cs.length;i++)for(var j=0;j<i;j++){
    if(cs[i].share&&cs[i].share===cs[j].share)continue;
    if((cs[i].observer&&cs[j].irq)||(cs[j].observer&&cs[i].irq))continue;
@@ -93,13 +129,16 @@
   if(counts.tone&&p.id==='avr328')timerUse('Timer2','tone');
   if(counts.tone&&p.id==='bluepill')timerUse('TIM3','tone');
   ['0','1','2'].forEach(function(n){if(counts['rawTimer'+n])timerUse('Timer'+n,'Direct timer registers / ISR');});
-  live.forEach(function(r){var s=specs[r.type];if(s&&s.resource==='pwm'){var t=(p.pwmTimer||{})[pin(p,r.fields.PIN)];if(timers[t]&&timers[t].length)error(r,'PWM timer '+t+' is used by '+timers[t].join(', ')+'.');}});
+  live.forEach(function(r){var s=specs[r.type];if(s)Object.keys(s.pins||{}).forEach(function(k){if(s.pins[k]!=='pwm')return;var t=(p.pwmTimer||{})[pin(p,r.fields[k])];if(timers[t]&&timers[t].length)error(r,'PWM timer '+t+' is used by '+timers[t].join(', ')+'.');});});
   return {errors:errors,claims:claims,counts:counts,timers:timers,rows:rows,notes:Array.from(new Set(notes))};
  }
  function choices(records,id,field,p){var r=records.filter(function(r){return r.id===id;})[0];if(!r||!specs[r.type])return [];var s=specs[r.type],kind=(s.pins||{})[field];if(!kind)return [];
   return (p[kind]||[]).filter(function(v){var copy=records.map(function(x){if(x.id!==id)return x;var f=Object.assign({},x.fields);f[field]=v;return Object.assign({},x,{fields:f});});
-   var a=analyze(copy,p),physical=pin(p,v);return !a.errors.some(function(e){return e.id===id&&((e.message.indexOf(field+' needs')>=0)||(e.message.indexOf(label(p,v)+' is occupied')>=0)||e.message.indexOf('PWM timer')>=0);})&&!((a.claims[physical]||[]).some(function(c){return c.id!==id&&!(s.read&&c.irq)&&!(s.irq&&c.observer)&&!(s.gpio&&c.share==='gpio:'+physical)&&!(s.legacyServo&&c.share==='servo:'+physical);}));
+   var a=analyze(copy,p),physical=pin(p,v),own=normalized(copy).filter(function(x){return x.id===id;})[0];
+   if(s.avr&&p.id!=='avr328')return false;
+   var candidates=[physical];if(s.pair)candidates.push(nextPin(physical));
+   return !a.errors.some(function(e){return e.id===id&&(e.message.indexOf(field+' needs')>=0||e.message.indexOf('PWM timer')>=0||candidates.some(function(c){return e.message.indexOf(label(p,c)+' is occupied')>=0;}));})&&!candidates.some(function(c){return (a.claims[c]||[]).some(function(cl){return cl.id!==id&&!(s.read&&cl.irq)&&!(s.irq&&cl.observer)&&!(s.gpio&&cl.share==='gpio:'+c)&&!(s.legacyServo&&cl.share==='servo:'+c)&&!(s.legacy&&cl.share.indexOf(own.owner+':')===0);});});
   });
  }
- return {profile:profile,specs:specs,pin:pin,label:label,analyze:analyze,choices:choices};
+ return {profile:profile,specs:specs,pin:pin,label:label,analyze:analyze,choices:choices,nextPin:nextPin};
 });

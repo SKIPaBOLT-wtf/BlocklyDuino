@@ -1,6 +1,8 @@
 #ifndef FAKE_ARDUINO_H
 #define FAKE_ARDUINO_H
 #include <stdint.h>
+#include <string>
+using String=std::string;
 #define NUM_DIGITAL_PINS 20
 #define NOT_A_PIN 0
 #define OUTPUT 1

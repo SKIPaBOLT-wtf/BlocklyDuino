@@ -3,6 +3,8 @@
     <field name="TYPE">uint8_t</field>
     <field name="VAR">visits</field>
     <field name="SIZE">3,4</field>
+    <comment pinned="false" w="340" h="170">Purpose: Use variable indices to access a multidimensional array from a function.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_typed_variable" x="20" y="90">
     <field name="TYPE">int</field>
@@ -21,8 +23,10 @@
             <field name="NUM">0</field>
           </block>
         </value>
+        <comment pinned="false" w="340" h="170">Create j as int. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
       </block>
     </next>
+    <comment pinned="false" w="340" h="170">Create i as int. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
   </block>
   <block type="procedures_defnoreturn" x="410" y="20">
     <mutation>
@@ -51,6 +55,7 @@
                     <field name="VAR">column</field>
                   </block>
                 </value>
+                <comment pinned="false" w="340" h="160">Read one element using the current index values. This does not copy the whole array. Keep each index inside the corresponding dimension.</comment>
               </block>
             </value>
             <value name="B">
@@ -79,10 +84,13 @@
                 <field name="VAR">nextVisit</field>
               </block>
             </value>
+            <comment pinned="false" w="340" h="160">Replace one array element at the given indices. Indices start at zero and must stay below each declared dimension. Other elements keep their previous values.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="170">Create nextVisit as uint8_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Define visit once and call it elsewhere. It does not run just because it is defined. Arguments and variables declared inside this body are local.</comment>
   </block>
   <block type="arduino_loop_section" x="20" y="230">
     <statement name="DO">
@@ -117,6 +125,7 @@
                     <field name="VAR">j</field>
                   </block>
                 </value>
+                <comment pinned="false" w="340" h="160">Read one element using the current index values. This does not copy the whole array. Keep each index inside the corresponding dimension.</comment>
               </block>
             </value>
             <next>
@@ -145,6 +154,7 @@
                         <field name="AXIS">2</field>
                       </block>
                     </value>
+                    <comment pinned="false" w="340" h="160">Keep the remainder after division. This is useful for wrapping a counter or animation position back to the beginning.</comment>
                   </block>
                 </value>
                 <next>
@@ -190,8 +200,10 @@
                                 <field name="AXIS">1</field>
                               </block>
                             </value>
+                            <comment pinned="false" w="340" h="160">Keep the remainder after division. This is useful for wrapping a counter or animation position back to the beginning.</comment>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
                       </block>
                     </statement>
                     <next>
@@ -201,15 +213,21 @@
                             <field name="NUM">200</field>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Evaluate the condition first. Execute the enclosed actions only when it is true; otherwise skip them or use the else branch.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="160">Run the blocks inside this named function, then continue with the next block here. Reuse functions for repeated actions instead of copying their blocks.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

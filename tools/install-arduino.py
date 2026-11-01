@@ -14,4 +14,6 @@ run('core','update-index',*extra)
 for core in a.cores: run('core','install',data['cores'][core],*extra)
 run('lib','update-index')
 for name,version in data['libraries'].items(): run('lib','install',name+'@'+version,'--no-deps')
+from arduino_compat import apply
+apply(a.cli)
 print('Dependencies installed. Bundled Blockly libraries are supplied by the local server.')

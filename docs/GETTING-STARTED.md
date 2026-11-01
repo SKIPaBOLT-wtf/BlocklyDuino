@@ -22,9 +22,14 @@ python3 tools/install-arduino.py
 
 Open **http://127.0.0.1:8080/**. The installer installs the pinned AVR core and
 example dependencies listed in `arduino/dependencies.json`. It does not flash
-hardware. Custom BlocklyStorage, BlocklyMusic and BlocklySDMusic sources are
+hardware. The installer also applies a version-checked ST7735 1.12.0 compatibility
+fix for STM32duino 3.x: omit an unused private header that core no longer provides.
+The original source is kept beside the library with a `.blocklyduino-original`
+suffix. If an Arduino IDE library update replaces it, rerun
+`python3 tools/arduino_compat.py` (or the dependency installer). Other library
+versions require review instead of being patched blindly. Custom BlocklyStorage, BlocklyMusic, BlocklySDMusic and BlocklyBuffers sources are
 bundled under `arduino/libraries`; the server supplies that directory to the
-compiler. To use exported code in Arduino IDE, copy those three library folders
+compiler. To use exported code in Arduino IDE, copy those four library folders
 into the IDE sketchbook's `libraries` folder as well.
 
 If Arduino CLI is not on PATH, pass `--cli /path/to/arduino-cli` to both scripts.

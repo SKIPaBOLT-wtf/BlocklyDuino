@@ -1,7 +1,7 @@
 const fs=require('fs'),{JSDOM}=require('jsdom'),assert=require('assert');
 const out='blockly/apps/blocklyduino',base='blockly';
 const w=new JSDOM('<html><body></body></html>',{runScripts:'outside-only'}).window;
-const files=['blockly_compressed.js','blocks_compressed.js','arduino_compressed.js','msg/js/en.js'].map(f=>base+'/'+f).concat(['extra_blocks.js','lcd20x4_blocks.js','popular_blocks.js','program_blocks.js','math_blocks.js','device_blocks.js','storage_blocks.js','avr_blocks.js','music_blocks.js','serial_blocks.js','timer_interrupt_blocks.js'].map(f=>out+'/'+f));
+const files=['blockly_compressed.js','blocks_compressed.js','arduino_compressed.js','msg/js/en.js'].map(f=>base+'/'+f).concat(['extra_blocks.js','lcd20x4_blocks.js','popular_blocks.js','program_blocks.js','math_blocks.js','device_blocks.js','storage_blocks.js','avr_blocks.js','music_blocks.js','field_message.js','serial_blocks.js','timer_interrupt_blocks.js'].map(f=>out+'/'+f));
 w.eval(files.map(f=>fs.readFileSync(f,'utf8')).join('\n')+'\nwindow.B=Blockly');const B=w.B;let tests=0;
 function check(xml,fn){const ws=new B.Workspace();B.Xml.domToWorkspace(ws,B.Xml.textToDom(xml));try{fn(ws);tests++;}finally{ws.dispose();}}
 const handler='<block type="irq_timer1"><value name="PERIOD_US"><block type="math_number"><field name="NUM">100000</field></block></value><statement name="DO"><block type="variables_set"><field name="VAR">ticks</field><value name="VALUE"><block type="math_arithmetic"><field name="OP">ADD</field><value name="A"><block type="variables_get"><field name="VAR">ticks</field></block></value><value name="B"><block type="math_number"><field name="NUM">1</field></block></value></block></value></block></statement></block>';

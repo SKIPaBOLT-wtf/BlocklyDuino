@@ -1,6 +1,8 @@
 <xml>
   <block type="serial_config" x="25" y="25">
     <field name="BAUD">115200</field>
+    <comment pinned="false" w="340" h="170">Purpose: Attach an external interrupt to count input edges.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_typed_variable" x="25" y="100">
     <field name="VAR">pulseCount</field>
@@ -11,9 +13,10 @@
         <field name="NUM">0</field>
       </block>
     </value>
+    <comment pinned="false" w="340" h="170">Create pulseCount as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
   </block>
   <block type="irq_external" x="430" y="25">
-    <mutation uid="irq-pulse-input"></mutation>
+    <mutation uid="irq-pulse-input" />
     <field name="NAME">pulseInput</field>
     <field name="PIN">2</field>
     <field name="EDGE">FALLING</field>
@@ -37,16 +40,20 @@
             </value>
           </block>
         </value>
+        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">This is an interrupt handler. Keep the body short: update counters/flags here and do slow display, serial or SD work in loop. Use atomic access for shared multibyte values.</comment>
   </block>
   <block type="arduino_setup_section" x="25" y="220">
     <statement name="DO">
       <block type="serial_text">
         <field name="TEXT">D2 falling edges. Button: D2 to GND; contacts may bounce.</field>
         <field name="END">println</field>
+        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
   <block type="arduino_loop_section" x="430" y="250">
     <statement name="DO">
@@ -69,6 +76,7 @@
                     <field name="VAR">pulseCount</field>
                   </block>
                 </value>
+                <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
               </block>
             </statement>
             <next>
@@ -90,15 +98,21 @@
                             <field name="NUM">100</field>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="160">Temporarily prevent interrupts while reading or changing shared multi-byte data. Keep this section short; it restores the previous interrupt state afterward.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="170">Create snapshot as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

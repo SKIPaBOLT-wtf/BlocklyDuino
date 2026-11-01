@@ -1,6 +1,7 @@
 #pragma once
 #include <BlocklySD.h>
 #include <BlocklyMusic.h>
+#include <BlocklyNote.h>
 
 // Text records: C4 250, D#4 500, R 100. At most 32 characters parsed per update.
 // Owns the card's one open file until stop/EOF; no String or whole-score buffer.
@@ -13,18 +14,7 @@ template<class Card> class BxSDMelody {
   bool running,comment,eof;
   bool noteToken(){
     token[length]=0;
-    if(length==1&&(token[0]=='R'||token[0]=='r')){frequency=0;return true;}
-    if(length<2||length>3)return false;
-    char letter=token[0];if(letter>='a'&&letter<='g')letter-=32;
-    int8_t semi;
-    switch(letter){case 'C':semi=0;break;case 'D':semi=2;break;case 'E':semi=4;break;case 'F':semi=5;break;case 'G':semi=7;break;case 'A':semi=9;break;case 'B':semi=11;break;default:return false;}
-    uint8_t at=1;
-    if(token[at]=='#'){++semi;++at;}else if(token[at]=='b'){--semi;++at;}
-    if(at!=length-1||token[at]<'0'||token[at]>'8')return false;
-    int16_t midi=(token[at]-'0'+1)*12+semi;
-    if(midi<0||midi>127)return false;
-    frequency=BlocklyBuzzer::midiFrequency(uint8_t(midi));
-    return frequency>=20&&frequency<=4000;
+    return BlocklyNote::pitch(token,frequency,BlocklyBuzzer::midiFrequency);
   }
   void fail(){stop();ok=false;}
   void startNote(){buzzer.note(frequency,duration);stage=length=digits=0;duration=0;}
@@ -71,3 +61,5 @@ template<class Card> class BxSDMelody {
     }
   }
 };
+
+#include <BlocklySDScore.h>

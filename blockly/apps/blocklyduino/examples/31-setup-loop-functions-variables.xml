@@ -7,6 +7,8 @@
         <field name="NUM">0</field>
       </block>
     </value>
+    <comment pinned="false" w="340" h="170">Purpose: Compare code that runs once in setup with repeating loop code, named functions and variables.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_setup_section" x="30" y="150">
     <statement name="DO">
@@ -19,10 +21,13 @@
                 <field name="TEXT">Start</field>
               </block>
             </value>
+            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="160">Change the built-in LED state so the program has a visible indication of this step.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
   <block type="arduino_loop_section" x="30" y="350">
     <statement name="DO">
@@ -53,12 +58,16 @@
                     <field name="VAR">skaicius</field>
                   </block>
                 </value>
+                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="160">Run the blocks inside this named function, then continue with the next block here. Reuse functions for repeated actions instead of copying their blocks.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
   <block type="procedures_defnoreturn" x="440" y="30">
     <field name="NAME">mirktelti</field>
@@ -82,13 +91,18 @@
                         <field name="NUM">300</field>
                       </block>
                     </value>
+                    <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="160">Change the built-in LED state so the program has a visible indication of this step.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="160">Change the built-in LED state so the program has a visible indication of this step.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Define mirktelti once and call it elsewhere. It does not run just because it is defined. Arguments and variables declared inside this body are local.</comment>
   </block>
 </xml>

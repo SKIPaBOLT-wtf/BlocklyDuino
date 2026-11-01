@@ -19,5 +19,9 @@ assert.match(errors([r('device_servo',{PIN:'9'})],R.profile('unknown:unknown:unk
 assert.equal(errors([{...lcd,disabled:true},adc]),'');assert.match(errors([r('avr_pin_write',{PIN:'C4'}),lcd]),/occupied/);assert.match(errors([r('avr_port_bits',{PORT:'C',_MASK:16}),lcd]),/occupied/);assert.equal(errors([r('avr_port_bits',{PORT:'C',_MASK:1}),lcd]),'');assert.match(errors([r('avr_register_write',{REGISTER:'TCCR1A'}),servo]),/Timer1/);
 const occupied=avr.digital.map(PIN=>r('device_servo',{PIN})),newmotor=r('device_stepper_driver',{STEP:'',DIR:''});assert.deepEqual(R.choices(occupied.concat([newmotor]),newmotor.id,'STEP',avr),[]);
 assert.match(errors([sd,r('inout_buildin_led',{})]),/occupied/);assert.equal(errors([r('irq_external',{PIN:'2'}),r('inout_digital_read',{PIN:'2'})]),'');
-assert(R.analyze([r('lcd1602_i2c_print',{})],avr).notes.some(n=>n.includes('Legacy')));
+assert.match(errors([r('lcd1602_i2c_print',{ADDR:'0x27'}),r('inout_analog_read',{PIN:'A4'})]),/occupied/);
+assert.equal(errors([r('dht_temperature',{PIN:'2',KIND:'DHT22'}),r('dht_humidity',{PIN:'2',KIND:'DHT22'})]),'');
+assert.match(errors([r('device_lcd',{ADDR:'0x27'}),r('dht_temperature',{PIN:'A4',KIND:'DHT22'})]),/occupied/);
+assert.match(errors([r('ll_serial_number',{}),r('device_servo',{PIN:'0'})]),/occupied/);
+assert.match(errors([r('st_sd_list',{}),r('device_servo',{PIN:'1'})]),/occupied/);
 console.log('PASS resource contracts: AVR/Pico/Blue Pill pins, shared buses, address/CS collisions, ADC, IRQ, PWM/timers, UART, PIO, limits, masks, exhaustion and unsupported boards');

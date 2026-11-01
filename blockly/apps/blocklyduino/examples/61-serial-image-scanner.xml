@@ -4,40 +4,29 @@
     <field name="NAME">pan</field>
     <field name="PIN">9</field>
     <field name="DEVICE_HUE">210</field>
+    <comment pinned="false" w="340" h="170">Purpose: Scan a photocell on A0 with two servos. Send ordinary Serial text: one @image header, then @pixel x,y,value rows. Plotter stores the image on the computer.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
-  <block type="device_servo" x="355" y="25">
+  <block type="device_servo" x="385" y="25">
     <mutation uid="scantilt" />
     <field name="NAME">tilt</field>
     <field name="PIN">10</field>
     <field name="DEVICE_HUE">30</field>
   </block>
-  <block type="serial_config" x="685" y="25">
+  <block type="serial_config" x="745" y="25">
     <field name="BAUD">115200</field>
   </block>
-  <block type="arduino_setup_section" x="25" y="215">
+  <block type="arduino_setup_section" x="25" y="180">
     <statement name="DO">
-      <block type="serial_image_header">
-        <field name="ID">photocell</field>
-        <field name="MODE">gray</field>
-        <value name="WIDTH">
-          <block type="math_number">
-            <field name="NUM">64</field>
-          </block>
-        </value>
-        <value name="HEIGHT">
-          <block type="math_number">
-            <field name="NUM">48</field>
-          </block>
-        </value>
-        <value name="MAX">
-          <block type="math_number">
-            <field name="NUM">1023</field>
-          </block>
-        </value>
+      <block type="serial_text">
+        <field name="TEXT">@image {"version":1,"id":"photocell","width":64,"height":48,"mode":"gray","max":1023}</field>
+        <field name="END">println</field>
+        <comment pinned="false">Ordinary Serial text. Plotter recognises this header and creates a 64×48 image. Change its JSON in the message editor; the Arduino needs no JSON library. Sent once before pixel data.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
-  <block type="arduino_loop_section" x="355" y="215">
+  <block type="arduino_loop_section" x="25" y="340">
     <statement name="DO">
       <block type="controls_for">
         <field name="VAR">y</field>
@@ -104,6 +93,7 @@
                         <field name="NUM">145</field>
                       </block>
                     </value>
+                    <comment pinned="false" w="340" h="160">Convert a value from one numeric range to another. All five inputs can be expressions. Arduino map uses integer arithmetic and does not clamp values outside the source range.</comment>
                   </block>
                 </value>
                 <next>
@@ -136,6 +126,7 @@
                             <field name="NUM">135</field>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Convert a value from one numeric range to another. All five inputs can be expressions. Arduino map uses integer arithmetic and does not clamp values outside the source range.</comment>
                       </block>
                     </value>
                     <next>
@@ -146,33 +137,75 @@
                           </block>
                         </value>
                         <next>
-                          <block type="serial_image_pixel_gray">
-                            <value name="X">
-                              <block type="variables_get">
-                                <field name="VAR">x</field>
+                          <block type="serial_text">
+                            <field name="TEXT">@pixel </field>
+                            <field name="END">print</field>
+                            <next>
+                              <block type="serial_send">
+                                <field name="END">print</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR">x</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="serial_text">
+                                    <field name="TEXT">,</field>
+                                    <field name="END">print</field>
+                                    <next>
+                                      <block type="serial_send">
+                                        <field name="END">print</field>
+                                        <value name="VALUE">
+                                          <block type="variables_get">
+                                            <field name="VAR">y</field>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="serial_text">
+                                            <field name="TEXT">,</field>
+                                            <field name="END">print</field>
+                                            <next>
+                                              <block type="serial_send">
+                                                <field name="END">println</field>
+                                                <value name="VALUE">
+                                                  <block type="inout_analog_read">
+                                                    <field name="PIN">A0</field>
+                                                    <comment pinned="false" w="340" h="160">Measure the voltage on this analog input. On ATmega168/328, the ADC returns 0–1023; other boards may use a different ADC range. A potentiometer wiper or analog sensor connects here.</comment>
+                                                  </block>
+                                                </value>
+                                                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                                              </block>
+                                            </next>
+                                            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                                          </block>
+                                        </next>
+                                        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                                      </block>
+                                    </next>
+                                    <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                                  </block>
+                                </next>
+                                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                               </block>
-                            </value>
-                            <value name="Y">
-                              <block type="variables_get">
-                                <field name="VAR">y</field>
-                              </block>
-                            </value>
-                            <value name="VALUE">
-                              <block type="inout_analog_read">
-                                <field name="PIN">A0</field>
-                              </block>
-                            </value>
+                            </next>
+                            <comment pinned="false">Send one text line: @pixel x,y,brightness. Commas separate the values; only the last send ends the line. The PC stores the image and overwrites just this pixel. No image buffer lives on the Arduino.</comment>
                           </block>
                         </next>
+                        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="160">Send a target position to the named servo. The library keeps generating pulses; reaching the target takes mechanical time. Position mode uses degrees, pulse mode uses microseconds.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="160">Send a target position to the named servo. The library keeps generating pulses; reaching the target takes mechanical time. Position mode uses degrees, pulse mode uses microseconds.</comment>
               </block>
             </statement>
+            <comment pinned="false" w="340" h="170">Repeat the body with x taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
           </block>
         </statement>
+        <comment pinned="false" w="340" h="170">Repeat the body with y taking each value from the start to the end, using the given step. Array indices start at zero.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

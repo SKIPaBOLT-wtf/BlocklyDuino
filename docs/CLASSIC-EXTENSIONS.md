@@ -14,15 +14,15 @@ The additions are Apache-2.0; original notices and the separate v2 license remai
 | Modules | AccelStepper acceleration, servos, LCD/OLED/TFT, common sensors, NeoPixel, IR, shift registers | `extra_blocks.js`, `popular_blocks.js`, `device_blocks.js` |
 | Memory | 24LC256, 25LC256, W25Q32; bounded typed/string access; SdFat files and directory listing | `storage_blocks.js`, `arduino/libraries/BlocklyStorage` |
 | Images | streamed/coordinate grayscale BMP, RGB BMP, high-precision PGM/PPM | `image_blocks.js`, `BlocklyStorage/src/BlocklyImage.h` |
-| Music | nonblocking tones, flash melodies, three Timer2 voices, SD text scores | `music_blocks.js`, `sd_music_blocks.js`, `BlocklyMusic`, `BlocklySDMusic` |
+| Music | nonblocking tones, flash melodies, three Timer2 voices, free note records, timed polyphonic SD scores | `music_blocks.js`, `sd_music_blocks.js`, `BlocklyMusic`, `BlocklySDMusic` |
 | Low-level | unsigned bit operations, logic, masked AVR port/register access, custom SPI/I2C transactions | `bit_blocks.js`, `logic_blocks.js`, `avr_blocks.js`, `bus_blocks.js` |
 | Interrupts | named external/pin-change handlers, attach/detach, atomic access, configurable Timer1 | `interrupt_blocks.js`, `timer_interrupt_blocks.js` |
-| Workspace | stack selection, new/recover project, pointer-anchored 1–300% zoom, labelled areas | `editor_actions.js`, `workspace_zoom.js`, `workspace_regions.js`, `blockly_helper.js` |
+| Workspace | undo/redo, stack selection, new/recover project, pointer-anchored 1–300% zoom, labelled areas | `editor_history.js`, `editor_actions.js`, `workspace_zoom.js`, `workspace_regions.js`, `blockly_helper.js` |
 | Serial | shared bidirectional connection, independent Monitor/Plotter, saved layouts and capture | `serial_client.js`, `serial_monitor.js`, `serial_plotter.js`, `serial_protocol.js` |
 | Build target | actual installed board menus, port selection, applied target persistence, compact panels | `target_picker.js`, `panel_state.js`, `server/` |
 
-The static toolbox has 176 block types, supplemented by 20 device configurations
-and 102 bound action entries. Sixty-nine numbered XML examples cover beginner
+The static toolbox has 177 block types, supplemented by 20 device configurations
+and 111 bound action entries. Seventy-eight commented numbered XML examples cover beginner
 circuits through interrupt control, music, files and streaming images. English
 guides explain wiring, constraints and extension templates. Legacy block types
 remain loadable where newer named-device actions replace them in the visible UI.
@@ -79,3 +79,30 @@ Feedback and alternative integration plans are welcome in the pull request.
 ## Board-aware editing and scanning images
 
 See [board resources and workflow](BOARD-RESOURCES.md) for tabs, the auto-revealing toolbox, searchable board history, catalogue ordering/colours, pin and timer validation, continuous stepper mode, precise servo pulses and the streaming image Plotter.
+
+## Compact editing, buffers and polyphonic scores
+
+Device colours are edited with the gear beside their Project devices entry.
+Old XML colour fields remain loadable but are hidden on blocks. Undo/redo keeps
+whole-workspace snapshots including device IDs, comments and labelled areas;
+keyboard shortcuts leave native text editing alone. Code/XML/Connections hide
+block manipulation controls. `board_diagram.js` shows board-specific header maps
+and ownership, including reserved buses and auxiliary analog pads.
+
+`field_message.js` provides a compact serial-text field with a multiline editor.
+JSON headers are formatted in the dialog and sent as one line. The image-scanner
+example uses ordinary Serial statements; old specialized image block definitions
+are retained only for XML compatibility, not shown in the palette.
+
+`buffer_blocks.js` and `BlocklyBuffers` pass typed whole-array references to LCD,
+OLED, TFT and NeoPixel outputs without a second framebuffer. Examples 64–67 use
+small buffers that leave room on ATmega168. Full frames are possible when the
+board has sufficient RAM; formats and layouts are documented in buffer-guide.html.
+
+The shared `BlocklyNote` parser accepts named pitches, Hz and rests from text
+variables, SD lines or EEPROM strings. Timed SD records add time and voice:
+`time_ms,voice,pitch,duration_ms`. Absolute/delta timing, one queued event and
+32-character service budgets support overlapping notes without loading a song.
+Example 69 and POLY.TXT demonstrate three voices. The engine still targets AVR
+Timer2; cooperative SD access can delay event dispatch. Read sd-music-guide.html
+for limits and how to keep the main loop responsive.

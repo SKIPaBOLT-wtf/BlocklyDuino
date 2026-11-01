@@ -1,7 +1,203 @@
 <xml>
-<block x="20" y="20" type="arduino_typed_variable"><field name="TYPE">uint8_t</field><field name="VAR">packet</field><value name="VALUE"><block type="math_number"><field name="NUM">0</field></block></value></block>
-<block x="20" y="110" type="arduino_typed_variable"><field name="TYPE">uint8_t</field><field name="VAR">bitIndex</field><value name="VALUE"><block type="math_number"><field name="NUM">5</field></block></value></block>
-<block x="20" y="200" type="arduino_typed_variable"><field name="TYPE">uint8_t</field><field name="VAR">gain</field><value name="VALUE"><block type="math_number"><field name="NUM">6</field></block></value></block>
-<block type="arduino_setup_section" x="350" y="20"><statement name="DO"><block type="variables_set"><field name="VAR">packet</field><value name="VALUE"><block type="ll_bits_replace"><field name="WIDTH">8</field><value name="VALUE"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="INDEX"><block type="variables_get"><field name="VAR">bitIndex</field></block></value><value name="BIT"><block type="logic_boolean"><field name="BOOL">TRUE</field></block></value></block></value><next><block type="variables_set"><field name="VAR">packet</field><value name="VALUE"><block type="ll_bits_insert"><field name="WIDTH">8</field><value name="VALUE"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="FIELD"><block type="variables_get"><field name="VAR">gain</field></block></value><value name="START"><block type="math_number"><field name="NUM">1</field></block></value><value name="COUNT"><block type="math_number"><field name="NUM">3</field></block></value></block></value><next><block type="serial_print"><value name="CONTENT"><block type="variables_get"><field name="VAR">packet</field></block></value><next><block type="serial_print"><value name="CONTENT"><block type="ll_bits_extract"><field name="WIDTH">8</field><value name="VALUE"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="START"><block type="math_number"><field name="NUM">1</field></block></value><value name="COUNT"><block type="math_number"><field name="NUM">3</field></block></value></block></value><next><block type="serial_print"><value name="CONTENT"><block type="ll_bits_test"><field name="WIDTH">8</field><value name="VALUE"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="INDEX"><block type="variables_get"><field name="VAR">bitIndex</field></block></value></block></value><next><block type="serial_print"><value name="CONTENT"><block type="ll_bits_shift"><field name="WIDTH">8</field><field name="OP">ROL</field><value name="VALUE"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="COUNT"><block type="math_number"><field name="NUM">1</field></block></value></block></value><next><block type="serial_print"><value name="CONTENT"><block type="ll_bits_integer_math"><field name="WIDTH">8</field><field name="OP">DIV</field><value name="A"><block type="variables_get"><field name="VAR">packet</field></block></value><value name="B"><block type="math_number"><field name="NUM">10</field></block></value></block></value></block></next></block></next></block></next></block></next></block></next></block></next></block></statement></block>
-<block type="arduino_loop_section" x="350" y="560"><statement name="DO"><block type="base_delay"><value name="DELAY_TIME"><block type="math_number"><field name="NUM">1000</field></block></value></block></statement></block>
+  <block x="20" y="20" type="arduino_typed_variable">
+    <field name="TYPE">uint8_t</field>
+    <field name="VAR">packet</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+    </value>
+    <comment pinned="false" w="340" h="170">Purpose: Pack flags and small fields into an integer using masks and shifts.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+  </block>
+  <block x="20" y="110" type="arduino_typed_variable">
+    <field name="TYPE">uint8_t</field>
+    <field name="VAR">bitIndex</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">5</field>
+      </block>
+    </value>
+    <comment pinned="false" w="340" h="170">Create bitIndex as uint8_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
+  </block>
+  <block x="20" y="200" type="arduino_typed_variable">
+    <field name="TYPE">uint8_t</field>
+    <field name="VAR">gain</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">6</field>
+      </block>
+    </value>
+    <comment pinned="false" w="340" h="170">Create gain as uint8_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
+  </block>
+  <block type="arduino_setup_section" x="350" y="20">
+    <statement name="DO">
+      <block type="variables_set">
+        <field name="VAR">packet</field>
+        <value name="VALUE">
+          <block type="ll_bits_replace">
+            <field name="WIDTH">8</field>
+            <value name="VALUE">
+              <block type="variables_get">
+                <field name="VAR">packet</field>
+              </block>
+            </value>
+            <value name="INDEX">
+              <block type="variables_get">
+                <field name="VAR">bitIndex</field>
+              </block>
+            </value>
+            <value name="BIT">
+              <block type="logic_boolean">
+                <field name="BOOL">TRUE</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="variables_set">
+            <field name="VAR">packet</field>
+            <value name="VALUE">
+              <block type="ll_bits_insert">
+                <field name="WIDTH">8</field>
+                <value name="VALUE">
+                  <block type="variables_get">
+                    <field name="VAR">packet</field>
+                  </block>
+                </value>
+                <value name="FIELD">
+                  <block type="variables_get">
+                    <field name="VAR">gain</field>
+                  </block>
+                </value>
+                <value name="START">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+                <value name="COUNT">
+                  <block type="math_number">
+                    <field name="NUM">3</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="serial_print">
+                <value name="CONTENT">
+                  <block type="variables_get">
+                    <field name="VAR">packet</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="serial_print">
+                    <value name="CONTENT">
+                      <block type="ll_bits_extract">
+                        <field name="WIDTH">8</field>
+                        <value name="VALUE">
+                          <block type="variables_get">
+                            <field name="VAR">packet</field>
+                          </block>
+                        </value>
+                        <value name="START">
+                          <block type="math_number">
+                            <field name="NUM">1</field>
+                          </block>
+                        </value>
+                        <value name="COUNT">
+                          <block type="math_number">
+                            <field name="NUM">3</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="serial_print">
+                        <value name="CONTENT">
+                          <block type="ll_bits_test">
+                            <field name="WIDTH">8</field>
+                            <value name="VALUE">
+                              <block type="variables_get">
+                                <field name="VAR">packet</field>
+                              </block>
+                            </value>
+                            <value name="INDEX">
+                              <block type="variables_get">
+                                <field name="VAR">bitIndex</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="serial_print">
+                            <value name="CONTENT">
+                              <block type="ll_bits_shift">
+                                <field name="WIDTH">8</field>
+                                <field name="OP">ROL</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR">packet</field>
+                                  </block>
+                                </value>
+                                <value name="COUNT">
+                                  <block type="math_number">
+                                    <field name="NUM">1</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="serial_print">
+                                <value name="CONTENT">
+                                  <block type="ll_bits_integer_math">
+                                    <field name="WIDTH">8</field>
+                                    <field name="OP">DIV</field>
+                                    <value name="A">
+                                      <block type="variables_get">
+                                        <field name="VAR">packet</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="math_number">
+                                        <field name="NUM">10</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                              </block>
+                            </next>
+                            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                          </block>
+                        </next>
+                        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                      </block>
+                    </next>
+                    <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+                  </block>
+                </next>
+                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+              </block>
+            </next>
+            <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
+          </block>
+        </next>
+        <comment pinned="false" w="340" h="160">Store the calculated value in this variable. Later blocks read the most recently stored value; this is how the program remembers state between steps.</comment>
+      </block>
+    </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
+  </block>
+  <block type="arduino_loop_section" x="350" y="560">
+    <statement name="DO">
+      <block type="base_delay">
+        <value name="DELAY_TIME">
+          <block type="math_number">
+            <field name="NUM">1000</field>
+          </block>
+        </value>
+        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
+      </block>
+    </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
+  </block>
 </xml>

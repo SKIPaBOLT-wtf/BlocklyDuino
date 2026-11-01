@@ -4,6 +4,8 @@
 #include <map>
 #include <limits>
 using String=std::string;
+inline uint32_t fakeMillis=0;
+inline uint32_t millis(){return fakeMillis;}
 struct FakeFile {
   std::string bytes;
   size_t pos=0, reads=0, errorAt=std::numeric_limits<size_t>::max();

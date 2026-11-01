@@ -208,7 +208,7 @@
     "description": "Play nonblocking notes and melodies; up to three voices.",
     "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 84\" role=\"img\" aria-label=\"Passive buzzer\"><title>Passive buzzer</title><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M47 66v12m26-12v12\" stroke=\"#a6b6c2\" stroke-width=\"3\"/><path d=\"M31 33v26c0 20 58 20 58 0V33\" fill=\"#334856\"/><ellipse cx=\"60\" cy=\"33\" rx=\"29\" ry=\"22\" fill=\"#536874\"/><ellipse cx=\"60\" cy=\"33\" rx=\"13\" ry=\"10\" fill=\"#162e3d\"/><path d=\"M94 25q8 8 0 16m9-23q13 15 0 30\" stroke=\"#ac79ba\" stroke-width=\"3\" fill=\"none\"/><text x=\"40\" y=\"28\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-size=\"10\" font-weight=\"700\" fill=\"#eaf5ff\">+</text></g></svg>",
     "actions": [
-      "music_note",
+      "music_note", "music_note_record",
       "music_pitch",
       "music_midi_pitch",
       "music_rest",
@@ -223,7 +223,7 @@
       {
         "label": "Notes",
         "actions": [
-          "music_note",
+          "music_note", "music_note_record",
           "music_pitch",
           "music_midi_pitch",
           "music_rest",
@@ -314,7 +314,7 @@
       "st_sd_print",
       "st_sd_write",
       "st_sd_read",
-      "st_sd_byte",
+      "st_sd_byte", "st_sd_read_line",
       "st_sd_seek",
       "st_sd_flush",
       "st_sd_close",
@@ -347,7 +347,7 @@
           "st_sd_print",
           "st_sd_write",
           "st_sd_read",
-          "st_sd_byte",
+          "st_sd_byte", "st_sd_read_line",
           "st_sd_seek",
           "st_sd_flush",
           "st_sd_close",

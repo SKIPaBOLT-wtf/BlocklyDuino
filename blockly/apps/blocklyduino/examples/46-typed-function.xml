@@ -1,5 +1,96 @@
 <xml>
- <block type="procedures_defreturn" x="20" y="20"><mutation><arg name="value" type="float"/></mutation><field name="NAME">doubleValue</field><field name="RETURN_TYPE">float</field><value name="RETURN"><block type="math_arithmetic"><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get"><field name="VAR">value</field></block></value><value name="B"><block type="math_number"><field name="NUM">2</field></block></value></block></value></block>
- <block type="procedures_defreturn" x="20" y="200"><mutation><arg name="counter" type="uint32_t"/></mutation><field name="NAME">nextCounter</field><field name="RETURN_TYPE">uint32_t</field><value name="RETURN"><block type="math_arithmetic"><field name="OP">ADD</field><value name="A"><block type="variables_get"><field name="VAR">counter</field></block></value><value name="B"><block type="math_number"><field name="NUM">1</field></block></value></block></value></block>
- <block type="arduino_loop_section" x="500" y="20"><statement name="DO"><block type="serial_print"><value name="CONTENT"><block type="procedures_callreturn"><mutation name="doubleValue"><arg name="value"/></mutation><value name="ARG0"><block type="math_number"><field name="NUM">0.5</field></block></value></block></value><next><block type="serial_print"><value name="CONTENT"><block type="procedures_callreturn"><mutation name="nextCounter"><arg name="counter"/></mutation><value name="ARG0"><block type="math_number"><field name="NUM">65536</field></block></value></block></value><next><block type="base_delay"><value name="DELAY_TIME"><block type="math_number"><field name="NUM">1000</field></block></value></block></next></block></next></block></statement></block>
+  <block type="procedures_defreturn" x="20" y="20">
+    <mutation>
+      <arg name="value" type="float" />
+    </mutation>
+    <field name="NAME">doubleValue</field>
+    <field name="RETURN_TYPE">float</field>
+    <value name="RETURN">
+      <block type="math_arithmetic">
+        <field name="OP">MULTIPLY</field>
+        <value name="A">
+          <block type="variables_get">
+            <field name="VAR">value</field>
+          </block>
+        </value>
+        <value name="B">
+          <block type="math_number">
+            <field name="NUM">2</field>
+          </block>
+        </value>
+      </block>
+    </value>
+    <comment pinned="false" w="340" h="170">Purpose: Pass typed arguments into a function and use its typed return value.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
+  </block>
+  <block type="procedures_defreturn" x="20" y="200">
+    <mutation>
+      <arg name="counter" type="uint32_t" />
+    </mutation>
+    <field name="NAME">nextCounter</field>
+    <field name="RETURN_TYPE">uint32_t</field>
+    <value name="RETURN">
+      <block type="math_arithmetic">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <block type="variables_get">
+            <field name="VAR">counter</field>
+          </block>
+        </value>
+        <value name="B">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+    </value>
+    <comment pinned="false" w="340" h="170">Define nextCounter once and call it elsewhere. It does not run just because it is defined. Arguments and variables declared inside this body are local.</comment>
+  </block>
+  <block type="arduino_loop_section" x="500" y="20">
+    <statement name="DO">
+      <block type="serial_print">
+        <value name="CONTENT">
+          <block type="procedures_callreturn">
+            <mutation name="doubleValue">
+              <arg name="value" />
+            </mutation>
+            <value name="ARG0">
+              <block type="math_number">
+                <field name="NUM">0.5</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="serial_print">
+            <value name="CONTENT">
+              <block type="procedures_callreturn">
+                <mutation name="nextCounter">
+                  <arg name="counter" />
+                </mutation>
+                <value name="ARG0">
+                  <block type="math_number">
+                    <field name="NUM">65536</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="base_delay">
+                <value name="DELAY_TIME">
+                  <block type="math_number">
+                    <field name="NUM">1000</field>
+                  </block>
+                </value>
+                <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
+              </block>
+            </next>
+            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+          </block>
+        </next>
+        <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
+      </block>
+    </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
+  </block>
 </xml>

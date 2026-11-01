@@ -14,7 +14,7 @@ repair and prevent block-code generation. Raw edited C++ remains the user's code
 In Add device, the gray gear toggles catalogue ordering. Each card gets a
 move-to-top icon; press the gear again to save the order. Device types already
 used in the project remain highlighted and ahead of unused types. Each device
-has a colour selector; its configuration, actions and toolbox accent follow it.
+has a colour setting behind the gear beside its name in Project devices. Its configuration, actions, toolbox accent and Connections card follow that colour. No colour field is displayed on a block or in Connections.
 
 ## Supported profiles
 
@@ -39,9 +39,7 @@ blocks yet. A fixed bus selector does not imply the chip has only one bus.
 ## Allocation and sharing
 
 Automatic ownership covers named device definitions and the supported GPIO,
-interrupt and direct-register blocks. Historical peripheral blocks loaded from
-older XML do not declare reusable devices; the editor marks that limitation.
-Use Add device definitions when combining them with other hardware.
+interrupt and direct-register blocks. Legacy pin-bearing blocks use the same capability/ownership checks. Implicit legacy stepper/NeoPixel defaults and fixed display pins are also reserved; repeated actions share their original object. Named definitions remain the easiest way to reuse wiring. Custom C++ and arbitrary register side effects cannot be inferred completely.
 
 - Signal dropdowns show compatible pins not occupied by another declared device.
   Adding a device allocates free pins or explains why resources are unavailable.
@@ -98,3 +96,13 @@ upgrades. Primary references:
 [AVR Servo timers](https://github.com/arduino-libraries/Servo/blob/master/src/avr/ServoTimers.h),
 [Arduino-Pico](https://github.com/earlephilhower/arduino-pico),
 [STM32duino core](https://github.com/stm32duino/Arduino_Core_STM32).
+
+## Compact editing and diagrams
+
+Undo/redo stores up to 60 workspace snapshots (12 MiB budget), including device identities, wiring, colours, comments, arrays and labelled areas. Ctrl+Z undoes; Ctrl+Shift+Z or Ctrl+Y redoes. A new edit clears the redo branch. History is session-local; XML save/autosave and explicit recovery copies remain available across reloads. Text editors keep their native text undo.
+
+Connections shows a board-specific labelled map for the supported profiles, with pin capabilities and coloured ownership. Pro Mini/Nano/Pico/Blue Pill use their labelled header arrangements; Uno/Duemilanove use a logical header-group view. Clone auxiliary pads can move, so always match printed labels. Servo, music and STEP/DIR work on ordinary digital pins. PWM-labelled pins are required by analogWrite; the resource model also checks the corresponding timer.
+
+Map and routine value operations use inline sockets. Serial text opens a multiline editor: recognised JSON headers are pretty-printed for editing and compacted to one wire line. The scanner example uses ordinary Serial text/send blocks; old dedicated image blocks remain import-compatible but are absent from the palette.
+
+Prepared arrays can be sent to LCD, OLED, TFT and NeoPixel devices. See [buffer formats](../blockly/apps/blocklyduino/examples/buffer-guide.html). One-note records and timed polyphonic SD scores share pitch syntax; see [score formats](../blockly/apps/blocklyduino/examples/sd-music-guide.html).

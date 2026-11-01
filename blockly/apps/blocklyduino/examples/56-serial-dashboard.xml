@@ -1,13 +1,17 @@
 <xml>
   <block type="serial_config" x="25" y="25">
     <field name="BAUD">115200</field>
+    <comment pinned="false" w="340" h="170">Purpose: Send a dashboard JSON header once, then stream values for its widgets.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
   <block type="arduino_setup_section" x="375" y="25">
     <statement name="DO">
       <block type="serial_plot_header">
         <field name="CONFIG">{"version":1,"id":"pot-dashboard","title":"Potentiometer dashboard","history":500,"fields":[{"id":"adc","label":"ADC","type":"number","min":0,"max":1023},{"id":"volts","label":"Voltage","unit":"V","type":"number","min":0,"max":5,"scale":0.004887585532746823}],"widgets":[{"type":"gauge","field":"volts"},{"type":"bar","field":"adc"},{"type":"line","fields":["adc"]},{"type":"xy","x":"adc","y":"volts"},{"type":"raw","fields":["adc","volts"]}]}</field>
+        <comment pinned="false" w="340" h="170">Send the dashboard JSON before ordinary data rows. Click this compact message field to edit the formatted JSON. Plotter creates the widgets; Arduino only prints text.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Runs once after power-on or reset. Initialise the program here; repeating measurements and animation belong in loop.</comment>
   </block>
   <block type="arduino_loop_section" x="25" y="155">
     <statement name="DO">
@@ -17,6 +21,7 @@
         <value name="VALUE">
           <block type="inout_analog_read">
             <field name="PIN">A0</field>
+            <comment pinned="false" w="340" h="160">Measure the voltage on this analog input. On ATmega168/328, the ADC returns 0–1023; other boards may use a different ADC range. A potentiometer wiper or analog sensor connects here.</comment>
           </block>
         </value>
         <next>
@@ -46,15 +51,21 @@
                             <field name="NUM">50</field>
                           </block>
                         </value>
+                        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
                       </block>
                     </next>
+                    <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
                   </block>
                 </next>
+                <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
               </block>
             </next>
+            <comment pinned="false" w="340" h="170">Send this value/text to the computer. A new line finishes one record; same line can build a record from several values. Match Monitor/Plotter baud to the sketch.</comment>
           </block>
         </next>
+        <comment pinned="false" w="340" h="170">Create sample as uint16_t. Outside a body it is global; inside a function/setup/loop it belongs to that body. Its value input is the initial value.</comment>
       </block>
     </statement>
+    <comment pinned="false" w="340" h="170">Repeats until power is removed. Each block runs in order, then execution returns to the top. Keep this loop responsive when servicing motors, music or serial input.</comment>
   </block>
 </xml>

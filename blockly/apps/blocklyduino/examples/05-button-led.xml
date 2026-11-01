@@ -9,11 +9,13 @@
     <statement name="DO0">
       <block type="inout_buildin_led">
         <field name="STAT">HIGH</field>
+        <comment pinned="false" w="340" h="160">Change the built-in LED state so the program has a visible indication of this step.</comment>
       </block>
     </statement>
     <statement name="ELSE">
       <block type="inout_buildin_led">
         <field name="STAT">LOW</field>
+        <comment pinned="false" w="340" h="160">Change the built-in LED state so the program has a visible indication of this step.</comment>
       </block>
     </statement>
     <next>
@@ -23,7 +25,10 @@
             <field name="NUM">20</field>
           </block>
         </value>
+        <comment pinned="false" w="340" h="160">Wait for the given number of milliseconds (1000 ms = 1 second). This pauses the main program; avoid long waits when loop must service motors, music files or serial input.</comment>
       </block>
     </next>
+    <comment pinned="false" w="340" h="170">Purpose: Read a button using a pull-up and control the LED. Pressed means LOW.
+Hardware: use Connections to check pin ownership for your selected board. Open the comment bubbles on the main steps for explanations.</comment>
   </block>
 </xml>

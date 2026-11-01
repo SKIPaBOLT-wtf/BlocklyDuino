@@ -2,6 +2,7 @@ const {spawnSync}=require('node:child_process');
 const fs=require('node:fs');
 process.chdir(require('node:path').resolve(__dirname,'..'));
 const tests=[
+  "tests/usability-tests/refinements.js",
   "tests/usability-tests/resources.js",
   "tests/usability-tests/resource-ui.js",
   "tests/usability-tests/example-resources.js",

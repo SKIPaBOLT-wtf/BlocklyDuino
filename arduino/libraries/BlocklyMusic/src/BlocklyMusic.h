@@ -2,6 +2,7 @@
 #define BLOCKLY_MUSIC_H
 #include <Arduino.h>
 #include <avr/pgmspace.h>
+#include "BlocklyNote.h"
 
 struct BlocklyMusicNote { uint16_t frequency; uint16_t duration; };
 
@@ -12,6 +13,8 @@ public:
   // Replace the current note/sequence. 0 Hz is silence; 0 ms stops immediately.
   // Range: 20..4000 Hz, duration up to65535 ms; values are clamped.
   void note(uint16_t frequencyHz, uint32_t durationMs);
+  bool noteRecord(const char *text) { uint16_t hz,ms;if(!BlocklyNote::record(text,hz,ms,midiFrequency))return false;note(hz,ms);return true; }
+  bool noteRecord(const String &text) { return noteRecord(text.c_str()); }
   void rest(uint32_t durationMs) { note(0, durationMs); }
   void stop();
   bool busy();
